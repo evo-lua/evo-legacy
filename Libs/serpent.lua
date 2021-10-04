@@ -106,7 +106,13 @@ local function s(t, opts)
       return tag..globerr(t, level)
     elseif ttype == 'function' then
       seen[t] = insref or spath
-      if opts.nocode then return tag.."function() --[[..skipped..]] end"..comment(t, level) end
+      if opts.nocode then
+		if opts.convertFunctionsToStrings then
+	      return tag .. tostring(t) .. comment(t, level)
+	    else
+		  return tag.."function() --[[..skipped..]] end"..comment(t, level)
+		end
+	  end
       local ok, res = pcall(string.dump, t)
       local func = ok and "((loadstring or load)("..safestr(res)..",'@serialized'))"..comment(t, level)
       return tag..(func or globerr(t, level))
