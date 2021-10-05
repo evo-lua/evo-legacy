@@ -384,7 +384,7 @@ end
    * @param {string} path
    * @returns {boolean}
    ]]--
-   local function isAbsolutePath(path)
+local function isAbsolutePath(path)
     validateString(path, 'path');
     local len = path.length;
     if (len == 0) then
@@ -482,6 +482,8 @@ end
    * @param {string} to
    * @returns {string}
    ]]--
+
+
    local function convertRelativePath(from, to)
     validateString(from, 'from');
     validateString(to, 'to');
@@ -838,13 +840,12 @@ local function getDirectoryName(path)
 		  return StringPrototypeSlice(path, start, endIndex);
 		end
 
-		local function
-			--[[
-			 * @param {string} path
-			 * @returns {string}
-			 ]]--
-			 getFileExtension(path)
-			  validateString(path, 'path');
+		--[[
+			* @param {string} path
+			* @returns {string}
+			]]--
+			local function getFileExtension(path)
+				validateString(path, 'path');
 			  local start = 0;
 			  local startDot = -1;
 			  local startPart = 0;
@@ -1045,10 +1046,10 @@ end
           startDot = i;
         else if (preDotState ~= 1) then
           preDotState = 1;
-      else if (startDot ~= -1) then
+        else if (startDot ~= -1) then
         -- We saw a non-dot and non-path separator before our dot, so we should
         -- have a good chance at having a non-empty extension
-        preDotState = -1;
+          preDotState = -1;
 	  end
     end
 
@@ -1076,9 +1077,8 @@ end
       ret.dir = StringPrototypeSlice(path, 0, startPart - 1);
     else
       ret.dir = ret.root;
-
     return ret;
-	end
+end
 
 local win32 = {
 	resolve = resolveRelativePath,
@@ -1096,7 +1096,7 @@ local win32 = {
 
 -- todo wat?
 -- path.format?
-  format: FunctionPrototypeBind(_format, nil, '\\'),
+  format = FunctionPrototypeBind(_format, nil, '\\'),
 
 -- path.sep?
   sep = '\\',
