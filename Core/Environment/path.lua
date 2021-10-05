@@ -1162,8 +1162,22 @@ end,
 };
 
 -- POSIX path API version NYI
-local posix = {}
-posix = win32 -- TODO: Replace with actual POSIX path APIs
+local posix = {
+	sep = '/',
+	delimiter = ':',
+	-- TODO replace with POSIX apis
+	resolve = resolveRelativePath,
+	normalize = normalizePath,
+	isAbsolute = isAbsolutePath,
+	join = joinPath,
+	relative = convertRelativePath,
+	toNamespacedPath = toNamespacedPath,
+	dirname = getDirectoryName,
+	basename = getFileName,
+	extname = getFileExtension,
+	parse = parsePath,
+}
+-- posix = win32 -- TODO: Replace with actual POSIX path APIs
 
 -- -- assign namespaces
 posix.win32 = win32

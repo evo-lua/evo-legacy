@@ -60,10 +60,11 @@ assert(path.posix.sep == '/', "POSIX path separator must be FORWARD_SLASH");
 
 -- path.delimiter tests
 -- windows
-assert.strictEqual(path.win32.delimiter, ';', "Windows path delimiter must be SEMICOLON");
+assert(path.win32.delimiter, ';', "Windows path delimiter must be SEMICOLON");
 -- posix
-assert.strictEqual(path.posix.delimiter, ':', "POSIX path delimiter must be COLON");
+assert(path.posix.delimiter, ':', "POSIX path delimiter must be COLON");
 
+local ffi = require("ffi")
 if (ffi.os == "Windows") then
     assert(path == path.win32, "Path API must be using path.win32 on Windows");
 else
