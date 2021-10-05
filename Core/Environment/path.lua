@@ -28,6 +28,8 @@
 -- --   validateString,
 -- -- } = require('internal/validators');
 
+
+
 local ffi = require("ffi")
 local platformIsWin32 = (ffi.os == 'Windows')
 
@@ -140,23 +142,29 @@ end
 
 local uv = require("uv")
 
+local function DEBUG(...)
+	print(...)
+end
+
 --   --[[
 --    * path.resolve([from ...], to)
 --    * @param {...string} args
 --    * @returns {string}
 --    ]]--
-local function resolve(...)
+local function resolveRelativePath(...)
+	DEBUG("resolveRelativePath", ...)
 	local args = { ... }
 
     local resolvedDevice = '';
     local resolvedTail = '';
     local resolvedAbsolute = false;
 
-    for i = #args, i >= -1, -1 do
+    for i = #args, -1, -1 do
       local path;
       if (i >= 0) then
         path = args[i];
-        validateString(path, 'path');
+        -- validateString(path, 'path');
+		if type(path) ~= "string" then return nil, "Usage: resolve(path)" end
 
         -- Skip empty entries
         if (#path == 0) then
@@ -293,7 +301,11 @@ end
 --    * @returns {string}
 --    ]]--
    local function normalizePath(path)
-    validateString(path, 'path');
+	DEBUG("normalizePath", path)
+    -- validateString(path, 'path');
+	if type(path) ~= "string" then return nil, "Usage: normalize(path)" end
+
+
     local len = #path;
     if (len == 0) then      return '.'; end
     local rootEnd = 0;
@@ -388,7 +400,10 @@ end
 --    * @returns {boolean}
 --    ]]--
 local function isAbsolutePath(path)
-    validateString(path, 'path');
+	DEBUG("isAbsolutePath", path)
+    -- validateString(path, 'path');
+	if type(path) ~= "string" then return nil, "Usage: isAbsolute(path)" end
+
     local len = path.length;
     if (len == 0) then
       return false;
@@ -407,17 +422,22 @@ local function isAbsolutePath(path)
    * @returns {string}
    ]]--
   local function joinPath(...)
+	DEBUG("joinPath", ...)
 	local args = { ... }
 
     if (#args == 0) then
       return '.';
 	end
+
     local joined;
     local firstPart;
-    for i = 0, i <= #args, 1 do -- TODO foreach
+
+    for i = 0, #args, 1 do
       local arg = args[i];
-      validateString(arg, 'path');
-      if (arg.length > 0) then
+
+	  if type(arg) ~= "string" then return nil, "path.join can only join strings" end
+
+      if (#arg > 0) then
         if (joined == nil) then
           joined = arg
 		  firstPart = arg;
@@ -490,8 +510,12 @@ end
 
 
    local function convertRelativePath(from, to)
-    validateString(from, 'from');
-    validateString(to, 'to');
+	DEBUG("convertRelativePath", from, to)
+    -- validateString(from, 'from');
+	if type(from) ~= "string" then return nil, "Usage: convert(from, to)" end
+    -- validateString(to, 'to');
+	if type(to) ~= "string" then return nil, "Usage: convert(from, to)" end
+
 
     if (from == to) then
       return '';
@@ -620,6 +644,7 @@ end
 		* @returns {string}
 		]]--
 local function toNamespacedPath(path)
+	DEBUG("toNamespacedPath", path)
 		  -- Note: this will *probably* throw somewhere.
 		  if (type(path) ~= 'string' or #path == 0) then
 			return path;
@@ -657,7 +682,9 @@ local function toNamespacedPath(path)
    * @returns {string}
 ]]--
 local function getDirectoryName(path)
-		validateString(path, 'path');
+	DEBUG("getDirectoryName", path)
+		-- validateString(path, 'path');
+		if type(path) ~= "string" then return nil, "Usage: dirname(path)" end
 		local len = path.length;
 		if (len == 0) then
 		  return '.';
@@ -756,10 +783,15 @@ local function getDirectoryName(path)
 		* @returns {string}
 		]]--
 local function getFileName(path, ext)
+	DEBUG("getFileName", path, ext)
 	if (ext ~= nil) then
-		validateString(ext, 'ext');
+		-- validateString(ext, 'ext');
+		if type(path) ~= "string" then return nil, "Usage: basename(path, ext)" end
+
 	end
-	validateString(path, 'path');
+	-- validateString(path, 'path');
+	if type(path) ~= "string" then return nil, "Usage: basename(path, ext)" end
+
 	local start = 0;
 	local endIndex = -1;
 	local matchedSlash = true;
@@ -852,7 +884,10 @@ end
 * @returns {string}
 ]]--
 local function getFileExtension(path)
-	validateString(path, 'path');
+	DEBUG("getFileExtension", path)
+	-- validateString(path, 'path');
+	if type(path) ~= "string" then return nil, "Usage: extname(path)" end
+
 	local start = 0;
 	local startDot = -1;
 	local startPart = 0;
@@ -930,7 +965,10 @@ end
    *  }}
    ]]--
    local function parsePath(path)
-    validateString(path, 'path');
+	DEBUG("parsePath", path)
+    -- validateString(path, 'path');
+	if type(path) ~= "string" then return nil, "Usage: parse(path)" end
+
 
     local ret = { root = '', dir = '', base = '', ext = '', name = '' };
     if (path.length == 0) then
@@ -1125,6 +1163,7 @@ end,
 
 -- POSIX path API version NYI
 local posix = {}
+posix = win32 -- TODO: Replace with actual POSIX path APIs
 
 -- -- assign namespaces
 posix.win32 = win32

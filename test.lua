@@ -1,15 +1,16 @@
 -- Test path implementation
 local path = require("./Core/Environment/path")
-p(path)
+-- p(path)
 
 -- Type errors: Only strings are valid paths(* excluding optional args)
 local invalidTypeValues = {true, false, 7, nil, {}, 42.0}
 
 local function fail(func, ...)
+	-- print(func, ...)
     local result, errorMessage = func(...)
     -- invalid types return nil and error
     assert(result == nil, "result is not nil")
-    assert(type(errorMessage) == "string", "message is not a string")
+    assert(type(errorMessage) == "string", "message is not a string: " .. tostring(errorMessage))
     assert(type(errorMessage) == "string", "message is not Usage: ...") -- todo
 end
 
@@ -26,7 +27,9 @@ for key, value in pairs(invalidTypeValues) do
         fail(namespace.dirname, value);
         fail(namespace.basename, value);
         fail(namespace.extname, value);
+		print("Namespace tested")
     end
+	print("Value tested: " .. tostring(value))
 end
 
 -- typeErrorTests.forEach((test) => {
@@ -51,18 +54,18 @@ end
 
 -- path.sep tests
 -- windows
-assert(path.win32.sep == '\\');
+assert(path.win32.sep == '\\', "Windows path separator must be BACKSLASH");
 --  posix
-assert.strictEqual(path.posix.sep, '/');
+assert(path.posix.sep == '/', "POSIX path separator must be FORWARD_SLASH");
 
 -- path.delimiter tests
 -- windows
-assert.strictEqual(path.win32.delimiter, ';');
+assert.strictEqual(path.win32.delimiter, ';', "Windows path delimiter must be SEMICOLON");
 -- posix
-assert.strictEqual(path.posix.delimiter, ':');
+assert.strictEqual(path.posix.delimiter, ':', "POSIX path delimiter must be COLON");
 
 if (ffi.os == "Windows") then
-    assert(path == path.win32, "path is not using path.win32");
+    assert(path == path.win32, "Path API must be using path.win32 on Windows");
 else
-    assert(path == path.posix, "path is not using path.posix"); -- will this even work or do we have to do deep table comparisons?
+    assert(path == path.posix, "The Path API must be using path.posix on POSIX-compliant platforms"); -- will this even work or do we have to do deep table comparisons?
 end
