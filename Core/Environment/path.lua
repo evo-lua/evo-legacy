@@ -1109,7 +1109,12 @@ local win32 = {
 
 -- todo wat?
 -- path.format?
-  format = FunctionPrototypeBind(_format, nil, '\\'),
+--   format = FunctionPrototypeBind(_format, nil, '\\'),
+format = function(self, separator)
+	self = nil
+	separator = '\\' -- Windows -- TBD: Does it need \\\\ instead?
+	_format(separator, {}) -- no pathobject is needed?
+end,
 
 -- path.sep?
   sep = '\\',
@@ -1118,6 +1123,8 @@ local win32 = {
   posix = nil
 };
 
+-- POSIX path API version NYI
+local posix = {}
 
 -- -- assign namespaces
 posix.win32 = win32
@@ -1132,8 +1139,11 @@ win32.posix = posix;
 
 -- -- definitely not relevant, just return the right one?
 if ffi.os == "Windows" then
+	-- todo proper logging (luvi builtin?)
+	print("returning win32 paths")
 	return win32
 else
+	print("returning posix paths")
 	return posix
 end
 -- -- module.exports = platformIsWin32 ? win32 : posix;
