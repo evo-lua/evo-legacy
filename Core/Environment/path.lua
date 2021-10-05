@@ -52,65 +52,67 @@ function normalizeString(path, allowAboveRoot, separator, isPathSeparator)
   local lastSlash = -1;
   local dots = 0;
   local code = 0;
-  for i = 0, path.length do
+  for i = 0, #path, 1 do
 
+	-- append path separator at the end, if it's missing?
     if (i < path.length) then
-      code = StringPrototypeCharCodeAt(path, i);
-    else if (isPathSeparator(code)) then
-      break;
-    else
-      code = CHAR_FORWARD_SLASH;
-	end
+    	code = StringPrototypeCharCodeAt(path, i);
+	else
+		if (isPathSeparator(code)) then
+			break;
+		else
+			code = CHAR_FORWARD_SLASH;
+		end
 
-    if (isPathSeparator(code)) then
-      if (lastSlash == i - 1 or dots == 1) then
-        -- NOOP
-      else if (dots == 2) then
+		if (isPathSeparator(code)) then
+		if (lastSlash == i - 1 or dots == 1) then
+			-- NOOP
+		else if (dots == 2) then
 
-        if (res.length < 2 or lastSegmentLength ~= 2 or
-            StringPrototypeCharCodeAt(res, res.length - 1) ~= CHAR_DOT or
-            StringPrototypeCharCodeAt(res, res.length - 2) ~= CHAR_DOT) then
-          if (res.length > 2) then
-            local lastSlashIndex = StringPrototypeLastIndexOf(res, separator);
-            if (lastSlashIndex == -1) then
-              res = '';
-              lastSegmentLength = 0;
-            else
-              res = StringPrototypeSlice(res, 0, lastSlashIndex);
-              lastSegmentLength =
-                res.length - 1 - StringPrototypeLastIndexOf(res, separator);
+			if (res.length < 2 or lastSegmentLength ~= 2 or
+				StringPrototypeCharCodeAt(res, res.length - 1) ~= CHAR_DOT or
+				StringPrototypeCharCodeAt(res, res.length - 2) ~= CHAR_DOT) then
+			if (res.length > 2) then
+				local lastSlashIndex = StringPrototypeLastIndexOf(res, separator);
+				if (lastSlashIndex == -1) then
+				res = '';
+				lastSegmentLength = 0;
+				else
+				res = StringPrototypeSlice(res, 0, lastSlashIndex);
+				lastSegmentLength =
+					res.length - 1 - StringPrototypeLastIndexOf(res, separator);
+				end
+				lastSlash = i;
+				dots = 0;
+				-- continue; -- TODO
+			else if (res.length ~= 0) then
+				res = '';
+				lastSegmentLength = 0;
+				lastSlash = i;
+				dots = 0;
+				-- continue; -- TODO
 			end
-            lastSlash = i;
-            dots = 0;
-            -- continue; -- TODO
-          else if (res.length ~= 0) then
-            res = '';
-            lastSegmentLength = 0;
-            lastSlash = i;
-            dots = 0;
-            -- continue; -- TODO
-		  end
-        end
-        if (allowAboveRoot) then
-        --   res += res.length > 0 ? `${separator}..` : '..'; -- TODO
-          lastSegmentLength = 2;
+			end
+			if (allowAboveRoot) then
+			--   res += res.length > 0 ? `${separator}..` : '..'; -- TODO
+			lastSegmentLength = 2;
+			end
+		else
+			if (res.length > 0) then
+			--   res += `${separator}${StringPrototypeSlice(path, lastSlash + 1, i)}`; -- TODO
+			else
+			res = StringPrototypeSlice(path, lastSlash + 1, i);
+			lastSegmentLength = i - lastSlash - 1;
+			end
+		lastSlash = i;
+		dots = 0;
 		end
-      else
-        if (res.length > 0) then
-        --   res += `${separator}${StringPrototypeSlice(path, lastSlash + 1, i)}`; -- TODO
-        else
-          res = StringPrototypeSlice(path, lastSlash + 1, i);
-        lastSegmentLength = i - lastSlash - 1;
+		else if (code == CHAR_DOT and dots ~= -1) then
+			dots = dots + 1
+		else
+		dots = -1;
 		end
-      lastSlash = i;
-      dots = 0;
 	end
-    else if (code == CHAR_DOT and dots ~= -1) then
-    --   ++dots; -- TODO
-    else
-      dots = -1;
-	end
-end
   return res;
 end
 
@@ -374,28 +376,20 @@ end
     if (device == nil) then
     --   return isAbsolute ? `\\${tail}` : tail; -- TODO
 	end
-    return isAbsolute ? `${device}\\${tail}` : `${device}${tail}`;
-  },
-
-
-local win32 = {
-	resolve = resolveRelativePath,
-	normalize = normalizePath,
-	isAbsolute = isAbsolutePath,
-	join = joinPath,
-	relative = convertRelativePath,
+    -- return isAbsolute ? `${device}\\${tail}` : `${device}${tail}`; -- TODO
+end
 
 
   --[[
    * @param {string} path
    * @returns {boolean}
    ]]--
-  isAbsolute(path) {
+   local function isAbsolutePath(path)
     validateString(path, 'path');
     local len = path.length;
-    if (len == 0)
+    if (len == 0) then
       return false;
-
+	end
     local code = StringPrototypeCharCodeAt(path, 0);
     return isPathSeparator(code) or
       -- Possible device root
@@ -403,77 +397,81 @@ local win32 = {
       isWindowsDeviceRoot(code) and
       StringPrototypeCharCodeAt(path, 1) == CHAR_COLON and
       isPathSeparator(StringPrototypeCharCodeAt(path, 2)));
-  },
+   end
 
   --[[
    * @param {...string} args
    * @returns {string}
    ]]--
-  join(...args) {
-    if (args.length == 0)
-      return '.';
+  local function joinPath(...)
+	local args = { ... }
 
+    if (#args == 0) then
+      return '.';
+	end
     local joined;
     local firstPart;
-    for (local i = 0; i < args.length; ++i) {
+    for i = 0, i <= #args, 1 do -- TODO foreach
       local arg = args[i];
       validateString(arg, 'path');
-      if (arg.length > 0) {
-        if (joined == nil)
-          joined = firstPart = arg;
+      if (arg.length > 0) then
+        if (joined == nil) then
+          joined = arg
+		  firstPart = arg;
         else
-          joined += `\\${arg}`;
-      }
-    }
+        --   joined = joined .. `\\${arg}`; -- TODO
+		end
+    end
 
-    if (joined == nil)
+    if (joined == nil) then
       return '.';
-
+	end
     -- Make sure that the joined path doesn't start with two slashes, because
     -- normalize() will mistake it for a UNC path then.
-    //
+    --
     -- This step is skipped when it is very clear that the user actually
     -- intended to point at a UNC path. This is assumed when the first
     -- non-empty string arguments starts with exactly two slashes followed by
     -- at least one more non-slash character.
-    //
+    --
     -- Note that for normalize() to treat a path as a UNC path it needs to
     -- have at least 2 components, so we don't filter for that here.
     -- This means that the user can use join to construct UNC paths from
     -- a server name and a share name; for example:
-    --   path.join('//server', 'share') -> '\\\\server\\share\\')
+    --   path.join('--server', 'share') -> '\\\\server\\share\\')
     local needsReplace = true;
     local slashCount = 0;
-    if (isPathSeparator(StringPrototypeCharCodeAt(firstPart, 0))) {
-      ++slashCount;
+    if (isPathSeparator(StringPrototypeCharCodeAt(firstPart, 0))) then
+      slashCount = slashCount + 1;
       local firstLen = firstPart.length;
       if (firstLen > 1 and
-          isPathSeparator(StringPrototypeCharCodeAt(firstPart, 1))) {
-        ++slashCount;
-        if (firstLen > 2) {
-          if (isPathSeparator(StringPrototypeCharCodeAt(firstPart, 2)))
-            ++slashCount;
-          else {
+          isPathSeparator(StringPrototypeCharCodeAt(firstPart, 1))) then
+			slashCount = slashCount + 1;
+        if (firstLen > 2) then
+          if (isPathSeparator(StringPrototypeCharCodeAt(firstPart, 2))) then
+		  slashCount = slashCount + 1;
+          else
             -- We matched a UNC path in the first part
             needsReplace = false;
-          }
-        }
-      }
-    }
-    if (needsReplace) {
+		  end
+        end
+	end
+end
+    if (needsReplace) then
       -- Find any more consecutive slashes we need to replace
-      while (slashCount < joined.length and
-             isPathSeparator(StringPrototypeCharCodeAt(joined, slashCount))) {
-        slashCount++;
-      }
+      while (slashCount < #joined and
+             isPathSeparator(StringPrototypeCharCodeAt(joined, slashCount))) do
+				slashCount = slashCount + 1;
+			 end
 
       -- Replace the slashes if needed
-      if (slashCount >= 2)
-        joined = `\\${StringPrototypeSlice(joined, slashCount)}`;
-    }
+      if (slashCount >= 2) then
+        -- joined = `\\${StringPrototypeSlice(joined, slashCount)}`; -- todo
+	  end
 
-    return win32.normalize(joined);
-  },
+    return win32.normalize(joined); -- todo fix lookup with closure
+end
+
 
   --[[
    * It will solve the relative path from `from` to `to`, for instancee
@@ -484,411 +482,434 @@ local win32 = {
    * @param {string} to
    * @returns {string}
    ]]--
-  relative(from, to) {
+   local function convertRelativePath(from, to)
     validateString(from, 'from');
     validateString(to, 'to');
 
-    if (from == to)
+    if (from == to) then
       return '';
+	end
 
     local fromOrig = win32.resolve(from);
     local toOrig = win32.resolve(to);
 
-    if (fromOrig == toOrig)
+    if (fromOrig == toOrig) then
       return '';
+	end
 
     from = StringPrototypeToLowerCase(fromOrig);
     to = StringPrototypeToLowerCase(toOrig);
 
-    if (from == to)
+    if (from == to) then
       return '';
+	end
 
     -- Trim any leading backslashes
     local fromStart = 0;
     while (fromStart < from.length and
-           StringPrototypeCharCodeAt(from, fromStart) == CHAR_BACKWARD_SLASH) {
-      fromStart++;
-    }
+           StringPrototypeCharCodeAt(from, fromStart) == CHAR_BACKWARD_SLASH) do
+			fromStart = fromStart + 1
+		   end
     -- Trim trailing backslashes (applicable to UNC paths only)
-    local fromEnd = from.length;
+    local fromEnd = #from;
     while (
       fromEnd - 1 > fromStart and
       StringPrototypeCharCodeAt(from, fromEnd - 1) == CHAR_BACKWARD_SLASH
-    ) {
-      fromEnd--;
-    }
+    ) do
+	  fromEnd = fromEnd - 1
+	end
     local fromLen = fromEnd - fromStart;
 
     -- Trim any leading backslashes
     local toStart = 0;
     while (toStart < to.length and
-           StringPrototypeCharCodeAt(to, toStart) == CHAR_BACKWARD_SLASH) {
-      toStart++;
-    }
+           StringPrototypeCharCodeAt(to, toStart) == CHAR_BACKWARD_SLASH) do
+			toStart = toStart + 1
+		   end
     -- Trim trailing backslashes (applicable to UNC paths only)
     local toEnd = to.length;
     while (toEnd - 1 > toStart and
-           StringPrototypeCharCodeAt(to, toEnd - 1) == CHAR_BACKWARD_SLASH) {
-      toEnd--;
-    }
+           StringPrototypeCharCodeAt(to, toEnd - 1) == CHAR_BACKWARD_SLASH) do
+	  toEnd = toEnd - 1
+		   end
     local toLen = toEnd - toStart;
 
     -- Compare paths to find the longest common path from root
-    local length = fromLen < toLen ? fromLen : toLen;
+    -- local length = fromLen < toLen ? fromLen : toLen; -- TODO
     local lastCommonSep = -1;
-    local i = 0;
-    for (; i < length; i++) {
+    local i;
+    for i = 0, i < length, 1 do
       local fromCode = StringPrototypeCharCodeAt(from, fromStart + i);
-      if (fromCode ~= StringPrototypeCharCodeAt(to, toStart + i))
+      if (fromCode ~= StringPrototypeCharCodeAt(to, toStart + i)) then
         break;
-      else if (fromCode == CHAR_BACKWARD_SLASH)
+      else if (fromCode == CHAR_BACKWARD_SLASH) then
         lastCommonSep = i;
-    }
+	  end
 
     -- We found a mismatch before the first common path separator was seen, so
     -- return the original `to`.
-    if (i ~= length) {
-      if (lastCommonSep == -1)
+    if (i ~= length) then
+      if (lastCommonSep == -1) then
         return toOrig;
-    } else {
-      if (toLen > length) {
+	  end
+    else
+      if (toLen > length) then
         if (StringPrototypeCharCodeAt(to, toStart + i) ==
-            CHAR_BACKWARD_SLASH) {
+            CHAR_BACKWARD_SLASH) then
           -- We get here if `from` is the exact base path for `to`.
           -- For example: from='C:\\foo\\bar'; to='C:\\foo\\bar\\baz'
           return StringPrototypeSlice(toOrig, toStart + i + 1);
-        }
-        if (i == 2) {
+			end
+        if (i == 2) then
           -- We get here if `from` is the device root.
           -- For example: from='C:\\'; to='C:\\foo'
           return StringPrototypeSlice(toOrig, toStart + i);
-        }
-      }
-      if (fromLen > length) {
+		end
+	end
+      if (fromLen > length) then
         if (StringPrototypeCharCodeAt(from, fromStart + i) ==
-            CHAR_BACKWARD_SLASH) {
+            CHAR_BACKWARD_SLASH) then
           -- We get here if `to` is the exact base path for `from`.
           -- For example: from='C:\\foo\\bar'; to='C:\\foo'
           lastCommonSep = i;
-        } else if (i == 2) {
+        else if (i == 2) then
           -- We get here if `to` is the device root.
           -- For example: from='C:\\foo\\bar'; to='C:\\'
           lastCommonSep = 3;
-        }
-      }
-      if (lastCommonSep == -1)
+		end
+	end
+      if (lastCommonSep == -1) then
         lastCommonSep = 0;
-    }
+	  end
+    end
 
     local out = '';
     -- Generate the relative path based on the path difference between `to` and
     -- `from`
-    for (i = fromStart + lastCommonSep + 1; i <= fromEnd; ++i) {
+    for i = fromStart + lastCommonSep + 1, i <= fromEnd, 1 do
       if (i == fromEnd or
-          StringPrototypeCharCodeAt(from, i) == CHAR_BACKWARD_SLASH) {
-        out += out.length == 0 ? '..' : '\\..';
-      }
-    }
+          StringPrototypeCharCodeAt(from, i) == CHAR_BACKWARD_SLASH) then
+        -- out += out.length == 0 ? '..' : '\\..';  -- todo
+		  end
+		end
 
-    toStart += lastCommonSep;
+    toStart = toStart + lastCommonSep;
 
     -- Lastly, append the rest of the destination (`to`) path that comes after
     -- the common path parts
-    if (out.length > 0)
-      return `${out}${StringPrototypeSlice(toOrig, toStart, toEnd)}`;
+    if (out.length > 0) then
+    --   return `${out}${StringPrototypeSlice(toOrig, toStart, toEnd)}`; -- todo
+	end
 
-    if (StringPrototypeCharCodeAt(toOrig, toStart) == CHAR_BACKWARD_SLASH)
-      ++toStart;
+    if (StringPrototypeCharCodeAt(toOrig, toStart) == CHAR_BACKWARD_SLASH) then
+	  toStart = toStart + 1
     return StringPrototypeSlice(toOrig, toStart, toEnd);
-  },
+	end
 
-  --[[
+	local type = type
+
+	--[[
+		* @param {string} path
+		* @returns {string}
+		]]--
+local function toNamespacedPath(path)
+		  -- Note: this will *probably* throw somewhere.
+		  if (type(path) ~= 'string' or #path == 0) then
+			return path;
+		  end
+
+		  local resolvedPath = win32.resolve(path);
+
+		  if (resolvedPath.length <= 2) then
+			return path;
+		  end
+
+		  if (StringPrototypeCharCodeAt(resolvedPath, 0) == CHAR_BACKWARD_SLASH) then
+			-- Possible UNC root
+			if (StringPrototypeCharCodeAt(resolvedPath, 1) == CHAR_BACKWARD_SLASH) then
+			  local code = StringPrototypeCharCodeAt(resolvedPath, 2);
+			  if (code ~= CHAR_QUESTION_MARK and code ~= CHAR_DOT) then
+				-- Matched non-long UNC root, convert the path to a long UNC path
+				-- return `\\\\?\\UNC\\${StringPrototypeSlice(resolvedPath, 2)}`; -- TODO
+			  end
+			end
+		 else if (
+			isWindowsDeviceRoot(StringPrototypeCharCodeAt(resolvedPath, 0)) and
+			StringPrototypeCharCodeAt(resolvedPath, 1) == CHAR_COLON and
+			StringPrototypeCharCodeAt(resolvedPath, 2) == CHAR_BACKWARD_SLASH
+		  ) then
+			-- Matched device root, convert the path to a long UNC path
+			-- return `\\\\?\\${resolvedPath}`; -- todo
+		  end
+
+		  return path;
+		end
+
+		  --[[
    * @param {string} path
    * @returns {string}
    ]]--
-  toNamespacedPath(path) {
-    -- Note: this will *probably* throw somewhere.
-    if (typeof path ~= 'string' or path.length == 0)
-      return path;
+local function getDirectoryName(path)
+		validateString(path, 'path');
+		local len = path.length;
+		if (len == 0) then
+		  return '.';
+		end
 
-    local resolvedPath = win32.resolve(path);
+		local rootEnd = -1;
+		local offset = 0;
+		local code = StringPrototypeCharCodeAt(path, 0);
 
-    if (resolvedPath.length <= 2)
-      return path;
+		if (len == 1) then
+		  -- `path` contains just a path separator, exit early to avoid
+		  -- unnecessary work or a dot.
+		--   return isPathSeparator(code) ? path : '.';  -- todo
+		end
 
-    if (StringPrototypeCharCodeAt(resolvedPath, 0) == CHAR_BACKWARD_SLASH) {
-      -- Possible UNC root
-      if (StringPrototypeCharCodeAt(resolvedPath, 1) == CHAR_BACKWARD_SLASH) {
-        local code = StringPrototypeCharCodeAt(resolvedPath, 2);
-        if (code ~= CHAR_QUESTION_MARK and code ~= CHAR_DOT) {
-          -- Matched non-long UNC root, convert the path to a long UNC path
-          return `\\\\?\\UNC\\${StringPrototypeSlice(resolvedPath, 2)}`;
-        }
-      }
-    } else if (
-      isWindowsDeviceRoot(StringPrototypeCharCodeAt(resolvedPath, 0)) and
-      StringPrototypeCharCodeAt(resolvedPath, 1) == CHAR_COLON and
-      StringPrototypeCharCodeAt(resolvedPath, 2) == CHAR_BACKWARD_SLASH
-    ) {
-      -- Matched device root, convert the path to a long UNC path
-      return `\\\\?\\${resolvedPath}`;
-    }
+		-- Try to match a root
+		if (isPathSeparator(code)) then
+		  -- Possible UNC root
 
-    return path;
-  },
+		  rootEnd = 1
+		  offset = 1;
 
-  --[[
-   * @param {string} path
-   * @returns {string}
-   ]]--
-  dirname(path) {
-    validateString(path, 'path');
-    local len = path.length;
-    if (len == 0)
-      return '.';
-    local rootEnd = -1;
-    local offset = 0;
-    local code = StringPrototypeCharCodeAt(path, 0);
+		  if (isPathSeparator(StringPrototypeCharCodeAt(path, 1))) then
+			-- Matched double path separator at beginning
+			local j = 2;
+			local last = j;
+			-- Match 1 or more non-path separators
+			while (j < len and
+				   not isPathSeparator(StringPrototypeCharCodeAt(path, j))) do
+			  j = j + 1;
+				   end
+			if (j < len and j ~= last) then
+			  -- Matchednot
+			  last = j;
+			  -- Match 1 or more path separators
+			  while (j < len and
+					 isPathSeparator(StringPrototypeCharCodeAt(path, j))) do
+				j = j + 1
+					 end
+			  if (j < len and j ~= last) then
+				-- Matchednot
+				last = j;
+				-- Match 1 or more non-path separators
+				while (j < len and
+					   not isPathSeparator(StringPrototypeCharCodeAt(path, j))) do
+						j = j + 1
+					   end
+				if (j == len) then
+				  -- We matched a UNC root only
+				  return path;
+				end
+				if (j ~= last) then
+				  -- We matched a UNC root with leftovers
 
-    if (len == 1) {
-      -- `path` contains just a path separator, exit early to avoid
-      -- unnecessary work or a dot.
-      return isPathSeparator(code) ? path : '.';
-    }
+				  -- Offset by 1 to include the separator after the UNC root to
+				  -- treat it as a "normal root" on top of a (UNC) root
+				  rootEnd = j + 1
+				  offset = j + 1;
+				end
+			end
+		end
+	end
+		-- Possible device root
+		else if (isWindowsDeviceRoot(code) and
+				   StringPrototypeCharCodeAt(path, 1) == CHAR_COLON) then
+		--   rootEnd =			len > 2 and isPathSeparator(StringPrototypeCharCodeAt(path, 2)) ? 3 : 2; -- todo
+		  offset = rootEnd;
+				   end
 
-    -- Try to match a root
-    if (isPathSeparator(code)) {
-      -- Possible UNC root
+		local endIndex = -1;
+		local matchedSlash = true;
+		for i = len - 1, i >= offset, -1 do
+		  if (isPathSeparator(StringPrototypeCharCodeAt(path, i))) then
+			if (not matchedSlash) then
+				endIndex = i;
+			  break;
+			end
+		  else
+			-- We saw the first non-path separator
+			matchedSlash = false;
+		  end
+		end
 
-      rootEnd = offset = 1;
+		if (endIndex == -1) then
+		  if (rootEnd == -1) then
+			return '.';
+		  end
+		  endIndex = rootEnd;
+		end
+		return StringPrototypeSlice(path, 0, endIndex);
+	end
 
-      if (isPathSeparator(StringPrototypeCharCodeAt(path, 1))) {
-        -- Matched double path separator at beginning
-        local j = 2;
-        local last = j;
-        -- Match 1 or more non-path separators
-        while (j < len and
-               not isPathSeparator(StringPrototypeCharCodeAt(path, j))) {
-          j++;
-        }
-        if (j < len and j ~= last) {
-          -- Matchednot
-          last = j;
-          -- Match 1 or more path separators
-          while (j < len and
-                 isPathSeparator(StringPrototypeCharCodeAt(path, j))) {
-            j++;
-          }
-          if (j < len and j ~= last) {
-            -- Matchednot
-            last = j;
-            -- Match 1 or more non-path separators
-            while (j < len and
-                   not isPathSeparator(StringPrototypeCharCodeAt(path, j))) {
-              j++;
-            }
-            if (j == len) {
-              -- We matched a UNC root only
-              return path;
-            }
-            if (j ~= last) {
-              -- We matched a UNC root with leftovers
+	--[[
+		* @param {string} path
+		* @param {string} [ext]
+		* @returns {string}
+		]]--
+		local function getFileName(path, ext)
+		  if (ext ~= nil) then
+			validateString(ext, 'ext');
+		  end
+		  validateString(path, 'path');
+		  local start = 0;
+		  local endIndex = -1;
+		  local matchedSlash = true;
 
-              -- Offset by 1 to include the separator after the UNC root to
-              -- treat it as a "normal root" on top of a (UNC) root
-              rootEnd = offset = j + 1;
-            }
-          }
-        }
-      }
-    -- Possible device root
-    } else if (isWindowsDeviceRoot(code) and
-               StringPrototypeCharCodeAt(path, 1) == CHAR_COLON) {
-      rootEnd =
-        len > 2 and isPathSeparator(StringPrototypeCharCodeAt(path, 2)) ? 3 : 2;
-      offset = rootEnd;
-    }
+		  -- Check for a drive letter prefix so as not to mistake the following
+		  -- path separator as an extra separator at the end of the path that can be
+		  -- disregarded
+		  if (path.length >= 2 and
+			  isWindowsDeviceRoot(StringPrototypeCharCodeAt(path, 0)) and
+			  StringPrototypeCharCodeAt(path, 1) == CHAR_COLON) then
+			start = 2;
+			  end
 
-    local end = -1;
-    local matchedSlash = true;
-    for (local i = len - 1; i >= offset; --i) {
-      if (isPathSeparator(StringPrototypeCharCodeAt(path, i))) {
-        if (not matchedSlash) {
-          end = i;
-          break;
-        }
-      } else {
-        -- We saw the first non-path separator
-        matchedSlash = false;
-      }
-    }
+		  if (ext ~= nil and #ext > 0 and #ext <= #path) then
+			if (ext == path) then
+			  return '';
+			end
 
-    if (end == -1) {
-      if (rootEnd == -1)
-        return '.';
+			local extIdx = ext.length - 1;
+			local firstNonSlashEnd = -1;
+			for i = #path - 1, i >= start, -1 do -- todo pairs
+			  local code = StringPrototypeCharCodeAt(path, i);
+			  if (isPathSeparator(code)) then
+				-- If we reached a path separator that was not part of a set of path
+				-- separators at the end of the string, stop now
+				if (not matchedSlash) then
+				  start = i + 1;
+				  break;
+				end
+			  else
+				if (firstNonSlashEnd == -1) then
+				  -- We saw the first non-path separator, remember this index in case
+				  -- we need it if the extension ends up not matching
+				  matchedSlash = false;
+				  firstNonSlashEnd = i + 1;
+				end
+				if (extIdx >= 0) then
+				  -- Try to match the explicit extension
+				  if (code == StringPrototypeCharCodeAt(ext, extIdx)) then
+					extIdx = extIdx - 1
+					if (extIdx == -1) then
+					  -- We matched the extension, so mark this as the end of our path
+					  -- component
+					  endIndex = i;
+					end
+				else
+					-- Extension does not match, so our result is the entire path
+					-- component
+					extIdx = -1;
+					endIndex = firstNonSlashEnd;
+				end
+			end
+		end
+	end
 
-      end = rootEnd;
-    }
-    return StringPrototypeSlice(path, 0, end);
-  },
+			if (start == endIndex) then
+				endIndex = firstNonSlashEnd;
+			else if (endIndex == -1) then
+				endIndex = path.length;
+			return StringPrototypeSlice(path, start, endIndex);
+			end
+		end
+		  for i = #path - 1, i >= start, -1 do -- todo pairs, review all for loops for this pattern
+			if (isPathSeparator(StringPrototypeCharCodeAt(path, i))) then
+			  -- If we reached a path separator that was not part of a set of path
+			  -- separators at the end of the string, stop now
+			  if (not matchedSlash) then
+				start = i + 1;
+				break;
+			  end
+			else if (endIndex == -1) then
+			  -- We saw the first non-path separator, mark this as the end of our
+			  -- path component
+			  matchedSlash = false;
+			  endIndex = i + 1;
+			end
+		end
 
-  --[[
-   * @param {string} path
-   * @param {string} [ext]
-   * @returns {string}
-   ]]--
-  basename(path, ext) {
-    if (ext ~= nil)
-      validateString(ext, 'ext');
-    validateString(path, 'path');
-    local start = 0;
-    local end = -1;
-    local matchedSlash = true;
+		  if (endIndex == -1) then
+			return '';
+		  end
 
-    -- Check for a drive letter prefix so as not to mistake the following
-    -- path separator as an extra separator at the end of the path that can be
-    -- disregarded
-    if (path.length >= 2 and
-        isWindowsDeviceRoot(StringPrototypeCharCodeAt(path, 0)) and
-        StringPrototypeCharCodeAt(path, 1) == CHAR_COLON) {
-      start = 2;
-    }
+		  return StringPrototypeSlice(path, start, endIndex);
+		end
 
-    if (ext ~= nil and ext.length > 0 and ext.length <= path.length) {
-      if (ext == path)
-        return '';
-      local extIdx = ext.length - 1;
-      local firstNonSlashEnd = -1;
-      for (local i = path.length - 1; i >= start; --i) {
-        local code = StringPrototypeCharCodeAt(path, i);
-        if (isPathSeparator(code)) {
-          -- If we reached a path separator that was not part of a set of path
-          -- separators at the end of the string, stop now
-          if (not matchedSlash) {
-            start = i + 1;
-            break;
-          }
-        } else {
-          if (firstNonSlashEnd == -1) {
-            -- We saw the first non-path separator, remember this index in case
-            -- we need it if the extension ends up not matching
-            matchedSlash = false;
-            firstNonSlashEnd = i + 1;
-          }
-          if (extIdx >= 0) {
-            -- Try to match the explicit extension
-            if (code == StringPrototypeCharCodeAt(ext, extIdx)) {
-              if (--extIdx == -1) {
-                -- We matched the extension, so mark this as the end of our path
-                -- component
-                end = i;
-              }
-            } else {
-              -- Extension does not match, so our result is the entire path
-              -- component
-              extIdx = -1;
-              end = firstNonSlashEnd;
-            }
-          }
-        }
-      }
+		local function
+			--[[
+			 * @param {string} path
+			 * @returns {string}
+			 ]]--
+			 getFileExtension(path)
+			  validateString(path, 'path');
+			  local start = 0;
+			  local startDot = -1;
+			  local startPart = 0;
+			  local endIndex = -1;
+			  local matchedSlash = true;
+			  -- Track the state of characters (if any) we see before our first dot and
+			  -- after any path separator we find
+			  local preDotState = 0;
 
-      if (start == end)
-        end = firstNonSlashEnd;
-      else if (end == -1)
-        end = path.length;
-      return StringPrototypeSlice(path, start, end);
-    }
-    for (local i = path.length - 1; i >= start; --i) {
-      if (isPathSeparator(StringPrototypeCharCodeAt(path, i))) {
-        -- If we reached a path separator that was not part of a set of path
-        -- separators at the end of the string, stop now
-        if (not matchedSlash) {
-          start = i + 1;
-          break;
-        }
-      } else if (end == -1) {
-        -- We saw the first non-path separator, mark this as the end of our
-        -- path component
-        matchedSlash = false;
-        end = i + 1;
-      }
-    }
+			  -- Check for a drive letter prefix so as not to mistake the following
+			  -- path separator as an extra separator at the end of the path that can be
+			  -- disregarded
 
-    if (end == -1)
-      return '';
-    return StringPrototypeSlice(path, start, end);
-  },
+			  if (#path >= 2 and
+				  StringPrototypeCharCodeAt(path, 1) == CHAR_COLON and
+				  isWindowsDeviceRoot(StringPrototypeCharCodeAt(path, 0))) then
+				start = 2
+				startPart = 2;
+			end
 
-  --[[
-   * @param {string} path
-   * @returns {string}
-   ]]--
-  extname(path) {
-    validateString(path, 'path');
-    local start = 0;
-    local startDot = -1;
-    local startPart = 0;
-    local end = -1;
-    local matchedSlash = true;
-    -- Track the state of characters (if any) we see before our first dot and
-    -- after any path separator we find
-    local preDotState = 0;
+			  for i = #path - 1, i >= start, -1 do -- todo pairs
+				local code = StringPrototypeCharCodeAt(path, i);
+				if (isPathSeparator(code)) then
+				  -- If we reached a path separator that was not part of a set of path
+				  -- separators at the end of the string, stop now
+				  if (not matchedSlash) then
+					startPart = i + 1;
+					break;
+				  end
+				--   continue; -- todo
+				end
 
-    -- Check for a drive letter prefix so as not to mistake the following
-    -- path separator as an extra separator at the end of the path that can be
-    -- disregarded
+				if (endIndex == -1) then
+				  -- We saw the first non-path separator, mark this as the end of our
+				  -- extension
+				  matchedSlash = false;
+				  endIndex = i + 1;
+				end
 
-    if (path.length >= 2 and
-        StringPrototypeCharCodeAt(path, 1) == CHAR_COLON and
-        isWindowsDeviceRoot(StringPrototypeCharCodeAt(path, 0))) {
-      start = startPart = 2;
-    }
+				if (code == CHAR_DOT) then
+				  -- If this is our first dot, mark it as the start of our extension
+				  if (startDot == -1) then
+					startDot = i;
+				  else if (preDotState ~= 1) then
+					preDotState = 1;
+				else if (startDot ~= -1) then
+				  -- We saw a non-dot and non-path separator before our dot, so we should
+				  -- have a good chance at having a non-empty extension
+				  preDotState = -1;
+				end
+			end
 
-    for (local i = path.length - 1; i >= start; --i) {
-      local code = StringPrototypeCharCodeAt(path, i);
-      if (isPathSeparator(code)) {
-        -- If we reached a path separator that was not part of a set of path
-        -- separators at the end of the string, stop now
-        if (not matchedSlash) {
-          startPart = i + 1;
-          break;
-        }
-        continue;
-      }
-      if (end == -1) {
-        -- We saw the first non-path separator, mark this as the end of our
-        -- extension
-        matchedSlash = false;
-        end = i + 1;
-      }
-      if (code == CHAR_DOT) {
-        -- If this is our first dot, mark it as the start of our extension
-        if (startDot == -1)
-          startDot = i;
-        else if (preDotState ~= 1)
-          preDotState = 1;
-      } else if (startDot ~= -1) {
-        -- We saw a non-dot and non-path separator before our dot, so we should
-        -- have a good chance at having a non-empty extension
-        preDotState = -1;
-      }
-    }
+			  if (startDot == -1 or
+			      endIndex == -1 or
+				  -- We saw a non-dot character immediately before the dot
+				  preDotState == 0 or
+				  -- The (right-most) trimmed path component is exactly '..'
+				  (preDotState == 1 and
+				   startDot == endIndex - 1 and
+				   startDot == startPart + 1)) then
+				return '';
+			  end
+			  return StringPrototypeSlice(path, startDot, endIndex);
+			end
 
-    if (startDot == -1 or
-        end == -1 or
-        -- We saw a non-dot character immediately before the dot
-        preDotState == 0 or
-        -- The (right-most) trimmed path component is exactly '..'
-        (preDotState == 1 and
-         startDot == end - 1 and
-         startDot == startPart + 1)) {
-      return '';
-    }
-    return StringPrototypeSlice(path, startDot, end);
-  },
-
-  format: FunctionPrototypeBind(_format, null, '\\'),
 
   --[[
    * @param {string} path
@@ -900,93 +921,99 @@ local win32 = {
    *  ext: string;
    *  }}
    ]]--
-  parse(path) {
+   local function parsePath(path)
     validateString(path, 'path');
 
-    local ret = { root: '', dir: '', base: '', ext: '', name: '' };
-    if (path.length == 0)
+    local ret = { root = '', dir = '', base = '', ext = '', name = '' };
+    if (path.length == 0) then
       return ret;
+	end
 
-    local len = path.length;
+    local len = #path;
     local rootEnd = 0;
     local code = StringPrototypeCharCodeAt(path, 0);
 
-    if (len == 1) {
-      if (isPathSeparator(code)) {
+    if (len == 1) then
+      if (isPathSeparator(code)) then
         -- `path` contains just a path separator, exit early to avoid
         -- unnecessary work
-        ret.root = ret.dir = path;
+        ret.root = path
+		ret.dir = path;
         return ret;
-      }
-      ret.base = ret.name = path;
+	  end
+      ret.base = path
+	  ret.name = path;
       return ret;
-    }
+    end
     -- Try to match a root
-    if (isPathSeparator(code)) {
+    if (isPathSeparator(code)) then
       -- Possible UNC root
 
       rootEnd = 1;
-      if (isPathSeparator(StringPrototypeCharCodeAt(path, 1))) {
+      if (isPathSeparator(StringPrototypeCharCodeAt(path, 1))) then
         -- Matched double path separator at beginning
         local j = 2;
         local last = j;
         -- Match 1 or more non-path separators
         while (j < len and
-               not isPathSeparator(StringPrototypeCharCodeAt(path, j))) {
-          j++;
-        }
-        if (j < len and j ~= last) {
+               not isPathSeparator(StringPrototypeCharCodeAt(path, j))) do
+          j = j + 1
+			   end
+        if (j < len and j ~= last) then
           -- Matchednot
           last = j;
           -- Match 1 or more path separators
           while (j < len and
-                 isPathSeparator(StringPrototypeCharCodeAt(path, j))) {
-            j++;
-          }
-          if (j < len and j ~= last) {
+                 isPathSeparator(StringPrototypeCharCodeAt(path, j))) do
+            j = j + 1
+		  end
+          if (j < len and j ~= last) then
             -- Matchednot
             last = j;
             -- Match 1 or more non-path separators
             while (j < len and
-                   not isPathSeparator(StringPrototypeCharCodeAt(path, j))) {
-              j++;
-            }
-            if (j == len) {
+                   not isPathSeparator(StringPrototypeCharCodeAt(path, j))) do
+              j = j + 1
+		   end
+            if (j == len) then
               -- We matched a UNC root only
               rootEnd = j;
-            } else if (j ~= last) {
+            else if (j ~= last) then
               -- We matched a UNC root with leftovers
               rootEnd = j + 1;
-            }
-          }
-        }
-      }
-    } else if (isWindowsDeviceRoot(code) and
-               StringPrototypeCharCodeAt(path, 1) == CHAR_COLON) {
+			end
+		end
+	end
+end
+    else if (isWindowsDeviceRoot(code) and
+               StringPrototypeCharCodeAt(path, 1) == CHAR_COLON) then
       -- Possible device root
-      if (len <= 2) {
+      if (len <= 2) then
         -- `path` contains just a drive root, exit early to avoid
         -- unnecessary work
-        ret.root = ret.dir = path;
+        ret.root = path
+		ret.dir = path;
         return ret;
-      }
+	  end
       rootEnd = 2;
-      if (isPathSeparator(StringPrototypeCharCodeAt(path, 2))) {
-        if (len == 3) {
+      if (isPathSeparator(StringPrototypeCharCodeAt(path, 2))) then
+        if (len == 3) then
           -- `path` contains just a drive root, exit early to avoid
           -- unnecessary work
-          ret.root = ret.dir = path;
+          ret.root = path
+		  ret.dir = path;
           return ret;
-        }
+		end
         rootEnd = 3;
-      }
-    }
-    if (rootEnd > 0)
+	end
+end
+    if (rootEnd > 0) then
       ret.root = StringPrototypeSlice(path, 0, rootEnd);
+	end
 
     local startDot = -1;
     local startPart = rootEnd;
-    local end = -1;
+    local endIndex = -1;
     local matchedSlash = true;
     local i = path.length - 1;
 
@@ -995,540 +1022,105 @@ local win32 = {
     local preDotState = 0;
 
     -- Get non-dir info
-    for (; i >= rootEnd; --i) {
+    for i = i, i >= rootEnd, -1 do -- todo pairs
       code = StringPrototypeCharCodeAt(path, i);
-      if (isPathSeparator(code)) {
+      if (isPathSeparator(code)) then
         -- If we reached a path separator that was not part of a set of path
         -- separators at the end of the string, stop now
-        if (not matchedSlash) {
+        if (not matchedSlash) then
           startPart = i + 1;
           break;
-        }
-        continue;
-      }
-      if (end == -1) {
+		end
+        -- continue; -- todo
+	end
+      if (endIndex == -1) then
         -- We saw the first non-path separator, mark this as the end of our
         -- extension
         matchedSlash = false;
-        end = i + 1;
-      }
-      if (code == CHAR_DOT) {
+        endIndex = i + 1;
+	end
+      if (code == CHAR_DOT) then
         -- If this is our first dot, mark it as the start of our extension
-        if (startDot == -1)
+        if (startDot == -1) then
           startDot = i;
-        else if (preDotState ~= 1)
+        else if (preDotState ~= 1) then
           preDotState = 1;
-      } else if (startDot ~= -1) {
+      else if (startDot ~= -1) then
         -- We saw a non-dot and non-path separator before our dot, so we should
         -- have a good chance at having a non-empty extension
         preDotState = -1;
-      }
-    }
+	  end
+    end
 
-    if (end ~= -1) {
+    if (endIndex ~= -1) then
       if (startDot == -1 or
           -- We saw a non-dot character immediately before the dot
           preDotState == 0 or
           -- The (right-most) trimmed path component is exactly '..'
           (preDotState == 1 and
-           startDot == end - 1 and
-           startDot == startPart + 1)) {
-        ret.base = ret.name = StringPrototypeSlice(path, startPart, end);
-      } else {
+           startDot == endIndex - 1 and
+           startDot == startPart + 1)) then
+        ret.base = StringPrototypeSlice(path, startPart, endIndex);
+		ret.name = StringPrototypeSlice(path, startPart, endIndex);
+      else
         ret.name = StringPrototypeSlice(path, startPart, startDot);
-        ret.base = StringPrototypeSlice(path, startPart, end);
-        ret.ext = StringPrototypeSlice(path, startDot, end);
-      }
-    }
+        ret.base = StringPrototypeSlice(path, startPart, endIndex);
+        ret.ext = StringPrototypeSlice(path, startDot, endIndex);
+	  end
+    end
 
     -- If the directory is the root, use the entire root as the `dir` including
     -- the trailing slash if any (`C:\abc` -> `C:\`). Otherwise, strip out the
     -- trailing slash (`C:\abc\def` -> `C:\abc`).
-    if (startPart > 0 and startPart ~= rootEnd)
+    if (startPart > 0 and startPart ~= rootEnd) then
       ret.dir = StringPrototypeSlice(path, 0, startPart - 1);
     else
       ret.dir = ret.root;
 
     return ret;
-  },
+	end
 
-  sep: '\\',
-  delimiter: ';',
-  win32: null,
-  posix: null
+local win32 = {
+	resolve = resolveRelativePath,
+	normalize = normalizePath,
+	isAbsolute = isAbsolutePath,
+	join = joinPath,
+	relative = convertRelativePath,
+	toNamespacedPath = toNamespacedPath,
+	dirname = getDirectoryName,
+	basename = getFileName,
+	extname = getFileExtension,
+	parse = parsePath,
+
+
+
+-- todo wat?
+-- path.format?
+  format: FunctionPrototypeBind(_format, nil, '\\'),
+
+-- path.sep?
+  sep = '\\',
+  delimiter = ';',
+  win32 = nil,
+  posix = nil
 };
 
-local posixCwd = (() => {
-  if (platformIsWin32) {
-    -- Converts Windows' backslash path separators to POSIX forward slashes
-    -- and truncates any drive indicator
-    local regexp = /\\/g;
-    return () => {
-      local cwd = StringPrototypeReplace(uv.cwd(), regexp, '/');
-      return StringPrototypeSlice(cwd, StringPrototypeIndexOf(cwd, '/'));
-    };
-  }
 
-  -- We're already on POSIX, no need for any transformations
-  return () => uv.cwd();
-})();
+-- assign namespaces
+posix.win32 = win32
+win32.win32 = win32;
+posix.posix = posix
+win32.posix = posix;
 
-local posix = {
-  --[[
-   * path.resolve([from ...], to)
-   * @param {...string} args
-   * @returns {string}
-   ]]--
-  resolve(...args) {
-    local resolvedPath = '';
-    local resolvedAbsolute = false;
-
-    for (local i = args.length - 1; i >= -1 and not resolvedAbsolute; i--) {
-      local path = i >= 0 ? args[i] : posixCwd();
-
-      validateString(path, 'path');
-
-      -- Skip empty entries
-      if (path.length == 0) {
-        continue;
-      }
-
-      resolvedPath = `${path}/${resolvedPath}`;
-      resolvedAbsolute =
-        StringPrototypeCharCodeAt(path, 0) == CHAR_FORWARD_SLASH;
-    }
-
-    -- At this point the path should be resolved to a full absolute path, but
-    -- handle relative paths to be safe (might happen when uv.cwd() fails)
-
-    -- Normalize the path
-    resolvedPath = normalizeString(resolvedPath, not resolvedAbsolute, '/',
-                                   isPosixPathSeparator);
-
-    if (resolvedAbsolute) {
-      return `/${resolvedPath}`;
-    }
-    return resolvedPath.length > 0 ? resolvedPath : '.';
-  },
-
-  --[[
-   * @param {string} path
-   * @returns {string}
-   ]]--
-  normalize(path) {
-    validateString(path, 'path');
-
-    if (path.length == 0)
-      return '.';
-
-    local isAbsolute =
-      StringPrototypeCharCodeAt(path, 0) == CHAR_FORWARD_SLASH;
-    local trailingSeparator =
-      StringPrototypeCharCodeAt(path, path.length - 1) == CHAR_FORWARD_SLASH;
-
-    -- Normalize the path
-    path = normalizeString(path, not isAbsolute, '/', isPosixPathSeparator);
-
-    if (path.length == 0) {
-      if (isAbsolute)
-        return '/';
-      return trailingSeparator ? './' : '.';
-    }
-    if (trailingSeparator)
-      path += '/';
-
-    return isAbsolute ? `/${path}` : path;
-  },
-
-  --[[
-   * @param {string} path
-   * @returns {boolean}
-   ]]--
-  isAbsolute(path) {
-    validateString(path, 'path');
-    return path.length > 0 and
-           StringPrototypeCharCodeAt(path, 0) == CHAR_FORWARD_SLASH;
-  },
-
-  --[[
-   * @param {...string} args
-   * @returns {string}
-   ]]--
-  join(...args) {
-    if (args.length == 0)
-      return '.';
-    local joined;
-    for (local i = 0; i < args.length; ++i) {
-      local arg = args[i];
-      validateString(arg, 'path');
-      if (arg.length > 0) {
-        if (joined == nil)
-          joined = arg;
-        else
-          joined += `/${arg}`;
-      }
-    }
-    if (joined == nil)
-      return '.';
-    return posix.normalize(joined);
-  },
-
-  --[[
-   * @param {string} from
-   * @param {string} to
-   * @returns {string}
-   ]]--
-  relative(from, to) {
-    validateString(from, 'from');
-    validateString(to, 'to');
-
-    if (from == to)
-      return '';
-
-    -- Trim leading forward slashes.
-    from = posix.resolve(from);
-    to = posix.resolve(to);
-
-    if (from == to)
-      return '';
-
-    local fromStart = 1;
-    local fromEnd = from.length;
-    local fromLen = fromEnd - fromStart;
-    local toStart = 1;
-    local toLen = to.length - toStart;
-
-    -- Compare paths to find the longest common path from root
-    local length = (fromLen < toLen ? fromLen : toLen);
-    local lastCommonSep = -1;
-    local i = 0;
-    for (; i < length; i++) {
-      local fromCode = StringPrototypeCharCodeAt(from, fromStart + i);
-      if (fromCode ~= StringPrototypeCharCodeAt(to, toStart + i))
-        break;
-      else if (fromCode == CHAR_FORWARD_SLASH)
-        lastCommonSep = i;
-    }
-    if (i == length) {
-      if (toLen > length) {
-        if (StringPrototypeCharCodeAt(to, toStart + i) == CHAR_FORWARD_SLASH) {
-          -- We get here if `from` is the exact base path for `to`.
-          -- For example: from='/foo/bar'; to='/foo/bar/baz'
-          return StringPrototypeSlice(to, toStart + i + 1);
-        }
-        if (i == 0) {
-          -- We get here if `from` is the root
-          -- For example: from='/'; to='/foo'
-          return StringPrototypeSlice(to, toStart + i);
-        }
-      } else if (fromLen > length) {
-        if (StringPrototypeCharCodeAt(from, fromStart + i) ==
-            CHAR_FORWARD_SLASH) {
-          -- We get here if `to` is the exact base path for `from`.
-          -- For example: from='/foo/bar/baz'; to='/foo/bar'
-          lastCommonSep = i;
-        } else if (i == 0) {
-          -- We get here if `to` is the root.
-          -- For example: from='/foo/bar'; to='/'
-          lastCommonSep = 0;
-        }
-      }
-    }
-
-    local out = '';
-    -- Generate the relative path based on the path difference between `to`
-    -- and `from`.
-    for (i = fromStart + lastCommonSep + 1; i <= fromEnd; ++i) {
-      if (i == fromEnd or
-          StringPrototypeCharCodeAt(from, i) == CHAR_FORWARD_SLASH) {
-        out += out.length == 0 ? '..' : '/..';
-      }
-    }
-
-    -- Lastly, append the rest of the destination (`to`) path that comes after
-    -- the common path parts.
-    return `${out}${StringPrototypeSlice(to, toStart + lastCommonSep)}`;
-  },
-
-  --[[
-   * @param {string} path
-   * @returns {string}
-   ]]--
-  toNamespacedPath(path) {
-    -- Non-op on posix systems
-    return path;
-  },
-
-  --[[
-   * @param {string} path
-   * @returns {string}
-   ]]--
-  dirname(path) {
-    validateString(path, 'path');
-    if (path.length == 0)
-      return '.';
-    local hasRoot = StringPrototypeCharCodeAt(path, 0) == CHAR_FORWARD_SLASH;
-    local end = -1;
-    local matchedSlash = true;
-    for (local i = path.length - 1; i >= 1; --i) {
-      if (StringPrototypeCharCodeAt(path, i) == CHAR_FORWARD_SLASH) {
-        if (not matchedSlash) {
-          end = i;
-          break;
-        }
-      } else {
-        -- We saw the first non-path separator
-        matchedSlash = false;
-      }
-    }
-
-    if (end == -1)
-      return hasRoot ? '/' : '.';
-    if (hasRoot and end == 1)
-      return '//';
-    return StringPrototypeSlice(path, 0, end);
-  },
-
-  --[[
-   * @param {string} path
-   * @param {string} [ext]
-   * @returns {string}
-   ]]--
-  basename(path, ext) {
-    if (ext ~= nil)
-      validateString(ext, 'ext');
-    validateString(path, 'path');
-
-    local start = 0;
-    local end = -1;
-    local matchedSlash = true;
-
-    if (ext ~= nil and ext.length > 0 and ext.length <= path.length) {
-      if (ext == path)
-        return '';
-      local extIdx = ext.length - 1;
-      local firstNonSlashEnd = -1;
-      for (local i = path.length - 1; i >= 0; --i) {
-        local code = StringPrototypeCharCodeAt(path, i);
-        if (code == CHAR_FORWARD_SLASH) {
-          -- If we reached a path separator that was not part of a set of path
-          -- separators at the end of the string, stop now
-          if (not matchedSlash) {
-            start = i + 1;
-            break;
-          }
-        } else {
-          if (firstNonSlashEnd == -1) {
-            -- We saw the first non-path separator, remember this index in case
-            -- we need it if the extension ends up not matching
-            matchedSlash = false;
-            firstNonSlashEnd = i + 1;
-          }
-          if (extIdx >= 0) {
-            -- Try to match the explicit extension
-            if (code == StringPrototypeCharCodeAt(ext, extIdx)) {
-              if (--extIdx == -1) {
-                -- We matched the extension, so mark this as the end of our path
-                -- component
-                end = i;
-              }
-            } else {
-              -- Extension does not match, so our result is the entire path
-              -- component
-              extIdx = -1;
-              end = firstNonSlashEnd;
-            }
-          }
-        }
-      }
-
-      if (start == end)
-        end = firstNonSlashEnd;
-      else if (end == -1)
-        end = path.length;
-      return StringPrototypeSlice(path, start, end);
-    }
-    for (local i = path.length - 1; i >= 0; --i) {
-      if (StringPrototypeCharCodeAt(path, i) == CHAR_FORWARD_SLASH) {
-        -- If we reached a path separator that was not part of a set of path
-        -- separators at the end of the string, stop now
-        if (not matchedSlash) {
-          start = i + 1;
-          break;
-        }
-      } else if (end == -1) {
-        -- We saw the first non-path separator, mark this as the end of our
-        -- path component
-        matchedSlash = false;
-        end = i + 1;
-      }
-    }
-
-    if (end == -1)
-      return '';
-    return StringPrototypeSlice(path, start, end);
-  },
-
-  --[[
-   * @param {string} path
-   * @returns {string}
-   ]]--
-  extname(path) {
-    validateString(path, 'path');
-    local startDot = -1;
-    local startPart = 0;
-    local end = -1;
-    local matchedSlash = true;
-    -- Track the state of characters (if any) we see before our first dot and
-    -- after any path separator we find
-    local preDotState = 0;
-    for (local i = path.length - 1; i >= 0; --i) {
-      local code = StringPrototypeCharCodeAt(path, i);
-      if (code == CHAR_FORWARD_SLASH) {
-        -- If we reached a path separator that was not part of a set of path
-        -- separators at the end of the string, stop now
-        if (not matchedSlash) {
-          startPart = i + 1;
-          break;
-        }
-        continue;
-      }
-      if (end == -1) {
-        -- We saw the first non-path separator, mark this as the end of our
-        -- extension
-        matchedSlash = false;
-        end = i + 1;
-      }
-      if (code == CHAR_DOT) {
-        -- If this is our first dot, mark it as the start of our extension
-        if (startDot == -1)
-          startDot = i;
-        else if (preDotState ~= 1)
-          preDotState = 1;
-      } else if (startDot ~= -1) {
-        -- We saw a non-dot and non-path separator before our dot, so we should
-        -- have a good chance at having a non-empty extension
-        preDotState = -1;
-      }
-    }
-
-    if (startDot == -1 or
-        end == -1 or
-        -- We saw a non-dot character immediately before the dot
-        preDotState == 0 or
-        -- The (right-most) trimmed path component is exactly '..'
-        (preDotState == 1 and
-         startDot == end - 1 and
-         startDot == startPart + 1)) {
-      return '';
-    }
-    return StringPrototypeSlice(path, startDot, end);
-  },
-
-  format: FunctionPrototypeBind(_format, null, '/'),
-
-  --[[
-   * @param {string} path
-   * @returns {{
-   *   dir: string;
-   *   root: string;
-   *   base: string;
-   *   name: string;
-   *   ext: string;
-   *   }}
-   ]]--
-  parse(path) {
-    validateString(path, 'path');
-
-    local ret = { root: '', dir: '', base: '', ext: '', name: '' };
-    if (path.length == 0)
-      return ret;
-    local isAbsolute =
-      StringPrototypeCharCodeAt(path, 0) == CHAR_FORWARD_SLASH;
-    local start;
-    if (isAbsolute) {
-      ret.root = '/';
-      start = 1;
-    } else {
-      start = 0;
-    }
-    local startDot = -1;
-    local startPart = 0;
-    local end = -1;
-    local matchedSlash = true;
-    local i = path.length - 1;
-
-    -- Track the state of characters (if any) we see before our first dot and
-    -- after any path separator we find
-    local preDotState = 0;
-
-    -- Get non-dir info
-    for (; i >= start; --i) {
-      local code = StringPrototypeCharCodeAt(path, i);
-      if (code == CHAR_FORWARD_SLASH) {
-        -- If we reached a path separator that was not part of a set of path
-        -- separators at the end of the string, stop now
-        if (not matchedSlash) {
-          startPart = i + 1;
-          break;
-        }
-        continue;
-      }
-      if (end == -1) {
-        -- We saw the first non-path separator, mark this as the end of our
-        -- extension
-        matchedSlash = false;
-        end = i + 1;
-      }
-      if (code == CHAR_DOT) {
-        -- If this is our first dot, mark it as the start of our extension
-        if (startDot == -1)
-          startDot = i;
-        else if (preDotState ~= 1)
-          preDotState = 1;
-      } else if (startDot ~= -1) {
-        -- We saw a non-dot and non-path separator before our dot, so we should
-        -- have a good chance at having a non-empty extension
-        preDotState = -1;
-      }
-    }
-
-    if (end ~= -1) {
-      local start = startPart == 0 and isAbsolute ? 1 : startPart;
-      if (startDot == -1 or
-          -- We saw a non-dot character immediately before the dot
-          preDotState == 0 or
-          -- The (right-most) trimmed path component is exactly '..'
-          (preDotState == 1 and
-          startDot == end - 1 and
-          startDot == startPart + 1)) {
-        ret.base = ret.name = StringPrototypeSlice(path, start, end);
-      } else {
-        ret.name = StringPrototypeSlice(path, start, startDot);
-        ret.base = StringPrototypeSlice(path, start, end);
-        ret.ext = StringPrototypeSlice(path, startDot, end);
-      }
-    }
-
-    if (startPart > 0)
-      ret.dir = StringPrototypeSlice(path, 0, startPart - 1);
-    else if (isAbsolute)
-      ret.dir = '/';
-
-    return ret;
-  },
-
-  sep: '/',
-  delimiter: ':',
-  win32: null,
-  posix: null
-};
-
-posix.win32 = win32.win32 = win32;
-posix.posix = win32.posix = posix;
-
+-- probably not relevant?
 -- Legacy internal API, docs-only deprecated: DEP0080
 win32._makeLong = win32.toNamespacedPath;
 posix._makeLong = posix.toNamespacedPath;
 
-module.exports = platformIsWin32 ? win32 : posix;
+-- definitely not relevant, just return the right one?
+if ffi.os == "Windows" then
+	return win32
+else
+	return posix
+end
+-- module.exports = platformIsWin32 ? win32 : posix;
