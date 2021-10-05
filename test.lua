@@ -11,7 +11,7 @@ local function fail(func, ...)
     -- invalid types return nil and error
     assert(result == nil, "result is not nil")
     assert(type(errorMessage) == "string", "message is not a string: " .. tostring(errorMessage))
-    assert(type(errorMessage) == "string", "message is not Usage: ...") -- todo
+    assert(errorMessage:find("Usage: "), "message is not Usage: ..., actual: " .. tostring(errorMessage)) -- todo
 end
 
 for key, value in pairs(invalidTypeValues) do

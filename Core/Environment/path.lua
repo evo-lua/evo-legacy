@@ -435,7 +435,7 @@ local function isAbsolutePath(path)
     for i = 0, #args, 1 do
       local arg = args[i];
 
-	  if type(arg) ~= "string" then return nil, "path.join can only join strings" end
+	  if type(arg) ~= "string" then return nil, "Usage: path.join(path)" end
 
       if (#arg > 0) then
         if (joined == nil) then
