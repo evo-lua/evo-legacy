@@ -4,19 +4,10 @@
 local format = string.format
 
 local path = require("../../Core/Environment/path")
-
-local currentNamespace = "win32"
-
-local function assertStrictEqual(actual, expected)
-	if actual ~= expected then
-		print("FAIL\t" .. actual .. " IS " .. expected .. " (" .. currentNamespace .. ")")
-		error(format("\nExpected %s, actual: %s", expected, actual) .. "\n" .. debug.traceback())
-	end
-	print("PASS\t" .. actual .. " IS " .. expected .. " (" .. currentNamespace .. ")")
-end
-
+require("../assert")
 
 -- win32
+_G.currentNamespace = "win32"
 assertStrictEqual(path.win32.dirname('c:\\'), 'c:\\');
 assertStrictEqual(path.win32.dirname('c:\\foo'), 'c:\\');
 assertStrictEqual(path.win32.dirname('c:\\foo\\'), 'c:\\');
@@ -62,7 +53,7 @@ assertStrictEqual(path.win32.dirname('foo'), '.');
 
 -- posix
 -- TODO
-currentNamespace = "posix"
+_G.currentNamespace = "posix"
 assertStrictEqual(path.posix.dirname('/a/b/'), '/a');
 assertStrictEqual(path.posix.dirname('/a/b'), '/a');
 assertStrictEqual(path.posix.dirname('/a'), '/');
@@ -71,3 +62,5 @@ assertStrictEqual(path.posix.dirname('/'), '/');
 assertStrictEqual(path.posix.dirname('////'), '/');
 assertStrictEqual(path.posix.dirname('//a'), '//');
 assertStrictEqual(path.posix.dirname('foo'), '.');
+
+print("OK\ttest-path-dirname")

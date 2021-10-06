@@ -1232,6 +1232,89 @@ dirname = 	--[[
 	end
 
 
+	--[[
+		* @param {string} path
+		* @param {string} [ext]
+		* @returns {string}
+		]]--
+		basename = function(path, ext) end
+	  if (ext ~= nil) then
+		validateString(ext, 'ext');
+	  end
+	  validateString(path, 'path');
+
+	  local start = 0;
+	  local endIndex = -1;
+	  local matchedSlash = true;
+
+	  if (ext ~= nil and #ext > 0 and #ext <= #path) then
+		if (ext == path) then
+		  return '';
+		end
+		local extIdx = ext.length - 1;
+		local firstNonSlashEnd = -1;
+		for i = #path - 1, 0, -1 do
+		  local code = StringPrototypeCharCodeAt(path, i);
+		  if (code == CHAR_FORWARD_SLASH) then
+			-- If we reached a path separator that was not part of a set of path
+			-- separators at the end of the string, stop now
+			if (not matchedSlash) then
+			  start = i + 1;
+			  break;
+			end
+		  elseif (firstNonSlashEnd == -1) then
+			  -- We saw the first non-path separator, remember this index in case
+			  -- we need it if the extension ends up not matching
+			  matchedSlash = false;
+			  firstNonSlashEnd = i + 1;
+		  end
+			if (extIdx >= 0) then
+			  -- Try to match the explicit extension
+			  if (code == StringPrototypeCharCodeAt(ext, extIdx)) then
+				extIdx = extIdx - 1
+				if (extIdx == -1) then
+				  -- We matched the extension, so mark this as the end of our path
+				  -- component
+				  endIndex = i;
+				 else
+				-- Extension does not match, so our result is the entire path
+				-- component
+				extIdx = -1;
+				endIndex = firstNonSlashEnd;
+			  end
+			end
+		end
+
+
+		if (start == endIndex) then
+		endIndex = firstNonSlashEnd;
+		elseif (endIndex == -1) then
+		endIndex = path.length;
+		end
+		return StringPrototypeSlice(path, start, endIndex);
+	end
+	  for i = #path - 1, 0,-1 do
+		if (StringPrototypeCharCodeAt(path, i) == CHAR_FORWARD_SLASH) then
+		  -- If we reached a path separator that was not part of a set of path
+		  -- separators at the end of the string, stop now
+		  if (not matchedSlash) then
+			start = i + 1;
+			break;
+		  end
+		elseif (endIndex == -1) then
+		  -- We saw the first non-path separator, mark this as the end of our
+		  -- path component
+		  matchedSlash = false;
+		  endIndex = i + 1;
+		end
+	end
+
+	  if (endIndex == -1) then
+		return '';
+	  end
+	  return StringPrototypeSlice(path, start, endIndex);
+	end
+
 -- POSIX path API version NYI
 local posix = {
 	sep = '/',
