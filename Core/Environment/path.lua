@@ -176,8 +176,8 @@ local uv = require("uv")
 --    * @param {...string} args
 --    * @returns {string}
 --    ]]--
-local function resolveRelativePath(...)
-	DEBUG("resolveRelativePath", ...)
+local function resolve(...)
+	DEBUG("resolve", ...)
 	local args = { ... }
 
     local resolvedDevice = '';
@@ -325,8 +325,8 @@ end
 --    * @param {string} path
 --    * @returns {string}
 --    ]]--
-   local function normalizePath(path)
-	DEBUG("normalizePath", path)
+   local function normalize(path)
+	DEBUG("normalize", path)
     -- validateString(path, 'path');
 	if type(path) ~= "string" then return nil, "Usage: normalize(path)" end
 
@@ -424,8 +424,8 @@ end
 --    * @param {string} path
 --    * @returns {boolean}
 --    ]]--
-local function isAbsolutePath(path)
-	DEBUG("isAbsolutePath", path)
+local function isAbsolute(path)
+	DEBUG("isAbsolute", path)
     -- validateString(path, 'path');
 	if type(path) ~= "string" then return nil, "Usage: isAbsolute(path)" end
 
@@ -446,8 +446,8 @@ local function isAbsolutePath(path)
    * @param {...string} args
    * @returns {string}
    ]]--
-  local function joinPath(...)
-	DEBUG("joinPath", ...)
+  local function join(...)
+	DEBUG("join", ...)
 	local args = { ... }
 
     if (#args == 0) then
@@ -534,8 +534,8 @@ end
 --    ]]--
 
 
-   local function convertRelativePath(from, to)
-	DEBUG("convertRelativePath", from, to)
+   local function relative(from, to)
+	DEBUG("relative", from, to)
     -- validateString(from, 'from');
 	if type(from) ~= "string" then return nil, "Usage: convert(from, to)" end
     -- validateString(to, 'to');
@@ -706,8 +706,8 @@ local function toNamespacedPath(path)
    * @param {string} path
    * @returns {string}
 ]]--
-local function getDirectoryName(path) -- dirname
-	DEBUG("getDirectoryName", path)
+local function dirname(path) -- dirname
+	DEBUG("dirname", path)
 		-- validateString(path, 'path');
 		if type(path) ~= "string" then return nil, "Usage: dirname(path)" end
 		local len = #path;
@@ -807,8 +807,8 @@ local function getDirectoryName(path) -- dirname
 		* @param {string} [ext]
 		* @returns {string}
 		]]--
-local function getFileName(path, ext)
-	DEBUG("getFileName", path, ext)
+local function basename(path, ext)
+	DEBUG("basename", path, ext)
 	if (ext ~= nil) then
 		-- validateString(ext, 'ext');
 		if type(path) ~= "string" then return nil, "Usage: basename(path, ext)" end
@@ -908,8 +908,8 @@ end
 * @param {string} path
 * @returns {string}
 ]]--
-local function getFileExtension(path)
-	DEBUG("getFileExtension", path)
+local function extname(path)
+	DEBUG("extname", path)
 	-- validateString(path, 'path');
 	if type(path) ~= "string" then return nil, "Usage: extname(path)" end
 
@@ -989,8 +989,8 @@ end
    *  ext: string;
    *  }}
    ]]--
-   local function parsePath(path)
-	DEBUG("parsePath", path)
+   local function parse(path)
+	DEBUG("parse", path)
     -- validateString(path, 'path');
 	if type(path) ~= "string" then return nil, "Usage: parse(path)" end
 
@@ -1157,16 +1157,16 @@ end
 end
 
 local win32 = {
-	resolve = resolveRelativePath,
-	normalize = normalizePath,
-	isAbsolute = isAbsolutePath,
-	join = joinPath,
-	relative = convertRelativePath,
+	resolve = resolve,
+	normalize = normalize,
+	isAbsolute = isAbsolute,
+	join = join,
+	relative = relative,
 	toNamespacedPath = toNamespacedPath,
-	dirname = getDirectoryName,
-	basename = getFileName,
-	extname = getFileExtension,
-	parse = parsePath,
+	dirname = dirname,
+	basename = basename,
+	extname = extname,
+	parse = parse,
 
 
 
@@ -1191,16 +1191,16 @@ local posix = {
 	sep = '/',
 	delimiter = ':',
 	-- TODO replace with POSIX apis
-	resolve = resolveRelativePath,
-	normalize = normalizePath,
-	isAbsolute = isAbsolutePath,
-	join = joinPath,
-	relative = convertRelativePath,
+	resolve = resolve,
+	normalize = normalize,
+	isAbsolute = isAbsolute,
+	join = join,
+	relative = relative,
 	toNamespacedPath = toNamespacedPath,
-	dirname = getDirectoryName,
-	basename = getFileName,
-	extname = getFileExtension,
-	parse = parsePath,
+	dirname = dirname,
+	basename = basename,
+	extname = extname,
+	parse = parse,
 }
 -- posix = win32 -- TODO: Replace with actual POSIX path APIs
 
