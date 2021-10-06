@@ -1186,6 +1186,52 @@ end,
   posix = nil
 };
 
+dirname = 	--[[
+	* @param {string} path
+	* @returns {string}
+	]]--
+   function (path)
+	--  validateString(path, 'path');
+	if type(path) ~= "string" then
+		return nil, "Usage: dirname(path)"
+	end
+
+	if (#path == 0) then
+		return '.';
+	end
+
+	local hasRoot = StringPrototypeCharCodeAt(path, 0) == CHAR_FORWARD_SLASH;
+	local endIndex= -1;
+	local matchedSlash = true;
+	print("A", path, hasRoot, endIndex, matchedSlash)
+	for i = #path - 1, 1, -1 do
+		if (StringPrototypeCharCodeAt(path, i) == CHAR_FORWARD_SLASH) then
+			if not matchedSlash then
+				endIndex = i;
+				print("B", path, hasRoot, endIndex, matchedSlash)
+				break;
+			end
+		else
+			-- We saw the first non-path separator
+			matchedSlash = false;
+			print("C", path, hasRoot, endIndex, matchedSlash)
+		end
+	end
+	print("D", path, hasRoot, endIndex, matchedSlash)
+
+	if (endIndex == -1) then
+		-- path = "//a", hasRoot = true, endIndex = -1, matchedSlash = false
+		print("E", path, hasRoot, endIndex, matchedSlash)
+		return hasRoot and '/' or '.';
+	end
+	if (hasRoot and endIndex == 1) then -- index 1 in js = 2nd character, offset by one due to Lua starting at index 1 (not 0)
+		print("F", path, hasRoot, endIndex, matchedSlash)
+	   return '//'; -- TODO check for more // to -- errors...
+	 end
+	 return StringPrototypeSlice(path, 0, endIndex); -- remove the offset again because the wrapper fixes it interally before slicing?
+	end
+
+
 -- POSIX path API version NYI
 local posix = {
 	sep = '/',

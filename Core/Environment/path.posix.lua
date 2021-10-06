@@ -200,35 +200,6 @@ local posixCwd = (() => {
 	  return path;
 	},
 
-	--[[
-	 * @param {string} path
-	 * @returns {string}
-	 ]]--
-	dirname(path) {
-	  validateString(path, 'path');
-	  if (path.length == 0)
-		return '.';
-	  local hasRoot = StringPrototypeCharCodeAt(path, 0) == CHAR_FORWARD_SLASH;
-	  local end = -1;
-	  local matchedSlash = true;
-	  for (local i = path.length - 1; i >= 1; --i) {
-		if (StringPrototypeCharCodeAt(path, i) == CHAR_FORWARD_SLASH) {
-		  if (not matchedSlash) {
-			end = i;
-			break;
-		  }
-		} else {
-		  -- We saw the first non-path separator
-		  matchedSlash = false;
-		}
-	  }
-
-	  if (end == -1)
-		return hasRoot ? '/' : '.';
-	  if (hasRoot and end == 1)
-		return '--';
-	  return StringPrototypeSlice(path, 0, end);
-	},
 
 	--[[
 	 * @param {string} path
