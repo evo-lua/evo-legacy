@@ -1237,11 +1237,13 @@ dirname = 	--[[
 		* @param {string} [ext]
 		* @returns {string}
 		]]--
-		basename = function(path, ext) end
+		basename = function(path, ext)
 	  if (ext ~= nil) then
-		validateString(ext, 'ext');
+		-- validateString(ext, 'ext');
+		if type(ext) ~= "string" then return nil, "Usage: basename(path, ext)" end
 	  end
-	  validateString(path, 'path');
+	--   validateString(path, 'path');
+	  if type(path) ~= "string" then return nil, "Usage: basename(path, ext)" end
 
 	  local start = 0;
 	  local endIndex = -1;
@@ -1284,7 +1286,7 @@ dirname = 	--[[
 			  end
 			end
 		end
-
+	end
 
 		if (start == endIndex) then
 		endIndex = firstNonSlashEnd;
