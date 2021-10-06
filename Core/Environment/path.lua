@@ -85,7 +85,7 @@ function normalizeString(path, allowAboveRoot, separator, isPathSeparator)
   for i = 0, #path, 1 do
 
 	-- append path separator at the end, if it's missing?
-    if (i < path.length) then
+    if (i < #path) then
     	code = StringPrototypeCharCodeAt(path, i);
 	else
 		if (isPathSeparator(code)) then
@@ -99,10 +99,10 @@ function normalizeString(path, allowAboveRoot, separator, isPathSeparator)
 			-- NOOP
 		else if (dots == 2) then
 
-			if (res.length < 2 or lastSegmentLength ~= 2 or
+			if (#res < 2 or lastSegmentLength ~= 2 or
 				StringPrototypeCharCodeAt(res, res.length - 1) ~= CHAR_DOT or
 				StringPrototypeCharCodeAt(res, res.length - 2) ~= CHAR_DOT) then
-			if (res.length > 2) then
+			if (#res > 2) then
 				local lastSlashIndex = StringPrototypeLastIndexOf(res, separator);
 				if (lastSlashIndex == -1) then
 				res = '';
@@ -110,12 +110,12 @@ function normalizeString(path, allowAboveRoot, separator, isPathSeparator)
 				else
 				res = StringPrototypeSlice(res, 0, lastSlashIndex);
 				lastSegmentLength =
-					res.length - 1 - StringPrototypeLastIndexOf(res, separator);
+					#res - 1 - StringPrototypeLastIndexOf(res, separator);
 				end
 				lastSlash = i;
 				dots = 0;
 				-- continue; -- TODO
-			elseif (res.length ~= 0) then
+			elseif (#res ~= 0) then
 				res = '';
 				lastSegmentLength = 0;
 				lastSlash = i;
@@ -128,7 +128,7 @@ function normalizeString(path, allowAboveRoot, separator, isPathSeparator)
 			lastSegmentLength = 2;
 			end
 		else
-			if (res.length > 0) then
+			if (#res > 0) then
 			--   res += `${separator}${StringPrototypeSlice(path, lastSlash + 1, i)}`; -- TODO
 			else
 			res = StringPrototypeSlice(path, lastSlash + 1, i);
@@ -303,7 +303,7 @@ local function resolve(...)
       else
         -- resolvedTail =          `${StringPrototypeSlice(path, rootEnd)}\\${resolvedTail}`; -- TODO
 		      resolvedAbsolute = isAbsolute;
-        if (isAbsolute and resolvedDevice.length > 0) then
+        if (isAbsolute and #resolvedDevice > 0) then
           break;
 		end
 	end
@@ -407,9 +407,9 @@ end
     end
 
     -- local tail = rootEnd < len ?      normalizeString(StringPrototypeSlice(path, rootEnd),                     not isAbsolute, '\\', isPathSeparator) :      ''; -- TODO
-    if (tail.length == 0 and not isAbsolute) then
+    if (#tail == 0 and not isAbsolute) then
       tail = '.'; end
-    if (tail.length > 0 and
+    if (#tail > 0 and
         isPathSeparator(StringPrototypeCharCodeAt(path, len - 1))) then
       tail = tail .. '\\';
 		end
@@ -429,7 +429,7 @@ local function isAbsolute(path)
     -- validateString(path, 'path');
 	if type(path) ~= "string" then return nil, "Usage: isAbsolute(path)" end
 
-    local len = path.length;
+    local len = #path;
     if (len == 0) then
       return false;
 	end
@@ -491,7 +491,7 @@ local function isAbsolute(path)
     local slashCount = 0;
     if (isPathSeparator(StringPrototypeCharCodeAt(firstPart, 0))) then
       slashCount = slashCount + 1;
-      local firstLen = firstPart.length;
+      local firstLen = #firstPart;
       if (firstLen > 1 and
           isPathSeparator(StringPrototypeCharCodeAt(firstPart, 1))) then
 			slashCount = slashCount + 1;
@@ -562,7 +562,7 @@ end
 
     -- Trim any leading backslashes
     local fromStart = 0;
-    while (fromStart < from.length and
+    while (fromStart < #from and
            StringPrototypeCharCodeAt(from, fromStart) == CHAR_BACKWARD_SLASH) do
 			fromStart = fromStart + 1
 		   end
@@ -578,12 +578,12 @@ end
 
     -- Trim any leading backslashes
     local toStart = 0;
-    while (toStart < to.length and
+    while (toStart < #to and
            StringPrototypeCharCodeAt(to, toStart) == CHAR_BACKWARD_SLASH) do
 			toStart = toStart + 1
 		   end
     -- Trim trailing backslashes (applicable to UNC paths only)
-    local toEnd = to.length;
+    local toEnd = #to;
     while (toEnd - 1 > toStart and
            StringPrototypeCharCodeAt(to, toEnd - 1) == CHAR_BACKWARD_SLASH) do
 	  toEnd = toEnd - 1
@@ -1253,7 +1253,7 @@ dirname = 	--[[
 		if (ext == path) then
 		  return '';
 		end
-		local extIdx = ext.length - 1;
+		local extIdx = #ext - 1;
 		local firstNonSlashEnd = -1;
 		for i = #path - 1, 0, -1 do
 		  local code = StringPrototypeCharCodeAt(path, i);
@@ -1291,7 +1291,7 @@ dirname = 	--[[
 		if (start == endIndex) then
 		endIndex = firstNonSlashEnd;
 		elseif (endIndex == -1) then
-		endIndex = path.length;
+		endIndex = #path;
 		end
 		return StringPrototypeSlice(path, start, endIndex);
 	end

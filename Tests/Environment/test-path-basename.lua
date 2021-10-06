@@ -16,7 +16,7 @@ assertStrictEqual(path.basename('basename.ext//'), 'basename.ext');
 assertStrictEqual(path.basename('aaa/bbb', '/bbb'), 'bbb');
 assertStrictEqual(path.basename('aaa/bbb', 'a/bbb'), 'bbb');
 assertStrictEqual(path.basename('aaa/bbb', 'bbb'), 'bbb');
-assertStrictEqual(path.basename('aaa/bbb//', 'bbb'), 'bbb');
+assertStrictEqual(path.basename('aaa/bbb//', 'bbb'), 'bbb'); -- WIP
 assertStrictEqual(path.basename('aaa/bbb', 'bb'), 'b');
 assertStrictEqual(path.basename('aaa/bbb', 'b'), 'bb');
 assertStrictEqual(path.basename('/aaa/bbb', '/bbb'), 'bbb');
