@@ -1,7 +1,8 @@
 -- -- Originally ported from the NodeJS source code @ 0d2b6aca60 (latest HEAD on 2021/10/05); Copyright Joyent, Inc. and other Node contributors.
 
-
+local ENABLE_DEBUG_OUTPUT = false
 local function DEBUG(...)
+	if not ENABLE_DEBUG_OUTPUT then return end
 	print(...)
 end
 
