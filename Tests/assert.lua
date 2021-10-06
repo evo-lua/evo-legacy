@@ -1,4 +1,4 @@
-
+local format = string.format
 
 function _G.assertStrictEqual(actual, expected)
 	if actual ~= expected then

@@ -2,6 +2,8 @@ local path = require("./Core/Environment/path")
 
 _G.currentNamespace = "any"
 
+__filename = "test-path-basename.js"
+
 assertStrictEqual(path.basename(__filename), 'test-path-basename.js');
 assertStrictEqual(path.basename(__filename, '.js'), 'test-path-basename');
 assertStrictEqual(path.basename('.js', '.js'), '');

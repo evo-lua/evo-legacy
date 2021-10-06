@@ -824,7 +824,7 @@ local function basename(path, ext)
 	-- Check for a drive letter prefix so as not to mistake the following
 	-- path separator as an extra separator at the end of the path that can be
 	-- disregarded
-	if (path.length >= 2 and
+	if (#path >= 2 and
 		isWindowsDeviceRoot(StringPrototypeCharCodeAt(path, 0)) and
 		StringPrototypeCharCodeAt(path, 1) == CHAR_COLON) then
 		start = 2;
@@ -835,9 +835,9 @@ local function basename(path, ext)
 			return '';
 		end
 
-		local extIdx = ext.length - 1;
+		local extIdx = #ext - 1;
 		local firstNonSlashEnd = -1;
-		for i = #path - 1, i >= start, -1 do -- todo pairs
+		for i = #path - 1, start, -1 do
 			local code = StringPrototypeCharCodeAt(path, i);
 			if (isPathSeparator(code)) then
 				-- If we reached a path separator that was not part of a set of path
@@ -875,12 +875,12 @@ local function basename(path, ext)
 		if (start == endIndex) then
 			endIndex = firstNonSlashEnd;
 		elseif (endIndex == -1) then
-			endIndex = path.length;
+			endIndex = #path;
 			return StringPrototypeSlice(path, start, endIndex);
 		end
 	end
 
-	for i = #path - 1, i >= start, -1 do -- todo pairs, review all for loops for this pattern
+	for i = #path - 1, start, -1 do
 		if (isPathSeparator(StringPrototypeCharCodeAt(path, i))) then
 			-- If we reached a path separator that was not part of a set of path
 			-- separators at the end of the string, stop now
@@ -996,7 +996,7 @@ end
 
 
     local ret = { root = '', dir = '', base = '', ext = '', name = '' };
-    if (path.length == 0) then
+    if (#path == 0) then
       return ret;
 	end
 
