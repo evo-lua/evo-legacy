@@ -5,9 +5,11 @@ local format = string.format
 
 local path = require("../../Core/Environment/path")
 
+local currentNamespace = "win32"
+
 local function assertStrictEqual(actual, expected)
 	assert(actual == expected, format("\nExpected %s, actual: %s", expected, actual) .. "\n" .. debug.traceback())
-	print("PASS\t" .. actual .. " IS " .. expected)
+	print("PASS\t" .. actual .. " IS " .. expected .. " (" .. currentNamespace .. ")")
 end
 
 
@@ -57,6 +59,7 @@ assertStrictEqual(path.win32.dirname('foo'), '.');
 
 -- posix
 -- TODO
+currentNamespace = "posix"
 assertStrictEqual(path.posix.dirname('/a/b/'), '/a');
 assertStrictEqual(path.posix.dirname('/a/b'), '/a');
 assertStrictEqual(path.posix.dirname('/a'), '/');
