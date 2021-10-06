@@ -70,3 +70,10 @@ if (ffi.os == "Windows") then
 else
     assert(path == path.posix, "The Path API must be using path.posix on POSIX-compliant platforms"); -- will this even work or do we have to do deep table comparisons?
 end
+
+
+-- win32 tests
+
+require("./Tests/Environment/test-path-dirname.lua")
+
+-- posix tests

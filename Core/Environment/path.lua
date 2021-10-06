@@ -1,5 +1,11 @@
 -- -- Originally ported from the NodeJS source code @ 0d2b6aca60 (latest HEAD on 2021/10/05); Copyright Joyent, Inc. and other Node contributors.
 
+
+local function DEBUG(...)
+	print(...)
+end
+
+
 -- -- TODO
 -- -- local {
 -- --   FunctionPrototypeBind,
@@ -11,24 +17,44 @@
 -- --   StringPrototypeToLowerCase,
 -- -- } = primordials;
 
+function string:charAt(index)
+	DEBUG("charAt", index)
+	return self:sub(index, index+1)
+end
+
+function string:charCodeAt(index)
+	DEBUG("charCodeAt", index)
+	return self:charAt(index):byte()
+end
+
+
+-- TBD: Test and create alias string.charCodeAt?
+local function StringPrototypeCharCodeAt(str, index)
+	DEBUG("StringPrototypeCharCodeAt", str, index)
+	index = index + 1 -- Offset by one because Lua indices start at 1, and not 0
+	return string.charCodeAt(str, index)
+end
+
+-- TBD: Test and create alias string.slice ?
+local function StringPrototypeSlice(str, i, j)
+
+	-- To offset for Lua indices starting at 1
+	if i ~= nil then i = i + 1 end
+	-- if j ~= nil then j = j + 1 end
+
+	return string.sub( str, i, j)
+end
+
 -- -- Character codes
--- CHAR_UPPERCASE_A = 65
--- CHAR_LOWERCASE_A = 97
--- CHAR_UPPERCASE_Z = 90
--- CHAR_LOWERCASE_Z = 122
--- CHAR_DOT = 46
--- CHAR_FORWARD_SLASH = 47
--- CHAR_BACKWARD_SLASH = 92
--- CHAR_COLON = 58
--- CHAR_QUESTION_MARK = 63
-
--- -- TODO
--- -- local {
--- --   validateObject,
--- --   validateString,
--- -- } = require('internal/validators');
-
-
+CHAR_UPPERCASE_A = 65
+CHAR_LOWERCASE_A = 97
+CHAR_UPPERCASE_Z = 90
+CHAR_LOWERCASE_Z = 122
+CHAR_DOT = 46
+CHAR_FORWARD_SLASH = 47
+CHAR_BACKWARD_SLASH = 92
+CHAR_COLON = 58
+CHAR_QUESTION_MARK = 63
 
 local ffi = require("ffi")
 local platformIsWin32 = (ffi.os == 'Windows')
@@ -49,6 +75,7 @@ end
 
 -- -- Resolves . and .. elements in a path with directory names
 function normalizeString(path, allowAboveRoot, separator, isPathSeparator)
+	error("normalizeString is still TODO")
   local res = '';
   local lastSegmentLength = 0;
   local lastSlash = -1;
@@ -131,6 +158,7 @@ end
  * @returns {string}
  ]]--
 function _format(sep, pathObject)
+	error("_format is still TODO")
   validateObject(pathObject, 'pathObject');
   local dir = pathObject.dir or pathObject.root;
 --   local base = pathObject.base or  `${pathObject.name or ''}${pathObject.ext or ''}`; -- TODO
@@ -141,10 +169,6 @@ function _format(sep, pathObject)
 end
 
 local uv = require("uv")
-
-local function DEBUG(...)
-	print(...)
-end
 
 --   --[[
 --    * path.resolve([from ...], to)
@@ -681,11 +705,11 @@ local function toNamespacedPath(path)
    * @param {string} path
    * @returns {string}
 ]]--
-local function getDirectoryName(path)
+local function getDirectoryName(path) -- dirname
 	DEBUG("getDirectoryName", path)
 		-- validateString(path, 'path');
 		if type(path) ~= "string" then return nil, "Usage: dirname(path)" end
-		local len = path.length;
+		local len = #path;
 		if (len == 0) then
 		  return '.';
 		end
@@ -697,7 +721,7 @@ local function getDirectoryName(path)
 		if (len == 1) then
 		  -- `path` contains just a path separator, exit early to avoid
 		  -- unnecessary work or a dot.
-		--   return isPathSeparator(code) ? path : '.';  -- todo
+		 return isPathSeparator(code) and path or '.';
 		end
 
 		-- Try to match a root
@@ -750,13 +774,13 @@ local function getDirectoryName(path)
 		-- Possible device root
 		elseif (isWindowsDeviceRoot(code) and
 				   StringPrototypeCharCodeAt(path, 1) == CHAR_COLON) then
-		--   rootEnd =			len > 2 and isPathSeparator(StringPrototypeCharCodeAt(path, 2)) ? 3 : 2; -- todo
+		rootEnd =			(len > 2 and isPathSeparator(StringPrototypeCharCodeAt(path, 2))) and 3 or 2;
 		  offset = rootEnd;
 				   end
 
 		local endIndex = -1;
 		local matchedSlash = true;
-		for i = len - 1, i >= offset, -1 do
+		for i = len - 1, offset, -1 do
 		  if (isPathSeparator(StringPrototypeCharCodeAt(path, i))) then
 			if (not matchedSlash) then
 				endIndex = i;
