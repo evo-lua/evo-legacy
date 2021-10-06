@@ -8,7 +8,10 @@ local path = require("../../Core/Environment/path")
 local currentNamespace = "win32"
 
 local function assertStrictEqual(actual, expected)
-	assert(actual == expected, format("\nExpected %s, actual: %s", expected, actual) .. "\n" .. debug.traceback())
+	if actual ~= expected then
+		print("FAIL\t" .. actual .. " IS " .. expected .. " (" .. currentNamespace .. ")")
+		error(format("\nExpected %s, actual: %s", expected, actual) .. "\n" .. debug.traceback())
+	end
 	print("PASS\t" .. actual .. " IS " .. expected .. " (" .. currentNamespace .. ")")
 end
 
