@@ -46,6 +46,20 @@ local function StringPrototypeSlice(str, i, j)
 	return string.sub( str, i, j)
 end
 
+-- If searchValue is an empty string, then fromIndex is returned.
+local function StringPrototypeLastIndexOf(str, searchValue, fromIndex)
+	if fromIndex == nil then fromIndex = math.huge end
+	-- If fromIndex < 0, the behavior will be the same as if it would be 0.
+	if fromIndex < 0 then fromIndex = 0 end
+
+	if searchValue == "" then return fromIndex end
+
+	local returnIndex = string.find(str, searchValue, fromIndex)
+	if returnIndex == nil then returnIndex = -1 end
+
+	return returnIndex
+end
+
 -- -- Character codes
 CHAR_UPPERCASE_A = 65
 CHAR_LOWERCASE_A = 97
@@ -74,78 +88,75 @@ function isWindowsDeviceRoot(code)
          (code >= CHAR_LOWERCASE_A and code <= CHAR_LOWERCASE_Z);
 end
 
--- -- Resolves . and .. elements in a path with directory names
+local format = string.format
+
+-- Resolves . and .. elements in a path with directory names
 function normalizeString(path, allowAboveRoot, separator, isPathSeparator)
-  local res = '';
-  local lastSegmentLength = 0;
-  local lastSlash = -1;
-  local dots = 0;
-  local code = 0;
-  for i = 0, #path, 1 do
+	local res = '';
+	local lastSegmentLength = 0;
+	local lastSlash = -1;
+	local dots = 0;
+	local code = 0;
+	for i = 0, #path, 1 do
+		::continue::
+	  if (i < #path) then		code = StringPrototypeCharCodeAt(path, i);
+	  elseif (isPathSeparator(code)) then
+		break;
+	  else
+		code = CHAR_FORWARD_SLASH;
+	  end
 
-	-- append path separator at the end, if it's missing?
-    if (i < #path) then
-    	code = StringPrototypeCharCodeAt(path, i);
-	else
-		if (isPathSeparator(code)) then
-			break;
-		else
-			code = CHAR_FORWARD_SLASH;
-		end
-
-		if (isPathSeparator(code)) then
+	  if (isPathSeparator(code)) then
 		if (lastSlash == i - 1 or dots == 1) then
-			-- NOOP
-		else if (dots == 2) then
-
-			if (#res < 2 or lastSegmentLength ~= 2 or
-				StringPrototypeCharCodeAt(res, #res - 1) ~= CHAR_DOT or
-				StringPrototypeCharCodeAt(res, #res - 2) ~= CHAR_DOT) then
+		  -- NOOP
+		elseif (dots == 2) then
+		  if (#res < 2 or lastSegmentLength ~= 2 or
+			  StringPrototypeCharCodeAt(res, #res - 1) ~= CHAR_DOT or
+			  StringPrototypeCharCodeAt(res, #res - 2) ~= CHAR_DOT) then
+				local shouldContinue = false
 			if (#res > 2) then
-				local lastSlashIndex = StringPrototypeLastIndexOf(res, separator);
-				if (lastSlashIndex == -1) then
-					res = '';
-					lastSegmentLength = 0;
-				else
-					res = StringPrototypeSlice(res, 0, lastSlashIndex);
-					lastSegmentLength =	#res - 1 - StringPrototypeLastIndexOf(res, separator);
-				end
-				lastSlash = i;
-				dots = 0;
-				-- continue; -- TODO
-				error("continue 1 NYI")
-			elseif (#res ~= 0) then
+			  local lastSlashIndex = StringPrototypeLastIndexOf(res, separator);
+			  if (lastSlashIndex == -1) then
 				res = '';
 				lastSegmentLength = 0;
-				lastSlash = i;
-				dots = 0;
-				error("continue 2 NYI")
-				-- continue; -- TODO
+			  else
+				res = StringPrototypeSlice(res, 0, lastSlashIndex);
+				lastSegmentLength =
+				  #res - 1 - StringPrototypeLastIndexOf(res, separator);
+			  end
+			  lastSlash = i;
+			  dots = 0;
+			  --   continue;
+			  goto continue
+			elseif (#res ~= 0) then
+			  res = '';
+			  lastSegmentLength = 0;
+			  lastSlash = i;
+			  dots = 0;
+			--   continue;
+			goto continue
 			end
-			end
-			if (allowAboveRoot) then
-				res = res .. ((#res > 0) and format("%s..", separator) or "..")
+		end
+		  if (allowAboveRoot) then
+			res = res .. (#res > 0 and format("%s..", separator) or '..')
 			lastSegmentLength = 2;
-			end
-		else
-			if (#res > 0) then
-			  res = res .. format("%s%s", separator, StringPrototypeSlice(path, lastSlash + 1, i))
-			else
+		  end
+		else if (#res > 0) then
+			res = res .. format("%s%s", separator, StringPrototypeSlice(path, lastSlash + 1, i))
+		  else
 			res = StringPrototypeSlice(path, lastSlash + 1, i);
-			lastSegmentLength = i - lastSlash - 1;
-			end
+		  end
+		  lastSegmentLength = i - lastSlash - 1;
+		end
 		lastSlash = i;
 		dots = 0;
-		end
-	end
-		elseif (code == CHAR_DOT and dots ~= -1) then
-			dots = dots + 1
-		else
+	  elseif (code == CHAR_DOT and dots ~= -1) then
+		dots = dots + 1
+	  else
 		dots = -1;
-		end
+	  end
 	end
-  return res;
-end
+	return res;
 end
 --[[
  * @param {string} sep
