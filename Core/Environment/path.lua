@@ -1330,6 +1330,43 @@ dirname = 	--[[
 			   StringPrototypeCharCodeAt(path, 0) == CHAR_FORWARD_SLASH;
 	 end
 
+
+	--[[
+	 * @param {string} path
+	 * @returns {string}
+	 ]]--
+	 normalize = function(path)
+		-- validateString(path, 'path');
+		if type(path) ~= "string" then
+			return nil, "Usage: normalize(path)"
+		end
+
+		if (path.length == 0) then
+		  return '.';
+		end
+
+		local isAbsolute =
+		  StringPrototypeCharCodeAt(path, 0) == CHAR_FORWARD_SLASH;
+		local trailingSeparator =
+		  StringPrototypeCharCodeAt(path, #path - 1) == CHAR_FORWARD_SLASH;
+
+		-- Normalize the path
+		path = normalizeString(path, not isAbsolute, '/', isPosixPathSeparator);
+
+		if (#path == 0) then
+		  if (isAbsolute) then
+			return '/';
+		  end
+		  return trailingSeparator and './' or '.';
+		end
+		if (trailingSeparator) then
+		  path = path .. '/';
+		end
+
+		return isAbsolute and format("/%s", path) or path;
+	end
+
+
 -- POSIX path API version NYI
 local posix = {
 	sep = '/',
