@@ -71,7 +71,7 @@ assertStrictEqual(path.posix.basename('foo'), 'foo');
 -- // POSIX filenames may include control characters
 -- // c.f. http://www.dwheeler.com/essays/fixing-unix-linux-filenames.html
 local controlCharFilename = string.format("Icon%s", string.char(13))
-assertStrictEqual(path.posix.basename(string.format("/a/b/%s", controlCharFilename), controlCharFilename))
+assertStrictEqual(path.posix.basename(string.format("/a/b/%s", controlCharFilename)), controlCharFilename)
 
 
 print("OK\ttest-path-basename")
