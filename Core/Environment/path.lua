@@ -76,7 +76,6 @@ end
 
 -- -- Resolves . and .. elements in a path with directory names
 function normalizeString(path, allowAboveRoot, separator, isPathSeparator)
-	error("normalizeString is still TODO")
   local res = '';
   local lastSegmentLength = 0;
   local lastSlash = -1;
@@ -100,36 +99,37 @@ function normalizeString(path, allowAboveRoot, separator, isPathSeparator)
 		else if (dots == 2) then
 
 			if (#res < 2 or lastSegmentLength ~= 2 or
-				StringPrototypeCharCodeAt(res, res.length - 1) ~= CHAR_DOT or
-				StringPrototypeCharCodeAt(res, res.length - 2) ~= CHAR_DOT) then
+				StringPrototypeCharCodeAt(res, #res - 1) ~= CHAR_DOT or
+				StringPrototypeCharCodeAt(res, #res - 2) ~= CHAR_DOT) then
 			if (#res > 2) then
 				local lastSlashIndex = StringPrototypeLastIndexOf(res, separator);
 				if (lastSlashIndex == -1) then
-				res = '';
-				lastSegmentLength = 0;
+					res = '';
+					lastSegmentLength = 0;
 				else
-				res = StringPrototypeSlice(res, 0, lastSlashIndex);
-				lastSegmentLength =
-					#res - 1 - StringPrototypeLastIndexOf(res, separator);
+					res = StringPrototypeSlice(res, 0, lastSlashIndex);
+					lastSegmentLength =	#res - 1 - StringPrototypeLastIndexOf(res, separator);
 				end
 				lastSlash = i;
 				dots = 0;
 				-- continue; -- TODO
+				error("continue 1 NYI")
 			elseif (#res ~= 0) then
 				res = '';
 				lastSegmentLength = 0;
 				lastSlash = i;
 				dots = 0;
+				error("continue 2 NYI")
 				-- continue; -- TODO
 			end
 			end
 			if (allowAboveRoot) then
-			--   res += res.length > 0 ? `${separator}..` : '..'; -- TODO
+				res = res .. ((#res > 0) and format("%s..", separator) or "..")
 			lastSegmentLength = 2;
 			end
 		else
 			if (#res > 0) then
-			--   res += `${separator}${StringPrototypeSlice(path, lastSlash + 1, i)}`; -- TODO
+			  res = res .. format("%s%s", separator, StringPrototypeSlice(path, lastSlash + 1, i))
 			else
 			res = StringPrototypeSlice(path, lastSlash + 1, i);
 			lastSegmentLength = i - lastSlash - 1;
@@ -320,6 +320,7 @@ end
     -- return resolvedAbsolute ?      `${resolvedDevice}\\${resolvedTail}` :      `${resolvedDevice}${resolvedTail}` or '.'; 00 TODO
 end
 
+local format = string.format
 
 --   --[[
 --    * @param {string} path
@@ -342,7 +343,7 @@ end
     if (len == 1) then
       -- `path` contains just a single char, exit early to avoid
       -- unnecessary work
-    --   return isPosixPathSeparator(code) ? '\\' : path; -- TODO
+      return isPosixPathSeparator(code) and '\\' or path;
 	end
     if (isPathSeparator(code)) then
       -- Possible UNC root
@@ -381,11 +382,11 @@ end
               -- We matched a UNC root only
               -- Return the normalized version of the UNC root since there
               -- is nothing left to process
-            --   return `\\\\${firstPart}\\${StringPrototypeSlice(path, last)}\\`; -- TODO
+              return format("\\\\%s\\%s\\", firstPart, StringPrototypeSlice(path, last));
 			end
             if (j ~= last) then
               -- We matched a UNC root with leftovers
-            --   device =                `\\\\${firstPart}\\${StringPrototypeSlice(path, last, j)}`; -- TODO
+              device =                format("\\\\%s\\%s", firstPart, StringPrototypeSlice(path, last, j));
               rootEnd = j;
 			end
 		end
@@ -406,7 +407,8 @@ end
 	  end
     end
 
-    -- local tail = rootEnd < len ?      normalizeString(StringPrototypeSlice(path, rootEnd),                     not isAbsolute, '\\', isPathSeparator) :      ''; -- TODO
+    local tail = (rootEnd < len ) and
+		normalizeString(StringPrototypeSlice(path, rootEnd), not isAbsolute, '\\', isPathSeparator) or '';
     if (#tail == 0 and not isAbsolute) then
       tail = '.'; end
     if (#tail > 0 and
@@ -414,9 +416,9 @@ end
       tail = tail .. '\\';
 		end
     if (device == nil) then
-    --   return isAbsolute ? `\\${tail}` : tail; -- TODO
+      return isAbsolute and format("\\%s", tail) or tail;
 	end
-    -- return isAbsolute ? `${device}\\${tail}` : `${device}${tail}`; -- TODO
+    return isAbsolute and format("%s\\%s", device, tail) or format("%s%s", device, tail);
 end
 
 

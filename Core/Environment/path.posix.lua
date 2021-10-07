@@ -52,35 +52,6 @@ local posixCwd = (() => {
 	  return resolvedPath.length > 0 ? resolvedPath : '.';
 	},
 
-	--[[
-	 * @param {string} path
-	 * @returns {string}
-	 ]]--
-	normalize(path) {
-	  validateString(path, 'path');
-
-	  if (path.length == 0)
-		return '.';
-
-	  local isAbsolute =
-		StringPrototypeCharCodeAt(path, 0) == CHAR_FORWARD_SLASH;
-	  local trailingSeparator =
-		StringPrototypeCharCodeAt(path, path.length - 1) == CHAR_FORWARD_SLASH;
-
-	  -- Normalize the path
-	  path = normalizeString(path, not isAbsolute, '/', isPosixPathSeparator);
-
-	  if (path.length == 0) {
-		if (isAbsolute)
-		  return '/';
-		return trailingSeparator ? './' : '.';
-	  }
-	  if (trailingSeparator)
-		path += '/';
-
-	  return isAbsolute ? `/${path}` : path;
-	},
-
 
 
 	--[[
