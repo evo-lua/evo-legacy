@@ -81,15 +81,7 @@ local posixCwd = (() => {
 	  return isAbsolute ? `/${path}` : path;
 	},
 
-	--[[
-	 * @param {string} path
-	 * @returns {boolean}
-	 ]]--
-	isAbsolute(path) {
-	  validateString(path, 'path');
-	  return path.length > 0 and
-			 StringPrototypeCharCodeAt(path, 0) == CHAR_FORWARD_SLASH;
-	},
+
 
 	--[[
 	 * @param {...string} args

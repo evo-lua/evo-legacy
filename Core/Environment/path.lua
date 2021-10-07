@@ -1317,6 +1317,17 @@ dirname = 	--[[
 	  return StringPrototypeSlice(path, start, endIndex);
 	end
 
+	--[[
+	 * @param {string} path
+	 * @returns {boolean}
+	 ]]--
+	 isAbsolute = function(path)
+		-- validateString(path, 'path');
+		if type(path) ~= "string" then return nil, "Usage: isAbsolute(path)" end
+		return #path > 0 and
+			   StringPrototypeCharCodeAt(path, 0) == CHAR_FORWARD_SLASH;
+	 end
+
 -- POSIX path API version NYI
 local posix = {
 	sep = '/',
