@@ -876,8 +876,8 @@ local function basename(path, ext)
 			endIndex = firstNonSlashEnd;
 		elseif (endIndex == -1) then
 			endIndex = #path;
-			return StringPrototypeSlice(path, start, endIndex);
 		end
+			return StringPrototypeSlice(path, start, endIndex);
 	end
 
 	for i = #path - 1, start, -1 do
