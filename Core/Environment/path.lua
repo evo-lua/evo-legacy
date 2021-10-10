@@ -485,7 +485,7 @@ end
     -- fails)
 
     -- Normalize the tail path
-    resolvedTail = normalizeString(resolvedTail, not resolvedAbsolute, '\\',                                isPathSeparator);
+    resolvedTail = normalizeString(resolvedTail, not resolvedAbsolute, '\\');
 
     -- return resolvedAbsolute ?      `${resolvedDevice}\\${resolvedTail}` :      `${resolvedDevice}${resolvedTail}` or '.'; 00 TODO
 end
@@ -578,7 +578,7 @@ local format = string.format
     end
 
     local tail = (rootEnd < len ) and
-		normalizeString(StringPrototypeSlice(path, rootEnd), not isAbsolute, '\\', isPathSeparator) or '';
+		normalizeString(StringPrototypeSlice(path, rootEnd), not isAbsolute, '\\') or '';
     if (#tail == 0 and not isAbsolute) then
       tail = '.'; end
     if (#tail > 0 and
@@ -590,7 +590,6 @@ local format = string.format
 	end
     return isAbsolute and format("%s\\%s", device, tail) or format("%s%s", device, tail);
 end
-
 
 --   --[[
 --    * @param {string} path
@@ -999,10 +998,12 @@ local function basename(path, ext)
 	if (#path >= 2 and
 		isWindowsDeviceRoot(StringPrototypeCharCodeAt(path, 0)) and
 		StringPrototypeCharCodeAt(path, 1) == CHAR_COLON) then
+			-- skip the device root letter (if present)
 		start = 2;
 	end
 
 	if (ext ~= nil and #ext > 0 and #ext <= #path) then
+		-- strip the extension (if one was given)
 		if (ext == path) then
 			return '';
 		end
@@ -1521,7 +1522,7 @@ dirname = 	--[[
 		  StringPrototypeCharCodeAt(path, #path - 1) == CHAR_FORWARD_SLASH;
 
 		-- Normalize the path
-		path = normalizeString(path, not isAbsolute, '/', isPosixPathSeparator);
+		path = normalizeString(path, not isAbsolute, '/', true);
 
 		if (#path == 0) then
 		  if (isAbsolute) then
