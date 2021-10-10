@@ -60,12 +60,12 @@ for index, testCase in ipairs(testCases) do
 	_G.currentNamespace = "win32"
 	local actual = path.win32.extname(input)
 	print(input, expected, actual, index, "win32")
-	assertStrictEqual(expected, actual, index)
+	assertStrictEqual(actual, expected, index)
 
 	_G.currentNamespace = "posix"
 	print(input, expected, actual, index, "posix")
 	actual = path.posix.extname(input)
-	assertStrictEqual(expected, actual, index)
+	assertStrictEqual(actual, expected, index)
 end
 
 -- On Windows, backslash is a path separator.
