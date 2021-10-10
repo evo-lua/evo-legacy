@@ -15,44 +15,7 @@ local posixCwd = (() => {
   })();
 
   local posix = {
-	--[[
-	 * path.resolve([from ...], to)
-	 * @param {...string} args
-	 * @returns {string}
-	 ]]--
-	resolve(...args) {
-	  local resolvedPath = '';
-	  local resolvedAbsolute = false;
-
-	  for (local i = args.length - 1; i >= -1 and not resolvedAbsolute; i--) {
-		local path = i >= 0 ? args[i] : posixCwd();
-
-		validateString(path, 'path');
-
-		-- Skip empty entries
-		if (path.length == 0) {
-		  continue;
-		}
-
-		resolvedPath = `${path}/${resolvedPath}`;
-		resolvedAbsolute =
-		  StringPrototypeCharCodeAt(path, 0) == CHAR_FORWARD_SLASH;
-	  }
-
-	  -- At this point the path should be resolved to a full absolute path, but
-	  -- handle relative paths to be safe (might happen when uv.cwd() fails)
-
-	  -- Normalize the path
-	  resolvedPath = normalizeString(resolvedPath, not resolvedAbsolute, '/',
-									 isPosixPathSeparator);
-
-	  if (resolvedAbsolute) {
-		return `/${resolvedPath}`;
-	  }
-	  return resolvedPath.length > 0 ? resolvedPath : '.';
-	},
-
-
+	
 
 	--[[
 	 * @param {...string} args

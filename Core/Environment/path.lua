@@ -1607,6 +1607,76 @@ dirname = 	--[[
 		return StringPrototypeSlice(path, startDot, endIndex);
 		end
 
+local function posixCwd()
+	if (ffi.os == "Windows") then
+		-- Converts Windows' backslash path separators to POSIX forward slashes
+		-- and truncates any drive indicator
+		local pattern = "\\"
+
+		local cwd = string.gsub(uv.cwd(), pattern, '/');
+		local index = string.find(cwd, '/') -- We don't need the others, so discard all but the first
+		return StringPrototypeSlice(cwd, index - 1);
+	end
+
+	-- We're already on POSIX, no need for any transformations
+	return uv.cwd()
+end
+
+		--[[
+			* path.resolve([from ...], to)
+			* @param {...string} args
+			* @returns {string}
+			]]--
+	resolve = function(arg, ...)
+		print("POSIX resolve")
+
+		local args = { arg, ... }
+		p(args)
+		if not arg then return nil, "Usage: resolve(path1, [path2, ..., pathN])" end
+
+		local resolvedPath = '';
+		local resolvedAbsolute = false;
+
+		local continue = false
+		local i = #args
+		while (i >= 0 and not resolvedAbsolute) do
+
+			if args[i] ~= nil and type(args[i]) ~= "string" then
+				--
+			end
+
+			local path = i >= 0 and args[i] or posixCwd();
+			p(path)
+			if type(path) ~= "string" then return nil, "Usage: extname(path)" end
+
+
+			-- Skip empty entries
+			if (#path == 0) then
+				-- continue;
+				continue = true
+			end
+
+			if not continue then
+				resolvedPath = format("%s/%s", path, resolvedPath);
+				p(resolvedPath)
+				-- if resolvedPath == "" then return nil, "Usage: resolve(path1, [path2, ..., pathN])" end
+				resolvedAbsolute = StringPrototypeCharCodeAt(path, 0) == CHAR_FORWARD_SLASH;
+		end
+		continue = false
+		i = i -1
+	end
+
+		-- At this point the path should be resolved to a full absolute path, but
+		-- handle relative paths to be safe (might happen when uv.cwd() fails)
+
+		-- Normalize the path
+		resolvedPath = normalizeString(resolvedPath, not resolvedAbsolute, "/", true);
+
+		if (resolvedAbsolute) then
+		return "/" .. resolvedPath
+		end
+		return #resolvedPath > 0 and resolvedPath or '.';
+	end
 
 -- POSIX path API version NYI
 local posix = {
