@@ -78,5 +78,6 @@ require("./Tests/Environment/test-path-dirname.lua")
 require("./Tests/Environment/test-path-basename.lua")
 require("./Tests/Environment/test-path-isabsolute.lua")
 require("./Tests/Environment/test-path-normalize.lua")
+require("./Tests/Environment/test-path-extname.lua")
 
 -- posix tests

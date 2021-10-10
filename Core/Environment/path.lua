@@ -1077,78 +1077,76 @@ local function basename(path, ext)
 	return StringPrototypeSlice(path, start, endIndex);
 end
 
---[[
-* @param {string} path
-* @returns {string}
-]]--
 local function extname(path)
-	DEBUG("extname", path)
-	-- validateString(path, 'path');
 	if type(path) ~= "string" then return nil, "Usage: extname(path)" end
 
-	local start = 0;
-	local startDot = -1;
-	local startPart = 0;
-	local endIndex = -1;
-	local matchedSlash = true;
-	-- Track the state of characters (if any) we see before our first dot and
-	-- after any path separator we find
-	local preDotState = 0;
+    local start = 0;
+    local startDot = -1;
+    local startPart = 0;
+    local endIndex = -1;
+    local matchedSlash = true;
+    -- Track the state of characters (if any) we see before our first dot and
+    -- after any path separator we find
+    local preDotState = 0;
 
-	-- Check for a drive letter prefix so as not to mistake the following
-	-- path separator as an extra separator at the end of the path that can be
-	-- disregarded
+    -- Check for a drive letter prefix so as not to mistake the following
+    -- path separator as an extra separator at the end of the path that can be
+    -- disregarded
 
-	if (#path >= 2 and
-		StringPrototypeCharCodeAt(path, 1) == CHAR_COLON and
-		isWindowsDeviceRoot(StringPrototypeCharCodeAt(path, 0))) then
-		start = 2
+    if (#path >= 2 and StringPrototypeCharCodeAt(path, 1) == CHAR_COLON and isWindowsDeviceRoot(StringPrototypeCharCodeAt(path, 0))) then
+    	start = 2
 		startPart = 2;
 	end
 
-	 for i = #path - 1, i >= start, -1 do -- todo pairs
-		local code = StringPrototypeCharCodeAt(path, i);
+	local continue = false
+    for i = #path - 1, start, -1 do
+    	local code = StringPrototypeCharCodeAt(path, i);
+
 		if (isPathSeparator(code)) then
-			-- If we reached a path separator that was not part of a set of path
-			-- separators at the end of the string, stop now
-			if (not matchedSlash) then
+        -- If we reached a path separator that was not part of a set of path
+        -- separators at the end of the string, stop now
+        	if (not matchedSlash) then
 				startPart = i + 1;
 				break;
 			end
-			--   continue; -- todo
+
+        -- continue;
+			continue = true
 		end
 
-		if (endIndex == -1) then
-				  -- We saw the first non-path separator, mark this as the end of our
-				  -- extension
-				  matchedSlash = false;
-				  endIndex = i + 1;
-		end
+		if not continue then
 
-		if (code == CHAR_DOT) then
-			-- If this is our first dot, mark it as the start of our extension
-			if (startDot == -1) then
-				startDot = i;
-			elseif (preDotState ~= 1) then
+			if (endIndex == -1) then
+				-- We saw the first non-path separator, mark this as the end of our
+				-- extension
+				matchedSlash = false;
+				endIndex = i + 1;
+			end
+
+			if (code == CHAR_DOT) then
+				-- If this is our first dot, mark it as the start of our extension
+				if (startDot == -1) then startDot = i;
+				elseif (preDotState ~= 1) then
 					preDotState = 1;
-			elseif (startDot ~= -1) then
-							-- We saw a non-dot and non-path separator before our dot, so we should
-				  			-- have a good chance at having a non-empty extension
-				  			preDotState = -1;
-					end
 				end
-			end
 
-			if (startDot == -1 or endIndex == -1 or
-		  		-- We saw a non-dot character immediately before the dot
-				  preDotState == 0 or
-				  -- The (right-most) trimmed path component is exactly '..'
-				  (preDotState == 1 and
-				  startDot == endIndex - 1 and
-				  startDot == startPart + 1)) then
-				return ''
+			elseif (startDot ~= -1) then
+				-- We saw a non-dot and non-path separator before our dot, so we should
+				-- have a good chance at having a non-empty extension
+				preDotState = -1;
 			end
-	return StringPrototypeSlice(path, startDot, endIndex);
+		end
+
+		continue = false
+	end
+
+    if (startDot == -1 or endIndex == -1 or preDotState == 0 or -- We saw a non-dot character immediately before the dot
+	(preDotState == 1 and startDot == endIndex - 1 and startDot == startPart + 1)) -- The (right-most) trimmed path component is exactly '..'
+	then
+      return '';
+    end
+
+    return StringPrototypeSlice(path, startDot, endIndex);
 end
 
 
@@ -1536,6 +1534,78 @@ dirname = 	--[[
 
 		return isAbsolute and format("/%s", path) or path;
 	end
+
+
+
+
+	--[[
+	 * @param {string} path
+	 * @returns {string}
+	 ]]--
+	 extname = function(path)
+
+		if type(path) ~= "string" then return nil, "Usage: extname(path)" end
+
+		local startDot = -1;
+		local startPart = 0;
+		local endIndex = -1;
+		local matchedSlash = true;
+
+		local continue = false
+		-- Track the state of characters (if any) we see before our first dot and
+		-- after any path separator we find
+		local preDotState = 0;
+		for i = #path - 1, 0, -1 do
+			local code = StringPrototypeCharCodeAt(path, i);
+			if (code == CHAR_FORWARD_SLASH) then
+				-- If we reached a path separator that was not part of a set of path
+				-- separators at the end of the string, stop now
+				if (not matchedSlash) then
+					startPart = i + 1;
+					break;
+				end
+				-- continue;
+				continue = true
+			end
+
+			if not continue then
+				if (endIndex == -1) then
+					-- We saw the first non-path separator, mark this as the end of our
+					-- extension
+					matchedSlash = false;
+					endIndex = i + 1;
+				end
+
+				if (code == CHAR_DOT) then
+					-- If this is our first dot, mark it as the start of our extension
+					if (startDot == -1) then
+						startDot = i;
+					elseif (preDotState ~= 1) then
+						preDotState = 1
+					end
+
+				elseif (startDot ~= -1) then
+					-- We saw a non-dot and non-path separator before our dot, so we should
+					-- have a good chance at having a non-empty extension
+					preDotState = -1;
+				end
+			end
+
+			continue = false
+		end
+
+		if (startDot == -1 or
+		endIndex == -1 or
+		-- We saw a non-dot character immediately before the dot
+		preDotState == 0 or
+		-- The (right-most) trimmed path component is exactly '..'
+		(preDotState == 1 and
+			startDot == endIndex - 1 and
+			startDot == startPart + 1)) then
+		return '';
+			end
+		return StringPrototypeSlice(path, startDot, endIndex);
+		end
 
 
 -- POSIX path API version NYI
