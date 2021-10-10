@@ -1,4 +1,4 @@
--- -- Originally ported from the NodeJS source code @ 0d2b6aca60 (latest HEAD on 2021/10/05); Copyright Joyent, Inc. and other Node contributors.
+-- -- Originally ported from the NodeJS source code @ 0d2b6aca60 (latest HEAD on 2021/10/05); Copyright Joyent, Inc. and other Node contributors. -- TODO Include license text here?
 
 local ENABLE_DEBUG_OUTPUT = false
 local function DEBUG(...)
@@ -217,7 +217,7 @@ function normalizeString(path, allowAboveRoot, separator, isBackslashRegularChar
 		-- "\\" -- windows
 	}
 	if not isBackslashRegularCharacter then
-		table_insert(pathDelimiters, "\\") -- Treat as regular character in POSIX-compliant systems
+		table_insert(pathDelimiters, "\\") -- Treat as regular character in POSIX-compliant systems, but now Windows
 	end
 	local tokens = path:explode(pathDelimiters) -- Always slash, because this function is only called on streamlined path strings (preprocessed)
 	p(tokens)
@@ -372,7 +372,7 @@ local function resolve(...)
         -- directories. If we've resolved a drive letter but not yet an
         -- absolute path, get cwd for that drive, or the process cwd if
         -- the drive cwd is not available. We're sure the device is not
-        -- a UNC path at this points, because UNC paths are always absolute.
+        -- a UNC path at this point, because UNC paths are always absolute.
         -- path = process.env[`=${resolvedDevice}`] or uv.cwd(); -- TODO
 
         -- Verify that a cwd was found and that it actually points
