@@ -1357,11 +1357,11 @@ end,
   posix = nil
 };
 
-dirname = 	--[[
+	--[[
 	* @param {string} path
 	* @returns {string}
 	]]--
-   function (path)
+	dirname =  function (path)
 	--  validateString(path, 'path');
 	if type(path) ~= "string" then
 		return nil, "Usage: dirname(path)"
