@@ -75,5 +75,8 @@ end
 -- win32 tests
 
 require("./Tests/Environment/test-path-dirname.lua")
+require("./Tests/Environment/test-path-basename.lua")
+require("./Tests/Environment/test-path-isabsolute.lua")
+require("./Tests/Environment/test-path-normalize.lua")
 
 -- posix tests

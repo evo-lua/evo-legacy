@@ -88,75 +88,154 @@ function isWindowsDeviceRoot(code)
          (code >= CHAR_LOWERCASE_A and code <= CHAR_LOWERCASE_Z);
 end
 
+local string_gmatch = string.gmatch
+local table_insert = table.insert
+local type = type
+
+-- Splits a string into tokens separated by a given delimiter.
+-- Note: This is inspired by PHP's explode function
+-- @param inputString The string to process
+-- @param[opt] delimiter The delimiter
+-- @return A table containing the individual tokens
+function string.explode(inputString, delimiter)
+	if type(inputString) ~= "string" then
+		return {}
+	end
+
+	delimiter = delimiter or "%s" -- Use whitespace by default
+	if type(delimiter) == "table" then
+		-- use multiple delimiters
+		local delimiterPattern = ""
+		for k, v in pairs(delimiter) do
+			delimiterPattern = delimiterPattern .. v
+		end
+		delimiter = delimiterPattern
+	end
+
+	local tokens = {}
+	for token in string_gmatch(inputString, "([^" .. delimiter .. "]+)") do
+		table_insert(tokens, token)
+	end
+	return tokens
+end
+
 local format = string.format
+local ipairs = ipairs
+local table_remove = table.remove
+local table_concat = table.concat
 
 -- Resolves . and .. elements in a path with directory names
-function normalizeString(path, allowAboveRoot, separator, isPathSeparator)
+function normalizeString(path, allowAboveRoot, separator, isBackslashRegularCharacter)
 	local res = '';
 	local lastSegmentLength = 0;
 	local lastSlash = -1;
 	local dots = 0;
 	local code = 0;
-	for i = 0, #path, 1 do
-		::continue::
-	  if (i < #path) then		code = StringPrototypeCharCodeAt(path, i);
-	  elseif (isPathSeparator(code)) then
-		break;
-	  else
-		code = CHAR_FORWARD_SLASH;
-	  end
-
-	  if (isPathSeparator(code)) then
-		if (lastSlash == i - 1 or dots == 1) then
-		  -- NOOP
-		elseif (dots == 2) then
-		  if (#res < 2 or lastSegmentLength ~= 2 or
-			  StringPrototypeCharCodeAt(res, #res - 1) ~= CHAR_DOT or
-			  StringPrototypeCharCodeAt(res, #res - 2) ~= CHAR_DOT) then
-				local shouldContinue = false
-			if (#res > 2) then
-			  local lastSlashIndex = StringPrototypeLastIndexOf(res, separator);
-			  if (lastSlashIndex == -1) then
-				res = '';
-				lastSegmentLength = 0;
-			  else
-				res = StringPrototypeSlice(res, 0, lastSlashIndex);
-				lastSegmentLength =
-				  #res - 1 - StringPrototypeLastIndexOf(res, separator);
-			  end
-			  lastSlash = i;
-			  dots = 0;
-			  --   continue;
-			  goto continue
-			elseif (#res ~= 0) then
-			  res = '';
-			  lastSegmentLength = 0;
-			  lastSlash = i;
-			  dots = 0;
-			--   continue;
-			goto continue
-			end
-		end
-		  if (allowAboveRoot) then
-			res = res .. (#res > 0 and format("%s..", separator) or '..')
-			lastSegmentLength = 2;
-		  end
-		else if (#res > 0) then
-			res = res .. format("%s%s", separator, StringPrototypeSlice(path, lastSlash + 1, i))
-		  else
-			res = StringPrototypeSlice(path, lastSlash + 1, i);
-		  end
-		  lastSegmentLength = i - lastSlash - 1;
-		end
-		lastSlash = i;
-		dots = 0;
-	  elseif (code == CHAR_DOT and dots ~= -1) then
-		dots = dots + 1
-	  else
-		dots = -1;
-	  end
+	print("Attempting to resolve path " .. path .. " with separator " ..  separator)
+	local pathDelimiters = {
+		"/", -- posix AND windows --
+		-- "\\" -- windows
+	}
+	if not isBackslashRegularCharacter then
+		table_insert(pathDelimiters, "\\") -- Treat as regular character in POSIX-compliant systems
 	end
-	return res;
+	local tokens = path:explode(pathDelimiters) -- Always slash, because this function is only called on streamlined path strings (preprocessed)
+	p(tokens)
+
+	local previousToken = nil
+	local resolvedPathTokens = {}
+	for tokenID, token in ipairs(tokens) do
+		print("Resolve token " .. tokenID)
+		if token == "." then
+			print("Resolve CWD (one dot)")
+			-- Nothing to do (do not add this to the resolved path)
+		elseif token == ".." then
+			print("Resolve PARENT (two dots)")
+			-- Remove previous token from the resolved path
+			if allowAboveRoot and (#resolvedPathTokens == 0 or resolvedPathTokens[#resolvedPathTokens] == "..") then
+				-- Can't go up so just leave the relative operator in place
+				-- It's the first token, so just leave it in place to allow going above the root element in relative paths
+				print("Leave relative operator (no previous token)")
+				table_insert(resolvedPathTokens, token)
+			else
+				print("Remove previous token")
+				table_remove(resolvedPathTokens) -- Implicit NOOP if none exists
+			end
+		else
+			-- Nothing to do (add the existing token as-is)
+			print("Adding token " .. token .. " to resolved path")
+			table_insert(resolvedPathTokens, token)
+		end
+
+	end
+	print("Dumping resolved path tokens")
+	p(resolvedPathTokens)
+	local resolvedPath = table_concat(resolvedPathTokens, separator)
+	print("Resolved " .. path .. " as " .. resolvedPath)
+	return resolvedPath
+	-- for i = 0, #path, 1 do
+	-- 	::continue::
+	--   if (i < #path) then		code = StringPrototypeCharCodeAt(path, i);
+	--   elseif (isPathSeparator(code)) then
+	-- 	break;
+	--   else
+	-- 	code = CHAR_FORWARD_SLASH;
+	--   end
+
+	--   if (isPathSeparator(code)) then
+	-- 	if (lastSlash == i - 1 or dots == 1) then
+	-- 	  -- NOOP
+	-- 	elseif (dots == 2) then
+	-- 	  if (#res < 2 or lastSegmentLength ~= 2 or
+	-- 		  StringPrototypeCharCodeAt(res, #res - 1) ~= CHAR_DOT or
+	-- 		  StringPrototypeCharCodeAt(res, #res - 2) ~= CHAR_DOT) then
+
+	-- 		if (#res > 2) then
+	-- 		  local lastSlashIndex = StringPrototypeLastIndexOf(res, separator);
+	-- 		  if (lastSlashIndex == -1) then
+	-- 			res = '';
+	-- 			lastSegmentLength = 0;
+	-- 		  else
+	-- 			res = StringPrototypeSlice(res, 0, lastSlashIndex);
+	-- 			lastSegmentLength =  #res - 1 - StringPrototypeLastIndexOf(res, separator);
+	-- 		  end
+	-- 		  lastSlash = i;
+	-- 		  dots = 0;
+	-- 		  -- continue;
+	-- 		  print("continue NYI")
+	-- 		  i = i + 1
+	-- 		  goto continue
+	-- 		elseif (#res ~= 0) then
+	-- 			res = '';
+	-- 			lastSegmentLength = 0;
+	-- 			lastSlash = i;
+	-- 			dots = 0;
+	-- 			--  continue;
+	-- 			print("continue NYI")
+	-- 			i = i + 1
+	-- 			goto continue
+	-- 		end
+	-- 	end
+	-- 	  if (allowAboveRoot) then
+	-- 		res = res .. (#res > 0 and format("%s..", separator) or '..')
+	-- 		lastSegmentLength = 2;
+	-- 	  end
+	-- 	else if (#res > 0) then
+	-- 		res = res .. format("%s%s", separator, StringPrototypeSlice(path, lastSlash + 1, i))
+	-- 	  else
+	-- 		res = StringPrototypeSlice(path, lastSlash + 1, i);
+	-- 	  end
+	-- 	  lastSegmentLength = i - lastSlash - 1;
+	-- 	end
+	-- 	lastSlash = i;
+	-- 	dots = 0;
+	--   elseif (code == CHAR_DOT and dots ~= -1) then
+	-- 	dots = dots + 1
+	--   else
+	-- 	dots = -1;
+	--   end
+	-- end
+	-- return res;
 end
 --[[
  * @param {string} sep
