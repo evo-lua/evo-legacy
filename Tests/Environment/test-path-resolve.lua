@@ -73,11 +73,6 @@ for index, testCase in ipairs(windowsTestCases) do
 	local actual = path.win32.resolve(unpack(inputs))
 	print(input, expected, actual, index, "win32")
 	assertStrictEqual(actual, expected, index)
-
-	-- _G.currentNamespace = "posix"
-	-- print(input, expected, actual, index, "posix")
-	-- actual = path.posix.resolve(unpack(inputs))
-	-- assertStrictEqual(actual, expected, index)
 end
 
 
@@ -86,27 +81,10 @@ for index, testCase in ipairs(posixTestCases) do
 	local expected = testCase[2]
 	local inputs = testCase[1]
 
-	-- The behaviour should be identical for both Windows and POSIX systems
-	-- _G.currentNamespace = "win32"
-	-- local actual = path.win32.resolve(unpack(inputs))
-	-- print(input, expected, actual, index, "win32")
-	-- assertStrictEqual(actual, expected, index)
-
 	_G.currentNamespace = "posix"
 	print(input, expected, actual, index, "posix")
 	actual = path.posix.resolve(unpack(inputs))
 	assertStrictEqual(actual, expected, index)
 end
-
--- if (common.isWindows) {
---   -- Test resolving the current Windows drive letter from a spawned process.
---   -- See https://github.com/nodejs/node/issues/7215
---   local currentDriveLetter = path.parse(process.cwd()).root.substring(0, 2);
---   local resolveFixture = fixtures.path('path-resolve.js');
---   local spawnResult = child.spawnSync(
---     process.argv{0}, {resolveFixture, currentDriveLetter});
---   local resolvedPath = spawnResult.stdout.toString().trim();
---   assertStrictEqual(resolvedPath.toLowerCase(), process.cwd().toLowerCase());
--- }
 
 print("OK\ttest-path-resolve")
