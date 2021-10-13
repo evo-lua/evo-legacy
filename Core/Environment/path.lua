@@ -237,7 +237,8 @@ function normalizeString(path, allowAboveRoot, separator, isBackslashRegularChar
 		if token == "." then
 			print("Resolve CWD (one dot)")
 			-- Nothing to do (do not add this to the resolved path)
-			if prependCwd then table_insert(resolvedPathTokens, uv.cwd()) end
+			if prependCwd and #tokens == 1 then -- If a path exists before this, . refers to that one ("stay in cwd") instead
+				table_insert(resolvedPathTokens, uv.cwd()) end
 		elseif token == ".." then
 			print("Resolve PARENT (two dots)")
 			-- Remove previous token from the resolved path
@@ -349,6 +350,8 @@ function _format(sep, pathObject)
 end
 
 local uv = require("uv")
+local string_find = string.find
+local string_gsub = string.gsub
 
 --   --[[
 --    * path.resolve([from ...], to)
@@ -362,28 +365,55 @@ local function resolve(...)
 	local resolvedDevice = '';
 	local resolvedTail = '';
 	local resolvedAbsolute = false;
+	if #args == 0 then return nil, "Usage: resolve(path1[, path2, path3, ..., pathN])" end -- validateString
+	-- Special case: one argument (not checked below, for some reason?)
+	if type(args[1]) ~= "string" then return nil, "Usage: resolve(path1[, path2, path3, ..., pathN])" end -- validateString
 
-	for i = #args, 1, -1 do -- Offset by 1 in Lua
+	for i = #args, 0, -1 do -- Offset by 1 in Lua
 		local continue = false -- skip to next iteration if true
 
 		local path
-		if i >= 0 then
+		if i >= 1 then -- Resolve root separately to deal with UNC issues
 			path = args[i];
 			print(i, path)
 			if type(path) ~= "string" then return nil, "Usage: resolve(path1[, path2, path3, ..., pathN])" end -- validateString
 
 			-- Skip empty entries
 			if (#path == 0) then
-			--   continue;
-				error("continue 1 nyi")
 				continue = true
 			end
 		elseif #resolvedDevice == 0 then
 			path = uv.cwd();
+			print("use cwd  because no resolved device");
 		else
-			error("unc nyi")
+			-- error("unc nyi")
+			print("get path from env");
+			-- Windows has the concept of drive-specific current working
+			-- directories. If we've resolved a drive letter but not yet an
+			-- absolute path, get cwd for that drive, or the process cwd if
+			-- the drive cwd is not available. We're sure the device is not
+			-- a UNC path at this points, because UNC paths are always absolute.
+
+			-- The current directory state written by the SetCurrentDirectory function is stored as a global variable in each process
+			-- See https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getcurrentdirectory
+			-- This is a virtual environment variable stored by the DOS command processor and it doesn't actually exist...
+			-- p(uv)
+			path = uv.os_getenv("=" .. resolvedDevice) or uv.cwd();
+			print("path is now", path);
+
+			-- Verify that a cwd was found and that it actually points
+			-- to our drive. If not, default to the drive's root.
+			if (path == nil or
+				(StringPrototypeToLowerCase(StringPrototypeSlice(path, 0, 2)) ~=
+				StringPrototypeToLowerCase(resolvedDevice) and
+				StringPrototypeCharCodeAt(path, 2) == CHAR_BACKWARD_SLASH)) then
+			  path = resolvedDevice .. "\\"
+			  print("path is now", path);
+				end
+
 		end
 
+if not continue then -- continue 1
 		local len = #path;
 		local rootEnd = 0;
 		local device = '';
@@ -399,7 +429,7 @@ local function resolve(...)
 		  end
 		elseif (isPathSeparator(code)) then
 		  -- Possible UNC root
-
+		  print("possible unc root");
 		  -- If we started with a separator, we know we at least have an
 		  -- absolute path of some kind (UNC or otherwise)
 		  isAbsolute = true;
@@ -443,6 +473,7 @@ local function resolve(...)
 		elseif (isWindowsDeviceRoot(code) and
 					StringPrototypeCharCodeAt(path, 1) == CHAR_COLON) then
 		  -- Possible device root
+		  print("possible device root");
 		  	device = StringPrototypeSlice(path, 0, 2);
 		  	rootEnd = 2;
 		  if (len > 2 and isPathSeparator(StringPrototypeCharCodeAt(path, 2))) then
@@ -461,10 +492,12 @@ local function resolve(...)
 				-- This path points to another device so it is not applicable
 				-- continue;
 				-- error("continue 2 nyi")
+				print("continue 2");
 				continue = true
 			  end
 			else
 			  resolvedDevice = device;
+			  print("resolved device is now ", device);
 			end
 		end
 
@@ -475,13 +508,15 @@ local function resolve(...)
 			  break;
 		    end
 		  else
-			resolvedTail =  StringPrototypeSlice(path, rootEnd) .. "\\ " .. resolvedTail;
+			resolvedTail =  StringPrototypeSlice(path, rootEnd) .. "\\" .. resolvedTail;
 			resolvedAbsolute = isAbsolute;
 			if (isAbsolute and #resolvedDevice > 0) then
+				print("resolved tail is now", resolvedTail);
 			  break;
 			end
 		end
 	  end -- continue 2
+	end -- continue 1
 	  continue = false
 	end -- end for
 
@@ -490,7 +525,7 @@ local function resolve(...)
 	-- fails)
 
 	-- Normalize the tail path
-	print("normalize tail nyi", resolvedTail)
+	print("normalize string", resolvedTail)
 	resolvedTail = normalizeString(resolvedTail, not resolvedAbsolute, '\\', false, true);
 
 	return ((resolvedAbsolute and

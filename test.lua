@@ -14,22 +14,32 @@ local function fail(func, ...)
     assert(errorMessage:find("Usage: "), "message is not Usage: ..., actual: " .. tostring(errorMessage)) -- todo
 end
 
+local functionsToTest = {
+	"join",
+	"resolve",
+	"normalize",
+	"isAbsolute",
+	"relative",
+	"parse",
+	"dirname",
+	"basename",
+	"extname",
+}
+
 for key, value in pairs(invalidTypeValues) do
 
-    for k, namespace in pairs({path.win32, path.posix}) do
-        fail(namespace.join, value);
-        fail(namespace.resolve, value);
-        fail(namespace.normalize, value);
-        fail(namespace.isAbsolute, value);
-        fail(namespace.relative, test, 'foo');
+    for name, namespace in pairs( { win32 = path.win32, posx = path.posix}) do
+		for index, func in ipairs(functionsToTest) do
+			print("Basic input validation test: " .. name .. "." .. func .. " (input: " .. tostring(value) .. ")")
+			fail(namespace[func], value);
+		end
+
+		fail(namespace.relative, value, 'foo');
         fail(namespace.relative, 'foo', value);
-        fail(namespace.parse, value);
-        fail(namespace.dirname, value);
-        fail(namespace.basename, value);
-        fail(namespace.extname, value);
-		print("Namespace tested")
+
+		print("Completed basic input validation tests for namespace " .. name)
     end
-	print("Value tested: " .. tostring(value))
+	-- print("Value tested: " .. tostring(value))
 end
 
 -- typeErrorTests.forEach((test) => {

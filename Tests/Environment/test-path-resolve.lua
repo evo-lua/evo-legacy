@@ -25,6 +25,12 @@ local posixyCwd = ffi.os == "Windows" and
 
 local uv = require("uv")
 
+local function getCurrentDeviceRoot()
+	local cwd = uv.cwd()
+	-- It's always an absolute path, which on windows starts with a disk designator (letter and colon)
+	return cwd:sub(1, 2)
+end
+
 local windowsTestCases = {
 	-- win32
     -- Arguments                               result
@@ -41,6 +47,9 @@ local windowsTestCases = {
      {{'c:/', '///some//dir'}, 'c:\\some\\dir'},
      {{'C:\\foo\\tmp.3\\', '..\\tmp.3\\cycles\\root.js'},
       'C:\\foo\\tmp.3\\cycles\\root.js'},
+	  -- Custom tests (since the NodeJS ones don't seem to exercise all code paths, for some reason)
+	  { {"ignore/dir"}, uv.cwd() .. "\\ignore\\dir" }, -- relative path resolution should use the current drive's cwd
+	  { {"ignore", "", "/dir"}, getCurrentDeviceRoot() .. "\\dir" } -- empty path segments should be ignored
 }
 
 local posixTestCases = {
@@ -98,15 +107,6 @@ end
 --     process.argv{0}, {resolveFixture, currentDriveLetter});
 --   local resolvedPath = spawnResult.stdout.toString().trim();
 --   assertStrictEqual(resolvedPath.toLowerCase(), process.cwd().toLowerCase());
--- }
-
--- if (!common.isWindows) {
---   -- Test handling relative paths to be safe when process.cwd() fails.
---   process.cwd = () => '';
---   assertStrictEqual(process.cwd(), '');
---   local resolved = path.resolve();
---   local expected = '.';
---   assertStrictEqual(resolved, expected);
 -- }
 
 print("OK\ttest-path-resolve")
