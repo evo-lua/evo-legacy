@@ -210,8 +210,10 @@ local ipairs = ipairs
 local table_remove = table.remove
 local table_concat = table.concat
 
+local uv = require("uv")
+
 -- Resolves . and .. elements in a path with directory names
-function normalizeString(path, allowAboveRoot, separator, isBackslashRegularCharacter)
+function normalizeString(path, allowAboveRoot, separator, isBackslashRegularCharacter, prependCwd)
 	local res = '';
 	local lastSegmentLength = 0;
 	local lastSlash = -1;
@@ -235,6 +237,7 @@ function normalizeString(path, allowAboveRoot, separator, isBackslashRegularChar
 		if token == "." then
 			print("Resolve CWD (one dot)")
 			-- Nothing to do (do not add this to the resolved path)
+			if prependCwd then table_insert(resolvedPathTokens, uv.cwd()) end
 		elseif token == ".." then
 			print("Resolve PARENT (two dots)")
 			-- Remove previous token from the resolved path
@@ -488,7 +491,7 @@ local function resolve(...)
 
 	-- Normalize the tail path
 	print("normalize tail nyi", resolvedTail)
-	resolvedTail = normalizeString(resolvedTail, not resolvedAbsolute, '\\');
+	resolvedTail = normalizeString(resolvedTail, not resolvedAbsolute, '\\', false, true);
 
 	return ((resolvedAbsolute and
 	(resolvedDevice .. "\\" .. resolvedTail)) or
