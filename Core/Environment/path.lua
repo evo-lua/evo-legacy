@@ -140,6 +140,12 @@ local function StringPrototypeLastIndexOf(sub, pat, position)
 	return StringLastIndexOf(sub, pat, index);
 end
 
+local string_lower = string.lower
+
+local function StringPrototypeToLowerCase(str)
+	return string_lower(str)
+end
+
 -- -- Character codes
 CHAR_UPPERCASE_A = 65
 CHAR_LOWERCASE_A = 97
@@ -347,147 +353,139 @@ local uv = require("uv")
 --    * @returns {string}
 --    ]]--
 local function resolve(...)
-	DEBUG("resolve", ...)
+
 	local args = { ... }
 
-    local resolvedDevice = '';
-    local resolvedTail = '';
-    local resolvedAbsolute = false;
+	local resolvedDevice = '';
+	local resolvedTail = '';
+	local resolvedAbsolute = false;
 
-    for i = #args, -1, -1 do
-      local path;
-      if (i >= 0) then
-        path = args[i];
-        -- validateString(path, 'path');
-		if type(path) ~= "string" then return nil, "Usage: resolve(path)" end
+	for i = #args, 1, -1 do -- Offset by 1 in Lua
+		local path
+		if i >= 0 then
+			path = args[i];
+			print(i, path)
+			if type(path) ~= "string" then return nil, "Usage: resolve(path1[, path2, path3, ..., pathN])" end -- validateString
 
-        -- Skip empty entries
-        if (#path == 0) then
-        --   continue; -- TODO
-		end
-      elseif (#resolvedDevice == 0) then
-        path = uv.cwd()
-      else
-        -- Windows has the concept of drive-specific current working
-        -- directories. If we've resolved a drive letter but not yet an
-        -- absolute path, get cwd for that drive, or the process cwd if
-        -- the drive cwd is not available. We're sure the device is not
-        -- a UNC path at this point, because UNC paths are always absolute.
-        -- path = process.env[`=${resolvedDevice}`] or uv.cwd(); -- TODO
-
-        -- Verify that a cwd was found and that it actually points
-        -- to our drive. If not, default to the drive's root.
-        if (path == nil or
-            (StringPrototypeToLowerCase(StringPrototypeSlice(path, 0, 2)) ~=
-            StringPrototypeToLowerCase(resolvedDevice) and
-            StringPrototypeCharCodeAt(path, 2) == CHAR_BACKWARD_SLASH)) then
-        --   path = `${resolvedDevice}\\`; -- TODO
+			-- Skip empty entries
+			if (#path == 0) then
+			--   continue;
+				error("continue 1 nyi")
 			end
+		elseif #resolvedDevice == 0 then
+			path = uv.cwd();
+		else
+			error("unc nyi")
 		end
 
-      local len = #path;
-      local rootEnd = 0;
-      local device = '';
-      local isAbsolute = false;
-      local code = StringPrototypeCharCodeAt(path, 0);
+		local len = #path;
+		local rootEnd = 0;
+		local device = '';
+		local isAbsolute = false;
+		local code = StringPrototypeCharCodeAt(path, 0);
 
-      -- Try to match a root
-      if (len == 1) then
-        if (isPathSeparator(code)) then
-          -- `path` contains just a path separator
-          rootEnd = 1;
-          isAbsolute = true;
-		end
-      elseif (isPathSeparator(code)) then
-        -- Possible UNC root
+		-- Try to match a root
+		if (len == 1) then
+		  if (isPathSeparator(code)) then
+			-- `path` contains just a path separator
+			rootEnd = 1;
+			isAbsolute = true;
+		  end
+		elseif (isPathSeparator(code)) then
+		  -- Possible UNC root
 
-        -- If we started with a separator, we know we at least have an
-        -- absolute path of some kind (UNC or otherwise)
-        isAbsolute = true;
+		  -- If we started with a separator, we know we at least have an
+		  -- absolute path of some kind (UNC or otherwise)
+		  isAbsolute = true;
 
-        if (isPathSeparator(StringPrototypeCharCodeAt(path, 1))) then
-          -- Matched double path separator at beginning
-          local j = 2;
-          local last = j;
-          -- Match 1 or more non-path separators
-          while (j < len and
-                 not isPathSeparator(StringPrototypeCharCodeAt(path, j))) do
-            j = j + 1;
-				 end
-          if (j < len and j ~= last) then
-            local firstPart = StringPrototypeSlice(path, last, j);
-            -- Matchednot
-            last = j;
-            -- Match 1 or more path separators
-            while (j < len and
-                   isPathSeparator(StringPrototypeCharCodeAt(path, j))) do
-              j = j + 1;
+		  if (isPathSeparator(StringPrototypeCharCodeAt(path, 1))) then
+			-- Matched double path separator at beginning
+			local j = 2;
+			local last = j;
+			-- Match 1 or more non-path separators
+			while (j < len and
+				   not isPathSeparator(StringPrototypeCharCodeAt(path, j))) do
+			  j = j + 1
 			end
-
-            if (j < len and j ~= last) then
-              -- Matchednot
-              last = j;
-              -- Match 1 or more non-path separators
-              while (j < len and
-                     not isPathSeparator(StringPrototypeCharCodeAt(path, j))) do
-                j = j + 1
-					 end
-              if (j == len or j ~= last) then
-                -- We matched a UNC root
-                -- device =                `\\\\${firstPart}\\${StringPrototypeSlice(path, last, j)}`; -- TODO
-                rootEnd = j;
+			if (j < len and j ~= last) then
+			  local firstPart = StringPrototypeSlice(path, last, j);
+			  -- Matched!
+			  last = j;
+			  -- Match 1 or more path separators
+			  while (j < len and
+					 isPathSeparator(StringPrototypeCharCodeAt(path, j))) do
+					j = j + 1
+		      end
+			  if (j < len and j ~= last) then
+				-- Matched!
+				last = j;
+				-- Match 1 or more non-path separators
+				while (j < len and
+					   not isPathSeparator(StringPrototypeCharCodeAt(path, j))) do
+					j = j + 1
+				end
+				if (j == len or j ~= last) then
+				  -- We matched a UNC root
+				  device = "\\\\" .. firstPart .. "\\" .. StringPrototypeSlice(path, last, j)
+				  rootEnd = j;
+				end
 			  end
-            end
+			end
+		  else
+			rootEnd = 1;
+		  end
+		elseif (isWindowsDeviceRoot(code) and
+					StringPrototypeCharCodeAt(path, 1) == CHAR_COLON) then
+		  -- Possible device root
+		  	device = StringPrototypeSlice(path, 0, 2);
+		  	rootEnd = 2;
+		  if (len > 2 and isPathSeparator(StringPrototypeCharCodeAt(path, 2))) then
+			-- Treat separator following drive name as an absolute path
+			-- indicator
+			isAbsolute = true;
+			rootEnd = 3;
+		  end
 		end
-        else
-          rootEnd = 1;
+		-- todo check for i, as that may be used in here and it's offset by one
+
+		if (#device > 0) then
+			if (#resolvedDevice > 0) then
+			  if (StringPrototypeToLowerCase(device) ~=
+				  StringPrototypeToLowerCase(resolvedDevice)) then
+				-- This path points to another device so it is not applicable
+				-- continue;
+				error("continue 2 nyi")
+			  end
+			else
+			  resolvedDevice = device;
+			end
 		end
-      elseif (isWindowsDeviceRoot(code) and
-                  StringPrototypeCharCodeAt(path, 1) == CHAR_COLON) then
-        -- Possible device root
-        device = StringPrototypeSlice(path, 0, 2);
-        rootEnd = 2;
-        if (len > 2 and isPathSeparator(StringPrototypeCharCodeAt(path, 2))) then
-          -- Treat separator following drive name as an absolute path
-          -- indicator
-          isAbsolute = true;
-          rootEnd = 3;
+
+		  if (resolvedAbsolute) then
+			if (#resolvedDevice > 0) then
+			  break;
+		    end
+		  else
+			resolvedTail =  StringPrototypeSlice(path, rootEnd) .. "\\ " .. resolvedTail;
+			resolvedAbsolute = isAbsolute;
+			if (isAbsolute and #resolvedDevice > 0) then
+			  break;
+			end
 		end
 	end
 
-      if (#device > 0) then
-        if (#resolvedDevice > 0) then
-          if (StringPrototypeToLowerCase(device) ~=
-              StringPrototypeToLowerCase(resolvedDevice)) then
-            -- This path points to another device so it is not applicable
-            -- continue; -- TODO
-        else
-          resolvedDevice = device;
-		end
-	end
--- TODO: Eliminate .length everywhere
-      if (resolvedAbsolute) then
-        if (#resolvedDevice > 0) then
-          break;
-		end
-      else
-        -- resolvedTail =          `${StringPrototypeSlice(path, rootEnd)}\\${resolvedTail}`; -- TODO
-		      resolvedAbsolute = isAbsolute;
-        if (isAbsolute and #resolvedDevice > 0) then
-          break;
-		end
-	end
-end
-end
+	-- At this point the path should be resolved to a full absolute path,
+	-- but handle relative paths to be safe (might happen when process.cwd()
+	-- fails)
 
-    -- At this point the path should be resolved to a full absolute path,
-    -- but handle relative paths to be safe (might happen when uv.cwd()
-    -- fails)
+	-- Normalize the tail path
+	print("normalize tail nyi", resolvedTail)
+	resolvedTail = normalizeString(resolvedTail, not resolvedAbsolute, '\\',
+								   isPathSeparator);
 
-    -- Normalize the tail path
-    resolvedTail = normalizeString(resolvedTail, not resolvedAbsolute, '\\');
-
-    -- return resolvedAbsolute ?      `${resolvedDevice}\\${resolvedTail}` :      `${resolvedDevice}${resolvedTail}` or '.'; 00 TODO
+	return ((resolvedAbsolute and
+	(resolvedDevice .. "\\" .. resolvedTail)) or
+	resolvedDevice .. resolvedTail) or '.';
 end
 
 local format = string.format

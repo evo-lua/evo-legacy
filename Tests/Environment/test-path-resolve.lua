@@ -25,14 +25,14 @@ local posixyCwd = ffi.os == "Windows" and
 
 local uv = require("uv")
 
-local testCases = {
+local windowsTestCases = {
 	-- win32
     -- Arguments                               result
     {{'c:/blah\\blah', 'd:/games', 'c:../a'}, 'c:\\blah\\a'},
-     {{'c:/ignore', 'd:\\a/b\\c/d', '\\e.exe'}, 'd:\\e.exe'},
-     {{'c:/ignore', 'c:/some/file'}, 'c:\\some\\file'},
-     {{'d:/ignore', 'd:some/dir//'}, 'd:\\ignore\\some\\dir'},
-     {{'.'}, uv.cwd()},
+     {{'c:/ignore', 'd:\\a/b\\c/d', '\\e.exe'}, 'd:\\e.exe'}, -- d is the last drive visited, so stay on there. network paths do not change the current drive
+     {{'c:/ignore', 'c:/some/file'}, 'c:\\some\\file'}, -- cd in same drive means the second command overrides the first
+     {{'d:/ignore', 'd:some/dir//'}, 'd:\\ignore\\some\\dir'}, -- d: is invalid drive identifier, so it should be skipped
+     {{'.'}, uv.cwd()}, -- cwd is resolved properly
      {{'//server/share', '..', 'relative\\'}, '\\\\server\\share\\relative'},
      {{'c:/', '//'}, 'c:\\'},
      {{'c:/', '//dir'}, 'c:\\dir'},
@@ -42,6 +42,7 @@ local testCases = {
      {{'C:\\foo\\tmp.3\\', '..\\tmp.3\\cycles\\root.js'},
       'C:\\foo\\tmp.3\\cycles\\root.js'},
 }
+
 local posixTestCases = {
    -- posix
     -- Arguments                    result
@@ -52,6 +53,24 @@ local posixTestCases = {
      {{'/some/dir', '.', '/absolute/'}, '/absolute'},
      {{'/foo/tmp.3/', '../tmp.3/cycles/root.js'}, '/foo/tmp.3/cycles/root.js'},
 }
+
+for index, testCase in ipairs(windowsTestCases) do
+	p(testCase)
+	local expected = testCase[2]
+	local inputs = testCase[1]
+
+	-- The behaviour should be identical for both Windows and POSIX systems
+	_G.currentNamespace = "win32"
+	local actual = path.win32.resolve(unpack(inputs))
+	print(input, expected, actual, index, "win32")
+	assertStrictEqual(actual, expected, index)
+
+	-- _G.currentNamespace = "posix"
+	-- print(input, expected, actual, index, "posix")
+	-- actual = path.posix.resolve(unpack(inputs))
+	-- assertStrictEqual(actual, expected, index)
+end
+
 
 for index, testCase in ipairs(posixTestCases) do
 	p(testCase)
