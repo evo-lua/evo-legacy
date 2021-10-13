@@ -361,6 +361,8 @@ local function resolve(...)
 	local resolvedAbsolute = false;
 
 	for i = #args, 1, -1 do -- Offset by 1 in Lua
+		local continue = false -- skip to next iteration if true
+
 		local path
 		if i >= 0 then
 			path = args[i];
@@ -371,6 +373,7 @@ local function resolve(...)
 			if (#path == 0) then
 			--   continue;
 				error("continue 1 nyi")
+				continue = true
 			end
 		elseif #resolvedDevice == 0 then
 			path = uv.cwd();
@@ -454,12 +457,15 @@ local function resolve(...)
 				  StringPrototypeToLowerCase(resolvedDevice)) then
 				-- This path points to another device so it is not applicable
 				-- continue;
-				error("continue 2 nyi")
+				-- error("continue 2 nyi")
+				continue = true
 			  end
 			else
 			  resolvedDevice = device;
 			end
 		end
+
+	  if not continue then
 
 		  if (resolvedAbsolute) then
 			if (#resolvedDevice > 0) then
@@ -472,7 +478,9 @@ local function resolve(...)
 			  break;
 			end
 		end
-	end
+	  end -- continue 2
+	  continue = false
+	end -- end for
 
 	-- At this point the path should be resolved to a full absolute path,
 	-- but handle relative paths to be safe (might happen when process.cwd()
@@ -480,8 +488,7 @@ local function resolve(...)
 
 	-- Normalize the tail path
 	print("normalize tail nyi", resolvedTail)
-	resolvedTail = normalizeString(resolvedTail, not resolvedAbsolute, '\\',
-								   isPathSeparator);
+	resolvedTail = normalizeString(resolvedTail, not resolvedAbsolute, '\\');
 
 	return ((resolvedAbsolute and
 	(resolvedDevice .. "\\" .. resolvedTail)) or
