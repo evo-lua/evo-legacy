@@ -213,120 +213,80 @@ local table_concat = table.concat
 local uv = require("uv")
 
 -- Resolves . and .. elements in a path with directory names
-function normalizeString(path, allowAboveRoot, separator, isBackslashRegularCharacter, prependCwd)
+function normalizeString(path, allowAboveRoot, separator, isPathSeparator)
 	local res = '';
 	local lastSegmentLength = 0;
 	local lastSlash = -1;
 	local dots = 0;
 	local code = 0;
-	print("Attempting to resolve path " .. path .. " with separator " ..  separator)
-	local pathDelimiters = {
-		"/", -- posix AND windows --
-		-- "\\" -- windows
-	}
-	if not isBackslashRegularCharacter then
-		table_insert(pathDelimiters, "\\") -- Treat as regular character in POSIX-compliant systems, but now Windows
-	end
-	local tokens = path:explode(pathDelimiters) -- Always slash, because this function is only called on streamlined path strings (preprocessed)
-	p(tokens)
 
-	local previousToken = nil
-	local resolvedPathTokens = {}
-	for tokenID, token in ipairs(tokens) do
-		print("Resolve token " .. tokenID)
-		if token == "." then
-			print("Resolve CWD (one dot)")
-			-- Nothing to do (do not add this to the resolved path)
-			if prependCwd and #tokens == 1 then -- If a path exists before this, . refers to that one ("stay in cwd") instead
-				table_insert(resolvedPathTokens, uv.cwd()) end
-		elseif token == ".." then
-			print("Resolve PARENT (two dots)")
-			-- Remove previous token from the resolved path
-			if allowAboveRoot and (#resolvedPathTokens == 0 or resolvedPathTokens[#resolvedPathTokens] == "..") then
-				-- Can't go up so just leave the relative operator in place
-				-- It's the first token, so just leave it in place to allow going above the root element in relative paths
-				print("Leave relative operator (no previous token)")
-				table_insert(resolvedPathTokens, token)
-			else
-				print("Remove previous token")
-				table_remove(resolvedPathTokens) -- Implicit NOOP if none exists
+	for i=0, #path,  1 do -- TBD start at 1 or 0?
+		if (i < #path) then -- TBD: < or <=?
+		code = StringPrototypeCharCodeAt(path, i);
+	  elseif (isPathSeparator(code)) then
+		break;
+	  else
+		code = CHAR_FORWARD_SLASH;
+	  end
+
+	  if (isPathSeparator(code)) then
+		if (lastSlash == i - 1 or dots == 1) then
+			-- NOOP
+		elseif dots ==2 then
+			-- ...
+			if (#res < 2 or lastSegmentLength ~= 2 or
+            StringPrototypeCharCodeAt(res, res.length - 1) ~= CHAR_DOT or
+            StringPrototypeCharCodeAt(res, res.length - 2) ~= CHAR_DOT) then
+				if #res > 2 then
+					local lastSlashIndex = StringPrototypeLastIndexOf(res, separator);
+					if (lastSlashIndex == -1) then
+					  res = '';
+					  lastSegmentLength = 0;
+					else
+					  res = StringPrototypeSlice(res, 0, lastSlashIndex);
+					  lastSegmentLength = #res - 1 - StringPrototypeLastIndexOf(res, separator);
+					end
+					lastSlash = i;
+					dots = 0;
+					-- continue;
+					error("continue 4 nyi")
+				elseif #res ~= 0 then
+					res = '';
+					lastSegmentLength = 0;
+					lastSlash = i;
+					dots = 0;
+					-- continue;
+					error("continue 3 NYI")
+				end
 			end
+
+			if (allowAboveRoot) then
+				res = res .. (#res > 0 and (separator .. "..") or '..')
+				lastSegmentLength = 2;
+			end
+
 		else
-			-- Nothing to do (add the existing token as-is)
-			print("Adding token " .. token .. " to resolved path")
-			table_insert(resolvedPathTokens, token)
+			if #res > 0 then
+				res = res .. separator .. StringPrototypeSlice(path, lastSlash + 1, i)
+			else
+				res = StringPrototypeSlice(path, lastSlash + 1, i);
+			end
+			lastSegmentLength = i - lastSlash - 1;
 		end
 
+		lastSlash = i
+		dots = 0
+	  elseif code == CHAR_DOT and dots ~= -1 then
+		dots = dots + 1
+	  else
+		dots = -1
+	  end
+
 	end
-	print("Dumping resolved path tokens")
-	p(resolvedPathTokens)
-	local resolvedPath = table_concat(resolvedPathTokens, separator)
-	print("Resolved " .. path .. " as " .. resolvedPath)
-	return resolvedPath
-	-- for i = 0, #path, 1 do
-	-- 	::continue::
-	--   if (i < #path) then		code = StringPrototypeCharCodeAt(path, i);
-	--   elseif (isPathSeparator(code)) then
-	-- 	break;
-	--   else
-	-- 	code = CHAR_FORWARD_SLASH;
-	--   end
 
-	--   if (isPathSeparator(code)) then
-	-- 	if (lastSlash == i - 1 or dots == 1) then
-	-- 	  -- NOOP
-	-- 	elseif (dots == 2) then
-	-- 	  if (#res < 2 or lastSegmentLength ~= 2 or
-	-- 		  StringPrototypeCharCodeAt(res, #res - 1) ~= CHAR_DOT or
-	-- 		  StringPrototypeCharCodeAt(res, #res - 2) ~= CHAR_DOT) then
-
-	-- 		if (#res > 2) then
-	-- 		  local lastSlashIndex = StringPrototypeLastIndexOf(res, separator);
-	-- 		  if (lastSlashIndex == -1) then
-	-- 			res = '';
-	-- 			lastSegmentLength = 0;
-	-- 		  else
-	-- 			res = StringPrototypeSlice(res, 0, lastSlashIndex);
-	-- 			lastSegmentLength =  #res - 1 - StringPrototypeLastIndexOf(res, separator);
-	-- 		  end
-	-- 		  lastSlash = i;
-	-- 		  dots = 0;
-	-- 		  -- continue;
-	-- 		  print("continue NYI")
-	-- 		  i = i + 1
-	-- 		  goto continue
-	-- 		elseif (#res ~= 0) then
-	-- 			res = '';
-	-- 			lastSegmentLength = 0;
-	-- 			lastSlash = i;
-	-- 			dots = 0;
-	-- 			--  continue;
-	-- 			print("continue NYI")
-	-- 			i = i + 1
-	-- 			goto continue
-	-- 		end
-	-- 	end
-	-- 	  if (allowAboveRoot) then
-	-- 		res = res .. (#res > 0 and format("%s..", separator) or '..')
-	-- 		lastSegmentLength = 2;
-	-- 	  end
-	-- 	else if (#res > 0) then
-	-- 		res = res .. format("%s%s", separator, StringPrototypeSlice(path, lastSlash + 1, i))
-	-- 	  else
-	-- 		res = StringPrototypeSlice(path, lastSlash + 1, i);
-	-- 	  end
-	-- 	  lastSegmentLength = i - lastSlash - 1;
-	-- 	end
-	-- 	lastSlash = i;
-	-- 	dots = 0;
-	--   elseif (code == CHAR_DOT and dots ~= -1) then
-	-- 	dots = dots + 1
-	--   else
-	-- 	dots = -1;
-	--   end
-	-- end
-	-- return res;
+	return res;
 end
+
 --[[
  * @param {string} sep
  * @param {{
@@ -526,7 +486,7 @@ if not continue then -- continue 1
 
 	-- Normalize the tail path
 	print("normalize string", resolvedTail)
-	resolvedTail = normalizeString(resolvedTail, not resolvedAbsolute, '\\', false, true);
+	resolvedTail = normalizeString(resolvedTail, not resolvedAbsolute, '\\', isPathSeparator);
 
 	return ((resolvedAbsolute and
 	(resolvedDevice .. "\\" .. resolvedTail)) or
@@ -621,7 +581,7 @@ local format = string.format
     end
 
     local tail = (rootEnd < len ) and
-		normalizeString(StringPrototypeSlice(path, rootEnd), not isAbsolute, '\\') or '';
+		normalizeString(StringPrototypeSlice(path, rootEnd), not isAbsolute, '\\', isPathSeparator) or '';
     if (#tail == 0 and not isAbsolute) then
       tail = '.'; end
     if (#tail > 0 and
@@ -1555,7 +1515,7 @@ end,
 			return nil, "Usage: normalize(path)"
 		end
 
-		if (path.length == 0) then
+		if (#path == 0) then
 		  return '.';
 		end
 
@@ -1565,7 +1525,7 @@ end,
 		  StringPrototypeCharCodeAt(path, #path - 1) == CHAR_FORWARD_SLASH;
 
 		-- Normalize the path
-		path = normalizeString(path, not isAbsolute, '/', true);
+		path = normalizeString(path, not isAbsolute, '/', isPosixPathSeparator);
 
 		if (#path == 0) then
 		  if (isAbsolute) then
@@ -1715,7 +1675,7 @@ end
 		-- handle relative paths to be safe (might happen when uv.cwd() fails)
 
 		-- Normalize the path
-		resolvedPath = normalizeString(resolvedPath, not resolvedAbsolute, "/", true);
+		resolvedPath = normalizeString(resolvedPath, not resolvedAbsolute, "/", isPosixPathSeparator);
 
 		if (resolvedAbsolute) then
 		return "/" .. resolvedPath
