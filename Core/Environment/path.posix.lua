@@ -15,30 +15,6 @@ local posixCwd = (() => {
   })();
 
   local posix = {
-	
-
-	--[[
-	 * @param {...string} args
-	 * @returns {string}
-	 ]]--
-	join(...args) {
-	  if (args.length == 0)
-		return '.';
-	  local joined;
-	  for (local i = 0; i < args.length; ++i) {
-		local arg = args[i];
-		validateString(arg, 'path');
-		if (arg.length > 0) {
-		  if (joined == nil)
-			joined = arg;
-		  else
-			joined += `/${arg}`;
-		}
-	  }
-	  if (joined == nil)
-		return '.';
-	  return posix.normalize(joined);
-	},
 
 	--[[
 	 * @param {string} from

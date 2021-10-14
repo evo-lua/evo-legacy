@@ -671,7 +671,7 @@ local function isAbsolute(path)
     local joined;
     local firstPart;
 
-    for i = 0, #args, 1 do
+    for i = 1, #args, 1 do
       local arg = args[i];
 
 	  if type(arg) ~= "string" then return nil, "Usage: path.join(path)" end
@@ -681,7 +681,7 @@ local function isAbsolute(path)
           joined = arg
 		  firstPart = arg;
         else
-        --   joined = joined .. `\\${arg}`; -- TODO
+        	   joined = joined .. "\\" .. arg
 		end
     end
 
@@ -728,11 +728,13 @@ end
 
       -- Replace the slashes if needed
       if (slashCount >= 2) then
-        -- joined = `\\${StringPrototypeSlice(joined, slashCount)}`; -- todo
+        	joined = "\\" .. StringPrototypeSlice(joined, slashCount)
 	  end
 
-    return win32.normalize(joined); -- todo fix lookup with closure
-end
+	end
+	  -- todo ensure it's always using the win32 version
+	--   error(joined)
+    return normalize(joined)
 end
 end
 
@@ -805,7 +807,7 @@ end
     local toLen = toEnd - toStart;
 
     -- Compare paths to find the longest common path from root
-    -- local length = fromLen < toLen ? fromLen : toLen; -- TODO
+    local length = fromLen < toLen and fromLen or toLen
     local lastCommonSep = -1;
     local i;
     for i = 0, i < length, 1 do
@@ -858,7 +860,7 @@ end
     for i = fromStart + lastCommonSep + 1, i <= fromEnd, 1 do
       if (i == fromEnd or
           StringPrototypeCharCodeAt(from, i) == CHAR_BACKWARD_SLASH) then
-        -- out += out.length == 0 ? '..' : '\\..';  -- todo
+        	out = out .. ((#out == 0) and '..' or '\\..')
 		  end
 		end
 
@@ -866,8 +868,8 @@ end
 
     -- Lastly, append the rest of the destination (`to`) path that comes after
     -- the common path parts
-    if (out.length > 0) then
-    --   return `${out}${StringPrototypeSlice(toOrig, toStart, toEnd)}`; -- todo
+    if (#out > 0) then
+    	return format("%s%s", out, StringPrototypeSlice(toOrig, toStart, toEnd))
 	end
 
     if (StringPrototypeCharCodeAt(toOrig, toStart) == CHAR_BACKWARD_SLASH) then
@@ -891,7 +893,7 @@ local function toNamespacedPath(path)
 
 		  local resolvedPath = win32.resolve(path);
 
-		  if (resolvedPath.length <= 2) then
+		  if (#resolvedPath <= 2) then
 			return path;
 		  end
 
@@ -901,7 +903,7 @@ local function toNamespacedPath(path)
 			  local code = StringPrototypeCharCodeAt(resolvedPath, 2);
 			  if (code ~= CHAR_QUESTION_MARK and code ~= CHAR_DOT) then
 				-- Matched non-long UNC root, convert the path to a long UNC path
-				-- return `\\\\?\\UNC\\${StringPrototypeSlice(resolvedPath, 2)}`; -- TODO
+				return "\\\\?\\UNC\\" .. StringPrototypeSlice(resolvedPath, 2)
 			  end
 			end
 		 elseif (
@@ -910,7 +912,7 @@ local function toNamespacedPath(path)
 			StringPrototypeCharCodeAt(resolvedPath, 2) == CHAR_BACKWARD_SLASH
 		  ) then
 			-- Matched device root, convert the path to a long UNC path
-			-- return `\\\\?\\${resolvedPath}`; -- todo
+			return "\\\\?\\" .. resolvedPath
 		  end
 
 		  return path;
@@ -1304,7 +1306,7 @@ end
     local startPart = rootEnd;
     local endIndex = -1;
     local matchedSlash = true;
-    local i = path.length - 1;
+    local i = #path - 1;
 
     -- Track the state of characters (if any) we see before our first dot and
     -- after any path separator we find
@@ -1719,6 +1721,35 @@ end
 		return "/" .. resolvedPath
 		end
 		return #resolvedPath > 0 and resolvedPath or '.';
+	end
+
+
+	--[[
+		* @param {...string} args
+		* @returns {string}
+		]]--
+		join = function(...)
+			local args = {...}
+		if (#args == 0) then		  return '.'; end
+		local joined;
+		for i = 0, #args, 1 do
+		  local arg = args[i];
+
+		  if type(arg) ~= "string" then return nil, "Usage: join(path1[, path2, path3, ..., pathN])" end
+
+		  if (#arg > 0) then
+			if (joined == nil) then
+			  joined = arg;
+			else
+			  joined =  joined .. "/" .. arg
+			end
+		  end
+		end
+		if (joined == nil) then
+		  return '.';
+		end
+		-- todo ensure it's always using the POSIX version
+		return normalize(joined);
 	end
 
 -- POSIX path API version NYI
