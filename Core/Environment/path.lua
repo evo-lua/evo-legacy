@@ -221,6 +221,7 @@ function normalizeString(path, allowAboveRoot, separator, isPathSeparator)
 	local code = 0;
 
 	for i=0, #path,  1 do -- TBD start at 1 or 0?
+		local continue = false
 		if (i < #path) then -- TBD: < or <=?
 		code = StringPrototypeCharCodeAt(path, i);
 	  elseif (isPathSeparator(code)) then
@@ -235,8 +236,8 @@ function normalizeString(path, allowAboveRoot, separator, isPathSeparator)
 		elseif dots ==2 then
 			-- ...
 			if (#res < 2 or lastSegmentLength ~= 2 or
-            StringPrototypeCharCodeAt(res, res.length - 1) ~= CHAR_DOT or
-            StringPrototypeCharCodeAt(res, res.length - 2) ~= CHAR_DOT) then
+            StringPrototypeCharCodeAt(res, #res - 1) ~= CHAR_DOT or
+            StringPrototypeCharCodeAt(res, #res - 2) ~= CHAR_DOT) then
 				if #res > 2 then
 					local lastSlashIndex = StringPrototypeLastIndexOf(res, separator);
 					if (lastSlashIndex == -1) then
@@ -249,21 +250,25 @@ function normalizeString(path, allowAboveRoot, separator, isPathSeparator)
 					lastSlash = i;
 					dots = 0;
 					-- continue;
-					error("continue 4 nyi")
+					-- error("continue 4 nyi")
+					continue = true
 				elseif #res ~= 0 then
 					res = '';
 					lastSegmentLength = 0;
 					lastSlash = i;
 					dots = 0;
 					-- continue;
-					error("continue 3 NYI")
+					-- error("continue 3 NYI")
+					continue = true
 				end
 			end
 
+if not continue then
 			if (allowAboveRoot) then
 				res = res .. (#res > 0 and (separator .. "..") or '..')
 				lastSegmentLength = 2;
 			end
+end
 
 		else
 			if #res > 0 then
@@ -274,14 +279,18 @@ function normalizeString(path, allowAboveRoot, separator, isPathSeparator)
 			lastSegmentLength = i - lastSlash - 1;
 		end
 
+
+	if not continue then
 		lastSlash = i
 		dots = 0
-	  elseif code == CHAR_DOT and dots ~= -1 then
-		dots = dots + 1
-	  else
-		dots = -1
-	  end
+	end
 
+	elseif code == CHAR_DOT and dots ~= -1 then
+		dots = dots + 1
+	else
+		dots = -1
+	end
+	continue = false
 	end
 
 	return res;
