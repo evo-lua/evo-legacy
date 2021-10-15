@@ -732,12 +732,9 @@ end
 
 
 function win32.relative(from, to)
-	DEBUG("relative", from, to)
-    -- validateString(from, 'from');
-	if type(from) ~= "string" then return nil, "Usage: convert(from, to)" end
-    -- validateString(to, 'to');
-	if type(to) ~= "string" then return nil, "Usage: convert(from, to)" end
 
+	if type(from) ~= "string" then return nil, "Usage: convert(from, to)" end
+	if type(to) ~= "string" then return nil, "Usage: convert(from, to)" end
 
     if (from == to) then
       return '';
@@ -788,16 +785,23 @@ function win32.relative(from, to)
     local toLen = toEnd - toStart;
 
     -- Compare paths to find the longest common path from root
-    local length = fromLen < toLen and fromLen or toLen
+	-- todo revert edit
+    local length
+	if (fromLen < toLen) then length = fromLen
+		else length = toLen
+	end
+
     local lastCommonSep = -1;
-    local i;
-    for i = 0, i < length, 1 do
-      local fromCode = StringPrototypeCharCodeAt(from, fromStart + i);
-      if (fromCode ~= StringPrototypeCharCodeAt(to, toStart + i)) then
+    local i = 0;
+    for l = 0, length, 1 do
+		i = l
+      local fromCode = StringPrototypeCharCodeAt(from, fromStart + l);
+      if (fromCode ~= StringPrototypeCharCodeAt(to, toStart + l)) then
         break;
       elseif (fromCode == CHAR_BACKWARD_SLASH) then
-        lastCommonSep = i;
+        lastCommonSep = l;
 	  end
+	end
 
     -- We found a mismatch before the first common path separator was seen, so
     -- return the original `to`.
@@ -805,7 +809,8 @@ function win32.relative(from, to)
       if (lastCommonSep == -1) then
         return toOrig;
 	  end
-    elseif (toLen > length) then
+    else
+	  if (toLen > length) then
         if (StringPrototypeCharCodeAt(to, toStart + i) ==
             CHAR_BACKWARD_SLASH) then
           -- We get here if `from` is the exact base path for `to`.
@@ -838,7 +843,8 @@ function win32.relative(from, to)
     local out = '';
     -- Generate the relative path based on the path difference between `to` and
     -- `from`
-    for i = fromStart + lastCommonSep + 1, i <= fromEnd, 1 do
+	-- lastCommonSep should be 7, but is 2...?
+    for i = fromStart + lastCommonSep + 1, fromEnd, 1 do
       if (i == fromEnd or
           StringPrototypeCharCodeAt(from, i) == CHAR_BACKWARD_SLASH) then
         	out = out .. ((#out == 0) and '..' or '\\..')
@@ -850,13 +856,13 @@ function win32.relative(from, to)
     -- Lastly, append the rest of the destination (`to`) path that comes after
     -- the common path parts
     if (#out > 0) then
-    	return format("%s%s", out, StringPrototypeSlice(toOrig, toStart, toEnd))
+    	return out .. StringPrototypeSlice(toOrig, toStart, toEnd)
 	end
 
     if (StringPrototypeCharCodeAt(toOrig, toStart) == CHAR_BACKWARD_SLASH) then
 	  toStart = toStart + 1
-    return StringPrototypeSlice(toOrig, toStart, toEnd);
 	end
+    return StringPrototypeSlice(toOrig, toStart, toEnd);
 end
 
 
@@ -1535,21 +1541,22 @@ end
 		end
 
 		local fromStart = 1;
-		local fromEnd = from.length;
+		local fromEnd = #from
 		local fromLen = fromEnd - fromStart;
 		local toStart = 1;
-		local toLen = to.length - toStart;
+		local toLen = #to - toStart;
 
 		-- Compare paths to find the longest common path from root
 		local length = (fromLen < toLen and fromLen or toLen);
 		local lastCommonSep = -1;
 		local i = 0;
-		for i = 0, length, 1 do
-		  local fromCode = StringPrototypeCharCodeAt(from, fromStart + i);
-		  if (fromCode ~= StringPrototypeCharCodeAt(to, toStart + i)) then
+		for l = 0, length, 1 do
+			i = l
+		  local fromCode = StringPrototypeCharCodeAt(from, fromStart + l);
+		  if (fromCode ~= StringPrototypeCharCodeAt(to, toStart + l)) then
 			break;
 		  elseif (fromCode == CHAR_FORWARD_SLASH) then
-			lastCommonSep = i;
+			lastCommonSep = l;
 		  end
 		end
 

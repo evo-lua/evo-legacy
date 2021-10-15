@@ -70,4 +70,4 @@ local windowsTestCases ={
 	end
 
 
-  print("OK\ttest-path-join")
+  print("OK\ttest-path-relative")
