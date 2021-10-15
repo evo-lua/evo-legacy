@@ -1699,11 +1699,16 @@ end
 		* @param {...string} args
 		* @returns {string}
 		]]--
-		join = function(...)
-			local args = {...}
-		if (#args == 0) then		  return '.'; end
+	join = function(...)
+		print("Posix join")
+		local args = {...}
+
+		if (#args == 0) then
+			return '.';
+		end
+
 		local joined;
-		for i = 0, #args, 1 do
+		for i = 1, #args, 1 do
 		  local arg = args[i];
 
 		  if type(arg) ~= "string" then return nil, "Usage: join(path1[, path2, path3, ..., pathN])" end
@@ -1719,7 +1724,7 @@ end
 		if (joined == nil) then
 		  return '.';
 		end
-		-- todo ensure it's always using the POSIX version
+
 		return normalizePosixPath(joined);
 	end
 
