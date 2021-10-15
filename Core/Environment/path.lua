@@ -308,14 +308,14 @@ end
  * @returns {string}
  ]]--
 function _format(sep, pathObject)
-	error("_format is still TODO")
-  validateObject(pathObject, 'pathObject');
+--   validateObject(pathObject, 'pathObject');
+if type(pathObject) ~= "table" then return nil, "Usage: format(separator, pathObject)" end
   local dir = pathObject.dir or pathObject.root;
---   local base = pathObject.base or  `${pathObject.name or ''}${pathObject.ext or ''}`; -- TODO
+  local base = pathObject.base or  (pathObject.name or '') .. (pathObject.ext or '')
   if (not dir) then
     return base;
   end
---   return dir == pathObject.root ? `${dir}${base}` : `${dir}${sep}${base}`; -- TODO
+  return (dir == pathObject.root) and (dir .. base) or dir .. sep .. base
 end
 
 local uv = require("uv")
@@ -327,7 +327,7 @@ local string_gsub = string.gsub
 --    * @param {...string} args
 --    * @returns {string}
 --    ]]--
-local function resolve(...)
+function win32.resolve(...)
 
 	local args = { ... }
 
@@ -508,7 +508,7 @@ local format = string.format
 --    * @param {string} path
 --    * @returns {string}
 --    ]]--
-   local function normalizeWindowsPath(path)
+   function win32.normalize(path)
 	print("Windows normalize", path)
     -- validateString(path, 'path');
 	if type(path) ~= "string" then return nil, "Usage: normalize(path)" end
@@ -607,7 +607,7 @@ end
 --    * @param {string} path
 --    * @returns {boolean}
 --    ]]--
-local function isAbsolute(path)
+function win32.isAbsolute(path)
 	DEBUG("isAbsolute", path)
     -- validateString(path, 'path');
 	if type(path) ~= "string" then return nil, "Usage: isAbsolute(path)" end
@@ -629,7 +629,7 @@ local function isAbsolute(path)
    * @param {...string} args
    * @returns {string}
    ]]--
-  local function join(...)
+  function win32.join(...)
 	DEBUG("join", ...)
 	local args = { ... }
 
@@ -705,7 +705,7 @@ local function isAbsolute(path)
 	end
 	  -- todo ensure it's always using the win32 version
 	--   error(joined)
-    return normalizeWindowsPath(joined)
+    return win32.normalize(joined)
 end
 
 
@@ -720,7 +720,7 @@ end
 --    ]]--
 
 
-   local function relative(from, to)
+function win32.relative(from, to)
 	DEBUG("relative", from, to)
     -- validateString(from, 'from');
 	if type(from) ~= "string" then return nil, "Usage: convert(from, to)" end
@@ -848,51 +848,15 @@ end
 	end
 end
 
+
 	local type = type
 
-	--[[
-		* @param {string} path
-		* @returns {string}
-		]]--
-local function toNamespacedPath(path)
-	DEBUG("toNamespacedPath", path)
-		  -- Note: this will *probably* throw somewhere.
-		  if (type(path) ~= 'string' or #path == 0) then
-			return path;
-		  end
-
-		  local resolvedPath = win32.resolve(path);
-
-		  if (#resolvedPath <= 2) then
-			return path;
-		  end
-
-		  if (StringPrototypeCharCodeAt(resolvedPath, 0) == CHAR_BACKWARD_SLASH) then
-			-- Possible UNC root
-			if (StringPrototypeCharCodeAt(resolvedPath, 1) == CHAR_BACKWARD_SLASH) then
-			  local code = StringPrototypeCharCodeAt(resolvedPath, 2);
-			  if (code ~= CHAR_QUESTION_MARK and code ~= CHAR_DOT) then
-				-- Matched non-long UNC root, convert the path to a long UNC path
-				return "\\\\?\\UNC\\" .. StringPrototypeSlice(resolvedPath, 2)
-			  end
-			end
-		 elseif (
-			isWindowsDeviceRoot(StringPrototypeCharCodeAt(resolvedPath, 0)) and
-			StringPrototypeCharCodeAt(resolvedPath, 1) == CHAR_COLON and
-			StringPrototypeCharCodeAt(resolvedPath, 2) == CHAR_BACKWARD_SLASH
-		  ) then
-			-- Matched device root, convert the path to a long UNC path
-			return "\\\\?\\" .. resolvedPath
-		  end
-
-		  return path;
-		end
 
 --[[
    * @param {string} path
    * @returns {string}
 ]]--
-local function dirname(path) -- dirname
+function win32.dirname(path) -- dirname
 	DEBUG("dirname", path)
 		-- validateString(path, 'path');
 		if type(path) ~= "string" then return nil, "Usage: dirname(path)" end
@@ -993,7 +957,7 @@ local function dirname(path) -- dirname
 		* @param {string} [ext]
 		* @returns {string}
 		]]--
-local function basename(path, ext)
+function win32.basename(path, ext)
 	DEBUG("basename", path, ext)
 	if (ext ~= nil) then
 		-- validateString(ext, 'ext');
@@ -1092,7 +1056,7 @@ local function basename(path, ext)
 	return StringPrototypeSlice(path, start, endIndex);
 end
 
-local function extname(path)
+function win32.extname(path)
 	if type(path) ~= "string" then return nil, "Usage: extname(path)" end
 
     local start = 0;
@@ -1164,219 +1128,30 @@ local function extname(path)
     return StringPrototypeSlice(path, startDot, endIndex);
 end
 
-
-  --[[
-   * @param {string} path
-   * @returns {{
-   *  dir: string;
-   *  root: string;
-   *  base: string;
-   *  name: string;
-   *  ext: string;
-   *  }}
-   ]]--
-   local function parse(path)
-	DEBUG("parse", path)
-    -- validateString(path, 'path');
-	if type(path) ~= "string" then return nil, "Usage: parse(path)" end
-
-
-    local ret = { root = '', dir = '', base = '', ext = '', name = '' };
-    if (#path == 0) then
-      return ret;
-	end
-
-    local len = #path;
-    local rootEnd = 0;
-    local code = StringPrototypeCharCodeAt(path, 0);
-
-    if (len == 1) then
-      if (isPathSeparator(code)) then
-        -- `path` contains just a path separator, exit early to avoid
-        -- unnecessary work
-        ret.root = path
-		ret.dir = path;
-        return ret;
-	  end
-      ret.base = path
-	  ret.name = path;
-      return ret;
-    end
-    -- Try to match a root
-    if (isPathSeparator(code)) then
-      -- Possible UNC root
-
-      rootEnd = 1;
-      if (isPathSeparator(StringPrototypeCharCodeAt(path, 1))) then
-
-        -- Matched double path separator at beginning
-        local j = 2;
-        local last = j;
-
-        -- Match 1 or more non-path separators
-        while (j < len and
-               not isPathSeparator(StringPrototypeCharCodeAt(path, j))) do
-          j = j + 1
-		end
-
-        if (j < len and j ~= last) then
-          -- Matchednot
-          last = j;
-          -- Match 1 or more path separators
-          while (j < len and
-                 isPathSeparator(StringPrototypeCharCodeAt(path, j))) do
-            j = j + 1
-		  end
-
-          if (j < len and j ~= last) then
-            -- Matchednot
-            last = j;
-            -- Match 1 or more non-path separators
-            while (j < len and
-                   not isPathSeparator(StringPrototypeCharCodeAt(path, j))) do
-              j = j + 1
-		   end
-            if (j == len) then
-              -- We matched a UNC root only
-              rootEnd = j;
-            elseif (j ~= last) then
-              -- We matched a UNC root with leftovers
-              rootEnd = j + 1;
-			end
-		end
-	end
-end
-    elseif (isWindowsDeviceRoot(code) and
-               StringPrototypeCharCodeAt(path, 1) == CHAR_COLON) then
-      -- Possible device root
-      if (len <= 2) then
-        -- `path` contains just a drive root, exit early to avoid
-        -- unnecessary work
-        ret.root = path
-		ret.dir = path;
-        return ret;
-	  end
-      rootEnd = 2;
-      if (isPathSeparator(StringPrototypeCharCodeAt(path, 2))) then
-        if (len == 3) then
-          -- `path` contains just a drive root, exit early to avoid
-          -- unnecessary work
-          ret.root = path
-		  ret.dir = path;
-          return ret;
-		end
-        rootEnd = 3;
-	end
-end
-    if (rootEnd > 0) then
-      ret.root = StringPrototypeSlice(path, 0, rootEnd);
-	end
-
-    local startDot = -1;
-    local startPart = rootEnd;
-    local endIndex = -1;
-    local matchedSlash = true;
-    local i = #path - 1;
-
-    -- Track the state of characters (if any) we see before our first dot and
-    -- after any path separator we find
-    local preDotState = 0;
-
-    -- Get non-dir info
-    for i = i, i >= rootEnd, -1 do -- todo pairs
-      code = StringPrototypeCharCodeAt(path, i);
-      if (isPathSeparator(code)) then
-        -- If we reached a path separator that was not part of a set of path
-        -- separators at the end of the string, stop now
-        if (not matchedSlash) then
-          startPart = i + 1;
-          break;
-		end
-        -- continue; -- todo
-	end
-      if (endIndex == -1) then
-        -- We saw the first non-path separator, mark this as the end of our
-        -- extension
-        matchedSlash = false;
-        endIndex = i + 1;
-	end
-      if (code == CHAR_DOT) then
-        -- If this is our first dot, mark it as the start of our extension
-        if (startDot == -1) then
-          startDot = i;
-        elseif (preDotState ~= 1) then
-          preDotState = 1;
-        elseif (startDot ~= -1) then
-        -- We saw a non-dot and non-path separator before our dot, so we should
-        -- have a good chance at having a non-empty extension
-          preDotState = -1;
-	  end
-    end
-end
-
-    if (endIndex ~= -1) then
-      if (startDot == -1 or
-          -- We saw a non-dot character immediately before the dot
-          preDotState == 0 or
-          -- The (right-most) trimmed path component is exactly '..'
-          (preDotState == 1 and
-           startDot == endIndex - 1 and
-           startDot == startPart + 1)) then
-        ret.base = StringPrototypeSlice(path, startPart, endIndex);
-		ret.name = StringPrototypeSlice(path, startPart, endIndex);
-      else
-        ret.name = StringPrototypeSlice(path, startPart, startDot);
-        ret.base = StringPrototypeSlice(path, startPart, endIndex);
-        ret.ext = StringPrototypeSlice(path, startDot, endIndex);
-	  end
-    end
-
-    -- If the directory is the root, use the entire root as the `dir` including
-    -- the trailing slash if any (`C:\abc` -> `C:\`). Otherwise, strip out the
-    -- trailing slash (`C:\abc\def` -> `C:\abc`).
-    if (startPart > 0 and startPart ~= rootEnd) then
-      ret.dir = StringPrototypeSlice(path, 0, startPart - 1);
-    else
-      ret.dir = ret.root;
-    return ret;
-	end
-end
-
-local win32 = {
-	resolve = resolve,
-	normalize = normalizeWindowsPath,
-	isAbsolute = isAbsolute,
-	join = join,
-	relative = relative,
-	toNamespacedPath = toNamespacedPath,
-	dirname = dirname,
-	basename = basename,
-	extname = extname,
-	parse = parse,
-
-
-
 -- todo wat?
 -- path.format?
 --   format = FunctionPrototypeBind(_format, nil, '\\'),
-format = function(self, separator)
+-- todo posix version
+function win32.format(path)
+	error("win32.format nyi")
 	self = nil
 	separator = '\\' -- Windows -- TBD: Does it need \\\\ instead?
 	_format(separator, {}) -- no pathobject is needed?
-end,
+end
+
+-- todo add tests for these two
+function posix.format(path)
+	error("posix.format nyi")
+end
 
 -- path.sep?
-  sep = '\\',
-  delimiter = ';',
-  win32 = nil,
-  posix = nil
-};
+
 
 	--[[
 	* @param {string} path
 	* @returns {string}
 	]]--
-	dirname =  function (path)
+	function posix.dirname(path)
 	--  validateString(path, 'path');
 	if type(path) ~= "string" then
 		return nil, "Usage: dirname(path)"
@@ -1417,13 +1192,12 @@ end,
 	 return StringPrototypeSlice(path, 0, endIndex); -- remove the offset again because the wrapper fixes it interally before slicing?
 	end
 
-
 	--[[
 		* @param {string} path
 		* @param {string} [ext]
 		* @returns {string}
 		]]--
-		basename = function(path, ext)
+		function posix.basename(path, ext)
 	  if (ext ~= nil) then
 		-- validateString(ext, 'ext');
 		if type(ext) ~= "string" then return nil, "Usage: basename(path, ext)" end
@@ -1507,7 +1281,7 @@ end,
 	 * @param {string} path
 	 * @returns {boolean}
 	 ]]--
-	 isAbsolute = function(path)
+	 function posix.isAbsolute(path)
 		-- validateString(path, 'path');
 		if type(path) ~= "string" then return nil, "Usage: isAbsolute(path)" end
 		return #path > 0 and
@@ -1519,7 +1293,7 @@ end,
 	 * @param {string} path
 	 * @returns {string}
 	 ]]--
-	 local function normalizePosixPath(path)
+	 function posix.normalize(path)
 		-- validateString(path, 'path');
 		print("Posix normalize")
 		if type(path) ~= "string" then
@@ -1558,7 +1332,7 @@ end,
 	 * @param {string} path
 	 * @returns {string}
 	 ]]--
-	 extname = function(path)
+	 function posix.extname(path)
 
 		if type(path) ~= "string" then return nil, "Usage: extname(path)" end
 
@@ -1643,7 +1417,7 @@ end
 			* @param {...string} args
 			* @returns {string}
 			]]--
-	resolve = function(arg, ...)
+	function posix.resolve(arg, ...)
 		print("POSIX resolve")
 
 		local args = { arg, ... }
@@ -1699,7 +1473,7 @@ end
 		* @param {...string} args
 		* @returns {string}
 		]]--
-	join = function(...)
+	function posix.join(...)
 		print("Posix join")
 		local args = {...}
 
@@ -1725,26 +1499,90 @@ end
 		  return '.';
 		end
 
-		return normalizePosixPath(joined);
+		return posix.normalize(joined);
 	end
 
--- POSIX path API version NYI
-local posix = {
-	sep = '/',
-	delimiter = ':',
-	-- TODO replace with POSIX apis
-	resolve = resolve,
-	normalize = normalizePosixPath,
-	isAbsolute = isAbsolute,
-	join = join,
-	relative = relative,
-	toNamespacedPath = toNamespacedPath,
-	dirname = dirname,
-	basename = basename,
-	extname = extname,
-	parse = parse,
-}
--- posix = win32 -- TODO: Replace with actual POSIX path APIs
+	--[[
+	 * @param {string} from
+	 * @param {string} to
+	 * @returns {string}
+	 ]]--
+	 function posix.relative(from, to)
+		if type(from) ~= "string" then return nil, "Usage: relative(from, to)" end
+		if type(to) ~= "string" then return nil, "Usage: relative(from, to)" end
+
+		if (from == to) then
+			return '';
+		end
+
+		-- Trim leading forward slashes.
+		from = posix.resolve(from);
+		to = posix.resolve(to);
+
+		if (from == to) then
+		  return '';
+		end
+
+		local fromStart = 1;
+		local fromEnd = from.length;
+		local fromLen = fromEnd - fromStart;
+		local toStart = 1;
+		local toLen = to.length - toStart;
+
+		-- Compare paths to find the longest common path from root
+		local length = (fromLen < toLen and fromLen or toLen);
+		local lastCommonSep = -1;
+		local i = 0;
+		for i = 0, length, 1 do
+		  local fromCode = StringPrototypeCharCodeAt(from, fromStart + i);
+		  if (fromCode ~= StringPrototypeCharCodeAt(to, toStart + i)) then
+			break;
+		  elseif (fromCode == CHAR_FORWARD_SLASH) then
+			lastCommonSep = i;
+		  end
+		end
+
+		if (i == length) then
+		  if (toLen > length) then
+			if (StringPrototypeCharCodeAt(to, toStart + i) == CHAR_FORWARD_SLASH) then
+			  -- We get here if `from` is the exact base path for `to`.
+			  -- For example: from='/foo/bar'; to='/foo/bar/baz'
+			  return StringPrototypeSlice(to, toStart + i + 1);
+			end
+			if (i == 0) then
+			  -- We get here if `from` is the root
+			  -- For example: from='/'; to='/foo'
+			  return StringPrototypeSlice(to, toStart + i);
+			end
+		  elseif (fromLen > length) then
+			if (StringPrototypeCharCodeAt(from, fromStart + i) ==
+				CHAR_FORWARD_SLASH) then
+			  -- We get here if `to` is the exact base path for `from`.
+			  -- For example: from='/foo/bar/baz'; to='/foo/bar'
+			  lastCommonSep = i;
+			elseif (i == 0) then
+			  -- We get here if `to` is the root.
+			  -- For example: from='/foo/bar'; to='/'
+			  lastCommonSep = 0;
+			end
+		  end
+		end
+
+		local out = '';
+		-- Generate the relative path based on the path difference between `to`
+		-- and `from`.
+		for i = fromStart + lastCommonSep + 1, fromEnd, 1 do
+		  if (i == fromEnd or
+			  StringPrototypeCharCodeAt(from, i) == CHAR_FORWARD_SLASH) then
+			out = out .. (#out == 0 and '..' or '/..');
+			  end
+		end
+
+		-- Lastly, append the rest of the destination (`to`) path that comes after
+		-- the common path parts.
+		return out .. StringPrototypeSlice(to, toStart + lastCommonSep)
+	end
+
 
 -- -- assign namespaces
 posix.win32 = win32
