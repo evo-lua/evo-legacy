@@ -7,6 +7,17 @@ local function DEBUG(...)
 end
 
 
+local win32 = {
+	sep = '\\',
+	delimiter = ';',
+
+}
+
+local posix = {
+	sep = '/',
+	delimiter = ':',
+}
+
 -- -- TODO
 -- -- local {
 -- --   FunctionPrototypeBind,
