@@ -508,8 +508,8 @@ local format = string.format
 --    * @param {string} path
 --    * @returns {string}
 --    ]]--
-   local function normalize(path)
-	DEBUG("normalize", path)
+   local function normalizeWindowsPath(path)
+	print("Windows normalize", path)
     -- validateString(path, 'path');
 	if type(path) ~= "string" then return nil, "Usage: normalize(path)" end
 
@@ -652,7 +652,8 @@ local function isAbsolute(path)
         else
         	   joined = joined .. "\\" .. arg
 		end
-    end
+      end
+	end
 
     if (joined == nil) then
       return '.';
@@ -669,7 +670,7 @@ local function isAbsolute(path)
     -- have at least 2 components, so we don't filter for that here.
     -- This means that the user can use join to construct UNC paths from
     -- a server name and a share name; for example:
-    --   path.join('--server', 'share') -> '\\\\server\\share\\')
+    --   path.join('//server', 'share') -> '\\\\server\\share\\')
     local needsReplace = true;
     local slashCount = 0;
     if (isPathSeparator(StringPrototypeCharCodeAt(firstPart, 0))) then
@@ -680,14 +681,15 @@ local function isAbsolute(path)
 			slashCount = slashCount + 1;
         if (firstLen > 2) then
           if (isPathSeparator(StringPrototypeCharCodeAt(firstPart, 2))) then
-		  slashCount = slashCount + 1;
+		  	slashCount = slashCount + 1;
           else
             -- We matched a UNC path in the first part
             needsReplace = false;
 		  end
         end
-	end
-end
+      end
+    end
+
     if (needsReplace) then
       -- Find any more consecutive slashes we need to replace
       while (slashCount < #joined and
@@ -703,8 +705,7 @@ end
 	end
 	  -- todo ensure it's always using the win32 version
 	--   error(joined)
-    return normalize(joined)
-end
+    return normalizeWindowsPath(joined)
 end
 
 
@@ -1343,7 +1344,7 @@ end
 
 local win32 = {
 	resolve = resolve,
-	normalize = normalize,
+	normalize = normalizeWindowsPath,
 	isAbsolute = isAbsolute,
 	join = join,
 	relative = relative,
@@ -1518,8 +1519,9 @@ end,
 	 * @param {string} path
 	 * @returns {string}
 	 ]]--
-	 normalize = function(path)
+	 local function normalizePosixPath(path)
 		-- validateString(path, 'path');
+		print("Posix normalize")
 		if type(path) ~= "string" then
 			return nil, "Usage: normalize(path)"
 		end
@@ -1718,7 +1720,7 @@ end
 		  return '.';
 		end
 		-- todo ensure it's always using the POSIX version
-		return normalize(joined);
+		return normalizePosixPath(joined);
 	end
 
 -- POSIX path API version NYI
@@ -1727,7 +1729,7 @@ local posix = {
 	delimiter = ':',
 	-- TODO replace with POSIX apis
 	resolve = resolve,
-	normalize = normalize,
+	normalize = normalizePosixPath,
 	isAbsolute = isAbsolute,
 	join = join,
 	relative = relative,
