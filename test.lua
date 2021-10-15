@@ -20,15 +20,15 @@ local functionsToTest = {
 	"normalize",
 	"isAbsolute",
 	"relative",
-	"parse",
+	-- "parse",
 	"dirname",
 	"basename",
 	"extname",
 }
 
 for key, value in pairs(invalidTypeValues) do
-
-    for name, namespace in pairs( { win32 = path.win32, posx = path.posix}) do
+p(path)
+    for name, namespace in pairs( { win32 = path.win32, posix = path.posix}) do
 		for index, func in ipairs(functionsToTest) do
 			print("Basic input validation test: " .. name .. "." .. func .. " (input: " .. tostring(value) .. ")")
 			fail(namespace[func], value);
@@ -91,5 +91,6 @@ require("./Tests/Environment/test-path-normalize.lua")
 require("./Tests/Environment/test-path-extname.lua")
 require("./Tests/Environment/test-path-resolve.lua")
 require("./Tests/Environment/test-path-join.lua")
+require("./Tests/Environment/test-path-relative.lua")
 
 -- posix tests

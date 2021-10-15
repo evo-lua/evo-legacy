@@ -16,96 +16,18 @@ local posixCwd = (() => {
 
   local posix = {
 
-	--[[
-	 * @param {string} from
-	 * @param {string} to
-	 * @returns {string}
-	 ]]--
-	relative(from, to) {
-	  validateString(from, 'from');
-	  validateString(to, 'to');
-
-	  if (from == to)
-		return '';
-
-	  -- Trim leading forward slashes.
-	  from = posix.resolve(from);
-	  to = posix.resolve(to);
-
-	  if (from == to)
-		return '';
-
-	  local fromStart = 1;
-	  local fromEnd = from.length;
-	  local fromLen = fromEnd - fromStart;
-	  local toStart = 1;
-	  local toLen = to.length - toStart;
-
-	  -- Compare paths to find the longest common path from root
-	  local length = (fromLen < toLen ? fromLen : toLen);
-	  local lastCommonSep = -1;
-	  local i = 0;
-	  for (; i < length; i++) {
-		local fromCode = StringPrototypeCharCodeAt(from, fromStart + i);
-		if (fromCode ~= StringPrototypeCharCodeAt(to, toStart + i))
-		  break;
-		else if (fromCode == CHAR_FORWARD_SLASH)
-		  lastCommonSep = i;
-	  }
-	  if (i == length) {
-		if (toLen > length) {
-		  if (StringPrototypeCharCodeAt(to, toStart + i) == CHAR_FORWARD_SLASH) {
-			-- We get here if `from` is the exact base path for `to`.
-			-- For example: from='/foo/bar'; to='/foo/bar/baz'
-			return StringPrototypeSlice(to, toStart + i + 1);
-		  }
-		  if (i == 0) {
-			-- We get here if `from` is the root
-			-- For example: from='/'; to='/foo'
-			return StringPrototypeSlice(to, toStart + i);
-		  }
-		} else if (fromLen > length) {
-		  if (StringPrototypeCharCodeAt(from, fromStart + i) ==
-			  CHAR_FORWARD_SLASH) {
-			-- We get here if `to` is the exact base path for `from`.
-			-- For example: from='/foo/bar/baz'; to='/foo/bar'
-			lastCommonSep = i;
-		  } else if (i == 0) {
-			-- We get here if `to` is the root.
-			-- For example: from='/foo/bar'; to='/'
-			lastCommonSep = 0;
-		  }
-		}
-	  }
-
-	  local out = '';
-	  -- Generate the relative path based on the path difference between `to`
-	  -- and `from`.
-	  for (i = fromStart + lastCommonSep + 1; i <= fromEnd; ++i) {
-		if (i == fromEnd or
-			StringPrototypeCharCodeAt(from, i) == CHAR_FORWARD_SLASH) {
-		  out += out.length == 0 ? '..' : '/..';
-		}
-	  }
-
-	  -- Lastly, append the rest of the destination (`to`) path that comes after
-	  -- the common path parts.
-	  return `${out}${StringPrototypeSlice(to, toStart + lastCommonSep)}`;
-	},
-
-	--[[
-	 * @param {string} path
-	 * @returns {string}
-	 ]]--
-	toNamespacedPath(path) {
-	  -- Non-op on posix systems
-	  return path;
-	},
-
 
 	-- path.format, with POSIX separator /
 	format: FunctionPrototypeBind(_format, nil, '/'),
 
+	  --[[
+	   * @param {string} path
+	   * @returns {string}
+	   ]]--
+	   toNamespacedPath(path) {
+		-- Non-op on posix systems
+		return path;
+	  }
 	--[[
 	 * @param {string} path
 	 * @returns {{
