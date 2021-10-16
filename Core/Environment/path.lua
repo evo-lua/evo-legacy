@@ -2,7 +2,7 @@
 
 local win32 = {
 	separator = '\\',
-	delimiter = ';',
+	delimiter = '',
 	convention = "Windows"
 }
 
@@ -129,7 +129,7 @@ local function StringPrototypeLastIndexOf(sub, pat, position)
 	  return -1
 	end
 
-	return StringLastIndexOf(sub, pat, index);
+	return StringLastIndexOf(sub, pat, index)
 end
 
 local string_lower = string.lower
@@ -156,13 +156,13 @@ function isPathSeparator(code)
 end
 
 function isPosixPathSeparator(code)
-  return code == CHAR_FORWARD_SLASH;
+  return code == CHAR_FORWARD_SLASH
 end
 
 function isWindowsDeviceRoot(code)
   -- isSingleLetterCharacter
   return (code >= CHAR_UPPERCASE_A and code <= CHAR_UPPERCASE_Z) or
-         (code >= CHAR_LOWERCASE_A and code <= CHAR_LOWERCASE_Z);
+         (code >= CHAR_LOWERCASE_A and code <= CHAR_LOWERCASE_Z)
 end
 
 local string_gmatch = string.gmatch
@@ -257,7 +257,7 @@ end
 	continue = false
 	end
 
-	return res;
+	return res
 end
 
 local uv = require("uv")
@@ -427,7 +427,7 @@ if not continue then -- continue 1
 
 	return ((resolvedAbsolute and
 	(resolvedDevice .. "\\" .. resolvedTail)) or
-	resolvedDevice .. resolvedTail) or '.';
+	resolvedDevice .. resolvedTail) or '.'
 end
 
 local format = string.format
@@ -527,7 +527,7 @@ local format = string.format
     if (device == nil) then
       return isAbsolute and format("\\%s", tail) or tail
 	end
-    return isAbsolute and format("%s\\%s", device, tail) or format("%s%s", device, tail);
+    return isAbsolute and format("%s\\%s", device, tail) or format("%s%s", device, tail)
 end
 
 --   --[[
@@ -774,7 +774,7 @@ function win32.relative(from, to)
     if (StringPrototypeCharCodeAt(toOrig, toStart) == CHAR_BACKWARD_SLASH) then
 	  toStart = toStart + 1
 	end
-    return StringPrototypeSlice(toOrig, toStart, toEnd);
+    return StringPrototypeSlice(toOrig, toStart, toEnd)
 end
 
 local type = type
@@ -978,7 +978,7 @@ function win32.basename(path, ext)
 		return ''
 	end
 
-	return StringPrototypeSlice(path, start, endIndex);
+	return StringPrototypeSlice(path, start, endIndex)
 end
 
 function win32.extname(path)
@@ -1050,7 +1050,7 @@ function win32.extname(path)
       return ''
     end
 
-    return StringPrototypeSlice(path, startDot, endIndex);
+    return StringPrototypeSlice(path, startDot, endIndex)
 end
 
 	--[[
@@ -1480,7 +1480,7 @@ end
 	end
 
 posix.win32 = win32
-win32.win32 = win32;
+win32.win32 = win32
 posix.posix = posix
 win32.posix = posix
 
