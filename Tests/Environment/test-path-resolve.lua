@@ -1,9 +1,4 @@
-
-
--- local fixtures = require('../common/fixtures')
-
--- local child = require('child_process')
-local path = require("./Core/Environment/path")
+local path = _G.path
 
 local failures = {}
 local slashPattern = "/"

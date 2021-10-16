@@ -1,4 +1,4 @@
-local path = require("./Core/Environment/path")
+local path = _G.path
 
 local backslashPattern = "\\"
 

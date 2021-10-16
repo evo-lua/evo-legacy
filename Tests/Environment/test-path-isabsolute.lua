@@ -1,4 +1,4 @@
-local path = require("./Core/Environment/path")
+local path = _G.path
 
 _G.currentNamespace = "win32"
 assertStrictEqual(path.win32.isAbsolute('/'), true)

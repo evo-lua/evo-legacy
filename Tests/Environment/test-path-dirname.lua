@@ -1,3 +1,4 @@
+local path = _G.path
 local format = string.format
 
 -- win32

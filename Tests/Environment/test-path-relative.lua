@@ -1,4 +1,4 @@
-local path = require("./Core/Environment/path")
+local path = _G.path
 
 local backslashPattern = "\\"
 
@@ -46,29 +46,25 @@ local windowsTestCases ={
 {'\\\\foo\\bar\\baz', 'C:\\baz', 'C:\\baz'},
 }
 
+for index, testCase in ipairs(windowsTestCases) do
 
-	for index, testCase in ipairs(windowsTestCases) do
+	local expected = testCase[3]
+	local inputs = { testCase[1], testCase[2] }
 
-		local expected = testCase[3]
-		local inputs = { testCase[1], testCase[2] }
+	_G.currentNamespace = "win32"
+	local actual = path.win32.relative(unpack(inputs))
+	assertStrictEqual(actual, expected, index)
+end
 
-		_G.currentNamespace = "win32"
-		local actual = path.win32.relative(unpack(inputs))
-		assertStrictEqual(actual, expected, index)
-	end
+for index, testCase in ipairs(posixTestCases) do
 
-	for index, testCase in ipairs(posixTestCases) do
+	local expected = testCase[3]
+	local inputs = { testCase[1], testCase[2] }
 
-		local expected = testCase[3]
-		local inputs = { testCase[1], testCase[2] }
-
-		_G.currentNamespace = "posix"
-		actual = path.posix.relative(unpack(inputs))
-		assertStrictEqual(actual, expected, index)
-	end
-
-
-
+	_G.currentNamespace = "posix"
+	actual = path.posix.relative(unpack(inputs))
+	assertStrictEqual(actual, expected, index)
+end
 
 -- Relative, internally calls resolve. So, '' is actually the current directory
 local uv = require("uv")
@@ -77,5 +73,4 @@ assertStrictEqual(path.relative('', pwd), '')
 assertStrictEqual(path.relative(pwd, ''), '')
 assertStrictEqual(path.relative(pwd, pwd), '')
 
-
-  print("OK\ttest-path-relative")
+print("OK\ttest-path-relative")
