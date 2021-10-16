@@ -2,6 +2,18 @@
 local path = require("./Core/Environment/path")
 -- p(path)
 
+-- Basic smoke tests
+assert(type(path.win32) == "table", "win32 path library must exist")
+assert(type(path.posix) == "table", "posix path library must exist")
+
+local ffi = require("ffi")
+if ffi.os == "Windows" then
+	assert(path.convention == "Windows", "Should default to Windows path library on Windows systems")
+else
+	assert(path.convention == "POSIX", "Should default to POSIX path library on non-Windows systems")
+end
+
+
 -- Type errors: Only strings are valid paths(* excluding optional args)
 local invalidTypeValues = {true, false, 7, nil, {}, 42.0}
 

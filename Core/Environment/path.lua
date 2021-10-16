@@ -10,12 +10,13 @@ end
 local win32 = {
 	sep = '\\',
 	delimiter = ';',
-
+	convention = "Windows"
 }
 
 local posix = {
 	sep = '/',
 	delimiter = ':',
+	convention = "POSIX"
 }
 
 -- -- TODO
