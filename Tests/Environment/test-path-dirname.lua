@@ -1,10 +1,4 @@
--- assertStrictEqual(path.dirname(__filename).substr(-13),
---     common.isWindows ? 'test\\parallel' : 'test/parallel');
-
 local format = string.format
-
-local path = require("../../Core/Environment/path")
-require("../assert")
 
 -- win32
 _G.currentNamespace = "win32"
