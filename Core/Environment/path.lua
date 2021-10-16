@@ -170,7 +170,6 @@ CHAR_COLON = 58
 CHAR_QUESTION_MARK = 63
 
 local ffi = require("ffi")
-local platformIsWin32 = (ffi.os == 'Windows')
 
 function isPathSeparator(code)
   return code == CHAR_FORWARD_SLASH or code == CHAR_BACKWARD_SLASH
@@ -189,33 +188,6 @@ end
 local string_gmatch = string.gmatch
 local table_insert = table.insert
 local type = type
-
--- Splits a string into tokens separated by a given delimiter.
--- Note: This is inspired by PHP's explode function
--- @param inputString The string to process
--- @param[opt] delimiter The delimiter
--- @return A table containing the individual tokens
-function string.explode(inputString, delimiter)
-	if type(inputString) ~= "string" then
-		return {}
-	end
-
-	delimiter = delimiter or "%s" -- Use whitespace by default
-	if type(delimiter) == "table" then
-		-- use multiple delimiters
-		local delimiterPattern = ""
-		for k, v in pairs(delimiter) do
-			delimiterPattern = delimiterPattern .. v
-		end
-		delimiter = delimiterPattern
-	end
-
-	local tokens = {}
-	for token in string_gmatch(inputString, "([^" .. delimiter .. "]+)") do
-		table_insert(tokens, token)
-	end
-	return tokens
-end
 
 local format = string.format
 local ipairs = ipairs
@@ -308,29 +280,8 @@ end
 	return res;
 end
 
---[[
- * @param {string} sep
- * @param {{
- *  dir?: string;
- *  root?: string;
- *  base?: string;
- *  name?: string;
- *  ext?: string;
- *  }} pathObject
- * @returns {string}
- ]]--
-function _format(sep, pathObject)
---   validateObject(pathObject, 'pathObject');
-if type(pathObject) ~= "table" then return nil, "Usage: format(separator, pathObject)" end
-  local dir = pathObject.dir or pathObject.root;
-  local base = pathObject.base or  (pathObject.name or '') .. (pathObject.ext or '')
-  if (not dir) then
-    return base;
-  end
-  return (dir == pathObject.root) and (dir .. base) or dir .. sep .. base
-end
-
 local uv = require("uv")
+
 local string_find = string.find
 local string_gsub = string.gsub
 
@@ -403,6 +354,7 @@ if not continue then -- continue 1
 
 		-- Try to match a root
 		if (len == 1) then
+			print("try to match root");
 		  if (isPathSeparator(code)) then
 			-- `path` contains just a path separator
 			rootEnd = 1;
@@ -644,6 +596,7 @@ function win32.isAbsolute(path)
   function win32.join(...)
 	DEBUG("join", ...)
 	local args = { ... }
+--	p("join", args)
 
     if (#args == 0) then
       return '.';
@@ -730,8 +683,6 @@ end
 --    * @param {string} to
 --    * @returns {string}
 --    ]]--
-
-
 function win32.relative(from, to)
 
 	if type(from) ~= "string" then return nil, "Usage: convert(from, to)" end
@@ -866,9 +817,7 @@ function win32.relative(from, to)
     return StringPrototypeSlice(toOrig, toStart, toEnd);
 end
 
-
-	local type = type
-
+local type = type
 
 --[[
    * @param {string} path
@@ -1145,25 +1094,6 @@ function win32.extname(path)
 
     return StringPrototypeSlice(path, startDot, endIndex);
 end
-
--- todo wat?
--- path.format?
---   format = FunctionPrototypeBind(_format, nil, '\\'),
--- todo posix version
-function win32.format(path)
-	error("win32.format nyi")
-	self = nil
-	separator = '\\' -- Windows -- TBD: Does it need \\\\ instead?
-	_format(separator, {}) -- no pathobject is needed?
-end
-
--- todo add tests for these two
-function posix.format(path)
-	error("posix.format nyi")
-end
-
--- path.sep?
-
 
 	--[[
 	* @param {string} path
@@ -1602,25 +1532,13 @@ end
 		return out .. StringPrototypeSlice(to, toStart + lastCommonSep)
 	end
 
-
--- -- assign namespaces
 posix.win32 = win32
 win32.win32 = win32;
 posix.posix = posix
 win32.posix = posix;
 
--- -- probably not relevant?
--- -- Legacy internal API, docs-only deprecated: DEP0080
--- win32._makeLong = win32.toNamespacedPath;
--- posix._makeLong = posix.toNamespacedPath;
-
--- -- definitely not relevant, just return the right one?
 if ffi.os == "Windows" then
-	-- todo proper logging (luvi builtin?)
-	print("returning win32 paths")
 	return win32
 else
-	print("returning posix paths")
 	return posix
 end
--- -- module.exports = platformIsWin32 ? win32 : posix;
