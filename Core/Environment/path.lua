@@ -1,13 +1,13 @@
 -- -- Originally ported from the NodeJS source code @ 0d2b6aca60 (latest HEAD on 2021/10/05); Copyright Joyent, Inc. and other Node contributors. -- TODO Include license text here?
 
 local win32 = {
-	sep = '\\',
+	separator = '\\',
 	delimiter = ';',
 	convention = "Windows"
 }
 
 local posix = {
-	sep = '/',
+	separator = '/',
 	delimiter = ':',
 	convention = "POSIX"
 }

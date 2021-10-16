@@ -15,8 +15,8 @@ local uv = require("uv")
 -- JavaScript is truly a thing of beauty...
 local posixyCwd = ffi.os == "Windows" and
  (function()
-    local _ = uv.cwd():gsub(path.sep, path.posix.sep);
-	local posixPath = _:sub(_:find(path.posix.sep), #_);
+    local _ = uv.cwd():gsub(path.separator, path.posix.separator);
+	local posixPath = _:sub(_:find(path.posix.separator), #_);
 	-- error(posixPath)
     return posixPath
  end)()
@@ -71,7 +71,6 @@ for index, testCase in ipairs(windowsTestCases) do
 	-- The behaviour should be identical for both Windows and POSIX systems
 	_G.currentNamespace = "win32"
 	local actual = path.win32.resolve(unpack(inputs))
-	print(input, expected, actual, index, "win32")
 	assertStrictEqual(actual, expected, index)
 end
 
@@ -82,7 +81,6 @@ for index, testCase in ipairs(posixTestCases) do
 	local inputs = testCase[1]
 
 	_G.currentNamespace = "posix"
-	print(input, expected, actual, index, "posix")
 	actual = path.posix.resolve(unpack(inputs))
 	assertStrictEqual(actual, expected, index)
 end

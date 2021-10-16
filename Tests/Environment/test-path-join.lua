@@ -108,7 +108,6 @@ local windowsTestCases =
 
 		_G.currentNamespace = "win32"
 		local actual = path.win32.join(unpack(inputs))
-		print(input, expected, actual, index, "win32")
 		assertStrictEqual(actual, expected, index)
 	end
 
@@ -117,7 +116,6 @@ local windowsTestCases =
 		local inputs = testCase[1]
 
 		_G.currentNamespace = "posix"
-		print(input, expected, actual, index, "posix")
 		actual = path.posix.join(unpack(inputs))
 		assertStrictEqual(actual, expected, index)
 	end

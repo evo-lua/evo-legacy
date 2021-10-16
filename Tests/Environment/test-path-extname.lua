@@ -58,11 +58,9 @@ for index, testCase in ipairs(testCases) do
 	-- The behaviour should be identical for both Windows and POSIX systems
 	_G.currentNamespace = "win32"
 	local actual = path.win32.extname(input)
-	print(input, expected, actual, index, "win32")
 	assertStrictEqual(actual, expected, index)
 
 	_G.currentNamespace = "posix"
-	print(input, expected, actual, index, "posix")
 	actual = path.posix.extname(input)
 	assertStrictEqual(actual, expected, index)
 end

@@ -10,7 +10,7 @@
  *  }} pathObject
  * @returns {string}
  ]]--
- function _format(sep, pathObject)
+ function _format(separator, pathObject)
 	--   validateObject(pathObject, 'pathObject');
 	if type(pathObject) ~= "table" then return nil, "Usage: format(separator, pathObject)" end
 	  local dir = pathObject.dir or pathObject.root;
@@ -18,7 +18,7 @@
 	  if (not dir) then
 		return base;
 	  end
-	  return (dir == pathObject.root) and (dir .. base) or dir .. sep .. base
+	  return (dir == pathObject.root) and (dir .. base) or dir .. separator .. base
 	end
 
 	function win32.format(path)
