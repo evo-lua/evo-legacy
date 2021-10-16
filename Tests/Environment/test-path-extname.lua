@@ -1,9 +1,5 @@
 local path = _G.path
 
-
-local failures = {}
-local slashPattern = "/"
-
 _G.currentNamespace = "any"
 local testCases = {
 	{"test-path-extname.lua", '.lua'},
@@ -67,7 +63,6 @@ end
 
 -- On Windows, backslash is a path separator.
 _G.currentNamespace = "win32"
-
 assertStrictEqual(path.win32.extname('.\\'), '')
 assertStrictEqual(path.win32.extname('..\\'), '')
 assertStrictEqual(path.win32.extname('file.ext\\'), '.ext')

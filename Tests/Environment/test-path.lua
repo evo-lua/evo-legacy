@@ -9,7 +9,7 @@ local require = require
 local ffi = require("ffi")
 
 -- Tests for the path library implementation (ported from NodeJS)
-_G.path = dofile("Core/Environment/path.lua") -- Expose to simulate the evo runtime environment
+_G.path = dofile("Core/Environment/path.lua") -- Expose to simulate the runtime environment
 
 -- Basic smoke tests
 assert(type(path.win32) == "table", "win32 path library must exist")
@@ -21,7 +21,6 @@ if ffi.os == "Windows" then
 	assert(path == path.win32, "The Path API must be using path.win32 on Windows")
 else
 	assert(path.convention == "POSIX", "Should default to POSIX path library on non-Windows systems")
-	-- TBD: Will this even work or do we have to do deep table comparisons?
 	assert(path == path.posix, "The Path API must be using path.posix on POSIX-compliant platforms")
 end
 
@@ -48,7 +47,6 @@ local functionsToTest = {
 }
 
 for key, value in pairs(invalidTypeValues) do
-
     for name, namespace in pairs( { win32 = path.win32, posix = path.posix}) do
 		for index, func in ipairs(functionsToTest) do
 			print("Basic input validation test: " .. name .. "." .. func .. " (input: " .. tostring(value) .. ")")
@@ -60,10 +58,8 @@ for key, value in pairs(invalidTypeValues) do
         fail(namespace.relative, 'foo', value)
 
 		print("Completed basic input validation tests for namespace: " .. name)
-
     end
 end
-
 
 -- Path separators and delimiters should be consistent with the respective OS' convention
 assert(path.win32.separator == '\\', "Windows path separator must be BACKSLASH")

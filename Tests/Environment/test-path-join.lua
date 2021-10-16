@@ -1,57 +1,55 @@
 local path = _G.path
 
-local backslashPattern = "\\"
-
 local posixTestCases = {
-    -- Arguments                     result
-	  {{'.', 'x/b', '..', '/b/c.js'}, 'x/b/c.js'},
-     {{}, '.'},
-     {{'/.', 'x/b', '..', '/b/c.js'}, '/x/b/c.js'},
-     {{'/foo', '../../../bar'}, '/bar'},
-     {{'foo', '../../../bar'}, '../../bar'},
-     {{'foo/', '../../../bar'}, '../../bar'},
-     {{'foo/x', '../../../bar'}, '../bar'},
-     {{'foo/x', './bar'}, 'foo/x/bar'},
-     {{'foo/x/', './bar'}, 'foo/x/bar'},
-     {{'foo/x/', '.', 'bar'}, 'foo/x/bar'},
-     {{'./'}, './'},
-     {{'.', './'}, './'},
-     {{'.', '.', '.'}, '.'},
-     {{'.', './', '.'}, '.'},
-     {{'.', '/./', '.'}, '.'},
-     {{'.', '/////./', '.'}, '.'},
-     {{'.'}, '.'},
-     {{'', '.'}, '.'},
-     {{'', 'foo'}, 'foo'},
-     {{'foo', '/bar'}, 'foo/bar'},
-     {{'', '/foo'}, '/foo'},
-     {{'', '', '/foo'}, '/foo'},
-     {{'', '', 'foo'}, 'foo'},
-     {{'foo', ''}, 'foo'},
-     {{'foo/', ''}, 'foo/'},
-     {{'foo', '', '/bar'}, 'foo/bar'},
-     {{'./', '..', '/foo'}, '../foo'},
-     {{'./', '..', '..', '/foo'}, '../../foo'},
-     {{'.', '..', '..', '/foo'}, '../../foo'},
-     {{'', '..', '..', '/foo'}, '../../foo'},
-     {{'/'}, '/'},
-     {{'/', '.'}, '/'},
-     {{'/', '..'}, '/'},
-     {{'/', '..', '..'}, '/'},
-     {{''}, '.'},
-     {{'', ''}, '.'},
-     {{' /foo'}, ' /foo'},
-     {{' ', 'foo'}, ' /foo'},
-     {{' ', '.'}, ' '},
-     {{' ', '/'}, ' /'},
-     {{' ', ''}, ' '},
-     {{'/', 'foo'}, '/foo'},
-     {{'/', '/foo'}, '/foo'},
-     {{'/', '//foo'}, '/foo'},
-     {{'/', '', '/foo'}, '/foo'},
-     {{'', '/', 'foo'}, '/foo'},
-     {{'', '/', '/foo'}, '/foo'},
-  }
+	-- Arguments                     result
+	{{'.', 'x/b', '..', '/b/c.js'}, 'x/b/c.js'},
+	{{}, '.'},
+	{{'/.', 'x/b', '..', '/b/c.js'}, '/x/b/c.js'},
+	{{'/foo', '../../../bar'}, '/bar'},
+	{{'foo', '../../../bar'}, '../../bar'},
+	{{'foo/', '../../../bar'}, '../../bar'},
+	{{'foo/x', '../../../bar'}, '../bar'},
+	{{'foo/x', './bar'}, 'foo/x/bar'},
+	{{'foo/x/', './bar'}, 'foo/x/bar'},
+	{{'foo/x/', '.', 'bar'}, 'foo/x/bar'},
+	{{'./'}, './'},
+	{{'.', './'}, './'},
+	{{'.', '.', '.'}, '.'},
+	{{'.', './', '.'}, '.'},
+	{{'.', '/./', '.'}, '.'},
+	{{'.', '/////./', '.'}, '.'},
+	{{'.'}, '.'},
+	{{'', '.'}, '.'},
+	{{'', 'foo'}, 'foo'},
+	{{'foo', '/bar'}, 'foo/bar'},
+	{{'', '/foo'}, '/foo'},
+	{{'', '', '/foo'}, '/foo'},
+	{{'', '', 'foo'}, 'foo'},
+	{{'foo', ''}, 'foo'},
+	{{'foo/', ''}, 'foo/'},
+	{{'foo', '', '/bar'}, 'foo/bar'},
+	{{'./', '..', '/foo'}, '../foo'},
+	{{'./', '..', '..', '/foo'}, '../../foo'},
+	{{'.', '..', '..', '/foo'}, '../../foo'},
+	{{'', '..', '..', '/foo'}, '../../foo'},
+	{{'/'}, '/'},
+	{{'/', '.'}, '/'},
+	{{'/', '..'}, '/'},
+	{{'/', '..', '..'}, '/'},
+	{{''}, '.'},
+	{{'', ''}, '.'},
+	{{' /foo'}, ' /foo'},
+	{{' ', 'foo'}, ' /foo'},
+	{{' ', '.'}, ' '},
+	{{' ', '/'}, ' /'},
+	{{' ', ''}, ' '},
+	{{'/', 'foo'}, '/foo'},
+	{{'/', '/foo'}, '/foo'},
+	{{'/', '//foo'}, '/foo'},
+	{{'/', '', '/foo'}, '/foo'},
+	{{'', '/', 'foo'}, '/foo'},
+	{{'', '/', '/foo'}, '/foo'},
+}
 
 local windowsTestCases =
     {-- Arguments                     result
@@ -102,34 +100,34 @@ local windowsTestCases =
       {{'c:', 'file'}, 'c:\\file'},
     }
 
-	for index, testCase in ipairs(windowsTestCases) do
-		local expected = testCase[2]
-		local inputs = testCase[1]
+for index, testCase in ipairs(windowsTestCases) do
+	local expected = testCase[2]
+	local inputs = testCase[1]
 
-		_G.currentNamespace = "win32"
-		local actual = path.win32.join(unpack(inputs))
-		assertStrictEqual(actual, expected, index)
-	end
+	_G.currentNamespace = "win32"
+	local actual = path.win32.join(unpack(inputs))
+	assertStrictEqual(actual, expected, index)
+end
 
-	for index, testCase in ipairs(posixTestCases) do
-		local expected = testCase[2]
-		local inputs = testCase[1]
+for index, testCase in ipairs(posixTestCases) do
+	local expected = testCase[2]
+	local inputs = testCase[1]
 
-		_G.currentNamespace = "posix"
-		actual = path.posix.join(unpack(inputs))
-		assertStrictEqual(actual, expected, index)
-	end
+	_G.currentNamespace = "posix"
+	actual = path.posix.join(unpack(inputs))
+	assertStrictEqual(actual, expected, index)
+end
 
 
-	-- Join will internally ignore all the zero-length strings and it will return
-	-- '.' if the joined string is a zero-length string.
-	local uv = require("uv")
-	local pwd = uv.cwd()
-	assertStrictEqual(path.posix.join(''), '.')
-	assertStrictEqual(path.posix.join('', ''), '.')
-	assertStrictEqual(path.win32.join(''), '.')
-	assertStrictEqual(path.win32.join('', ''), '.')
-	assertStrictEqual(path.join(pwd), pwd)
-	assertStrictEqual(path.join(pwd, ''), pwd)
+-- Join will internally ignore all the zero-length strings and it will return
+-- '.' if the joined string is a zero-length string.
+local uv = require("uv")
+local pwd = uv.cwd()
+assertStrictEqual(path.posix.join(''), '.')
+assertStrictEqual(path.posix.join('', ''), '.')
+assertStrictEqual(path.win32.join(''), '.')
+assertStrictEqual(path.win32.join('', ''), '.')
+assertStrictEqual(path.join(pwd), pwd)
+assertStrictEqual(path.join(pwd, ''), pwd)
 
-  print("OK\ttest-path-join")
+print("OK\ttest-path-join")

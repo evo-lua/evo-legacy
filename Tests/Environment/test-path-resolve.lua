@@ -1,9 +1,5 @@
 local path = _G.path
 
-local failures = {}
-local slashPattern = "/"
-local backslashPattern = "\\"
-
 local ffi = require("ffi")
 local uv = require("uv")
 
@@ -12,7 +8,6 @@ local posixyCwd = ffi.os == "Windows" and
  (function()
     local _ = uv.cwd():gsub(path.separator, path.posix.separator)
 	local posixPath = _:sub(_:find(path.posix.separator), #_)
-	-- error(posixPath)
     return posixPath
  end)()
   or
@@ -27,7 +22,6 @@ local function getCurrentDeviceRoot()
 end
 
 local windowsTestCases = {
-	-- win32
     -- Arguments                               result
     {{'c:/blah\\blah', 'd:/games', 'c:../a'}, 'c:\\blah\\a'},
      {{'c:/ignore', 'd:\\a/b\\c/d', '\\e.exe'}, 'd:\\e.exe'}, -- d is the last drive visited, so stay on there. network paths do not change the current drive
@@ -48,7 +42,6 @@ local windowsTestCases = {
 }
 
 local posixTestCases = {
-   -- posix
     -- Arguments                    result
     {{'/var/lib', '../', 'file/'}, '/var/file'},
      {{'/var/lib', '/../', 'file/'}, '/file'},

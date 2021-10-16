@@ -1,8 +1,6 @@
 local path = require("./Core/Environment/path")
 
-
 _G.currentNamespace = "win32"
-
 assertStrictEqual(path.win32.normalize('./fixtures///b/../b/c.js'),                   'fixtures\\b\\c.js')
 assertStrictEqual(path.win32.normalize('/foo/../../../bar'), '\\bar')
 assertStrictEqual(path.win32.normalize('a//b//../b'), 'a\\b')
