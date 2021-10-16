@@ -125,4 +125,15 @@ local windowsTestCases =
 	end
 
 
+	-- Join will internally ignore all the zero-length strings and it will return
+	-- '.' if the joined string is a zero-length string.
+	local uv = require("uv")
+	local pwd = uv.cwd();
+	assertStrictEqual(path.posix.join(''), '.');
+	assertStrictEqual(path.posix.join('', ''), '.');
+	assertStrictEqual(path.win32.join(''), '.');
+	assertStrictEqual(path.win32.join('', ''), '.');
+	assertStrictEqual(path.join(pwd), pwd);
+	assertStrictEqual(path.join(pwd, ''), pwd);
+
   print("OK\ttest-path-join")

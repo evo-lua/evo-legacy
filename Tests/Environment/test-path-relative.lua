@@ -70,4 +70,14 @@ local windowsTestCases ={
 	end
 
 
+
+
+-- Relative, internally calls resolve. So, '' is actually the current directory
+local uv = require("uv")
+local pwd = uv.cwd()
+assertStrictEqual(path.relative('', pwd), '');
+assertStrictEqual(path.relative(pwd, ''), '');
+assertStrictEqual(path.relative(pwd, pwd), '');
+
+
   print("OK\ttest-path-relative")

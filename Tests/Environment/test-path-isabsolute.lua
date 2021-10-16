@@ -26,4 +26,8 @@ assertStrictEqual(path.posix.isAbsolute('/home/foo/..'), true);
 assertStrictEqual(path.posix.isAbsolute('bar/'), false);
 assertStrictEqual(path.posix.isAbsolute('./baz'), false);
 
+-- Since '' is not a valid path in any of the common environments, return false
+assertStrictEqual(path.posix.isAbsolute(''), false);
+assertStrictEqual(path.win32.isAbsolute(''), false);
+
 print("OK\ttest-path-isabsolute")

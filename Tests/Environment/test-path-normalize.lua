@@ -48,4 +48,9 @@ assertStrictEqual(  path.posix.normalize('../foobar/barfoo/foo/../../../bar/../.
 assertStrictEqual(  path.posix.normalize('../.../../foobar/../../../bar/../../baz'),  '../../../../baz');
 assertStrictEqual(path.posix.normalize('foo/bar\\baz'), 'foo/bar\\baz');
 
+-- Normalize will return '.' if the input is a zero-length string
+assertStrictEqual(path.posix.normalize(''), '.');
+assertStrictEqual(path.win32.normalize(''), '.');
+assertStrictEqual(path.normalize(pwd), pwd);
+
 print("OK\ttest-path-normalize")

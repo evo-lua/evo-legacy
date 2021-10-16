@@ -87,4 +87,10 @@ for index, testCase in ipairs(posixTestCases) do
 	assertStrictEqual(actual, expected, index)
 end
 
+-- Resolve, internally ignores all the zero-length strings and returns the
+-- current working directory
+local pwd = uv.cwd()
+assertStrictEqual(path.resolve(''), pwd);
+assertStrictEqual(path.resolve('', ''), pwd);
+
 print("OK\ttest-path-resolve")
