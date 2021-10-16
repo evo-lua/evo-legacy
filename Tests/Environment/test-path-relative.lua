@@ -48,7 +48,7 @@ local windowsTestCases ={
 
 
 	for index, testCase in ipairs(windowsTestCases) do
-		p(testCase)
+
 		local expected = testCase[3]
 		local inputs = { testCase[1], testCase[2] }
 
@@ -59,7 +59,7 @@ local windowsTestCases ={
 	end
 
 	for index, testCase in ipairs(posixTestCases) do
-		p(testCase)
+
 		local expected = testCase[3]
 		local inputs = { testCase[1], testCase[2] }
 

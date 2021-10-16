@@ -52,7 +52,6 @@ local testCases = {
 }
 
 for index, testCase in ipairs(testCases) do
-	p(testCase)
 	local expected = testCase[2]
 	local input = testCase[1]
 

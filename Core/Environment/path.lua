@@ -287,7 +287,7 @@ function win32.resolve(...)
 		local path
 		if i >= 1 then -- Resolve root separately to deal with UNC issues
 			path = args[i];
-			print(i, path)
+
 			if type(path) ~= "string" then return nil, "Usage: resolve(path1[, path2, path3, ..., pathN])" end -- validateString
 
 			-- Skip empty entries
@@ -296,10 +296,7 @@ function win32.resolve(...)
 			end
 		elseif #resolvedDevice == 0 then
 			path = uv.cwd();
-			print("use cwd  because no resolved device");
 		else
-			-- error("unc nyi")
-			print("get path from env");
 			-- Windows has the concept of drive-specific current working
 			-- directories. If we've resolved a drive letter but not yet an
 			-- absolute path, get cwd for that drive, or the process cwd if
@@ -309,9 +306,7 @@ function win32.resolve(...)
 			-- The current directory state written by the SetCurrentDirectory function is stored as a global variable in each process
 			-- See https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getcurrentdirectory
 			-- This is a virtual environment variable stored by the DOS command processor and it doesn't actually exist...
-			-- p(uv)
 			path = uv.os_getenv("=" .. resolvedDevice) or uv.cwd();
-			print("path is now", path);
 
 			-- Verify that a cwd was found and that it actually points
 			-- to our drive. If not, default to the drive's root.
@@ -320,7 +315,6 @@ function win32.resolve(...)
 				StringPrototypeToLowerCase(resolvedDevice) and
 				StringPrototypeCharCodeAt(path, 2) == CHAR_BACKWARD_SLASH)) then
 			  path = resolvedDevice .. "\\"
-			  print("path is now", path);
 				end
 
 		end
@@ -334,7 +328,6 @@ if not continue then -- continue 1
 
 		-- Try to match a root
 		if (len == 1) then
-			print("try to match root");
 		  if (isPathSeparator(code)) then
 			-- `path` contains just a path separator
 			rootEnd = 1;
@@ -342,7 +335,6 @@ if not continue then -- continue 1
 		  end
 		elseif (isPathSeparator(code)) then
 		  -- Possible UNC root
-		  print("possible unc root");
 		  -- If we started with a separator, we know we at least have an
 		  -- absolute path of some kind (UNC or otherwise)
 		  isAbsolute = true;
@@ -386,7 +378,6 @@ if not continue then -- continue 1
 		elseif (isWindowsDeviceRoot(code) and
 					StringPrototypeCharCodeAt(path, 1) == CHAR_COLON) then
 		  -- Possible device root
-		  print("possible device root");
 		  	device = StringPrototypeSlice(path, 0, 2);
 		  	rootEnd = 2;
 		  if (len > 2 and isPathSeparator(StringPrototypeCharCodeAt(path, 2))) then
@@ -396,21 +387,16 @@ if not continue then -- continue 1
 			rootEnd = 3;
 		  end
 		end
-		-- todo check for i, as that may be used in here and it's offset by one
 
 		if (#device > 0) then
 			if (#resolvedDevice > 0) then
 			  if (StringPrototypeToLowerCase(device) ~=
 				  StringPrototypeToLowerCase(resolvedDevice)) then
 				-- This path points to another device so it is not applicable
-				-- continue;
-				-- error("continue 2 nyi")
-				print("continue 2");
 				continue = true
 			  end
 			else
 			  resolvedDevice = device;
-			  print("resolved device is now ", device);
 			end
 		end
 
@@ -424,7 +410,6 @@ if not continue then -- continue 1
 			resolvedTail =  StringPrototypeSlice(path, rootEnd) .. "\\" .. resolvedTail;
 			resolvedAbsolute = isAbsolute;
 			if (isAbsolute and #resolvedDevice > 0) then
-				print("resolved tail is now", resolvedTail);
 			  break;
 			end
 		end
@@ -438,7 +423,6 @@ if not continue then -- continue 1
 	-- fails)
 
 	-- Normalize the tail path
-	print("normalize string", resolvedTail)
 	resolvedTail = normalizeString(resolvedTail, not resolvedAbsolute, '\\', isPathSeparator);
 
 	return ((resolvedAbsolute and
@@ -453,7 +437,6 @@ local format = string.format
 --    * @returns {string}
 --    ]]--
    function win32.normalize(path)
-	print("Windows normalize", path)
     -- validateString(path, 'path');
 	if type(path) ~= "string" then return nil, "Usage: normalize(path)" end
 
@@ -1087,29 +1070,25 @@ end
 	local hasRoot = StringPrototypeCharCodeAt(path, 0) == CHAR_FORWARD_SLASH;
 	local endIndex= -1;
 	local matchedSlash = true;
-	print("A", path, hasRoot, endIndex, matchedSlash)
+
 	for i = #path - 1, 1, -1 do
 		if (StringPrototypeCharCodeAt(path, i) == CHAR_FORWARD_SLASH) then
 			if not matchedSlash then
 				endIndex = i;
-				print("B", path, hasRoot, endIndex, matchedSlash)
 				break;
 			end
 		else
 			-- We saw the first non-path separator
 			matchedSlash = false;
-			print("C", path, hasRoot, endIndex, matchedSlash)
+
 		end
 	end
-	print("D", path, hasRoot, endIndex, matchedSlash)
+
 
 	if (endIndex == -1) then
-		-- path = "//a", hasRoot = true, endIndex = -1, matchedSlash = false
-		print("E", path, hasRoot, endIndex, matchedSlash)
 		return hasRoot and '/' or '.';
 	end
 	if (hasRoot and endIndex == 1) then -- index 1 in js = 2nd character, offset by one due to Lua starting at index 1 (not 0)
-		print("F", path, hasRoot, endIndex, matchedSlash)
 	   return '//'; -- TODO check for more // to -- errors...
 	 end
 	 return StringPrototypeSlice(path, 0, endIndex); -- remove the offset again because the wrapper fixes it interally before slicing?
@@ -1217,8 +1196,6 @@ end
 	 * @returns {string}
 	 ]]--
 	 function posix.normalize(path)
-		-- validateString(path, 'path');
-		print("Posix normalize")
 		if type(path) ~= "string" then
 			return nil, "Usage: normalize(path)"
 		end
@@ -1341,10 +1318,9 @@ end
 			* @returns {string}
 			]]--
 	function posix.resolve(arg, ...)
-		print("POSIX resolve")
 
 		local args = { arg, ... }
-		p(args)
+
 		if not arg then return nil, "Usage: resolve(path1, [path2, ..., pathN])" end
 
 		local resolvedPath = '';
@@ -1359,9 +1335,8 @@ end
 			end
 
 			local path = i >= 0 and args[i] or posixCwd();
-			p(path)
-			if type(path) ~= "string" then return nil, "Usage: extname(path)" end
 
+			if type(path) ~= "string" then return nil, "Usage: extname(path)" end
 
 			-- Skip empty entries
 			if (#path == 0) then
@@ -1371,8 +1346,6 @@ end
 
 			if not continue then
 				resolvedPath = format("%s/%s", path, resolvedPath);
-				p(resolvedPath)
-				-- if resolvedPath == "" then return nil, "Usage: resolve(path1, [path2, ..., pathN])" end
 				resolvedAbsolute = StringPrototypeCharCodeAt(path, 0) == CHAR_FORWARD_SLASH;
 		end
 		continue = false
@@ -1397,7 +1370,6 @@ end
 		* @returns {string}
 		]]--
 	function posix.join(...)
-		print("Posix join")
 		local args = {...}
 
 		if (#args == 0) then
