@@ -1,12 +1,5 @@
 -- -- Originally ported from the NodeJS source code @ 0d2b6aca60 (latest HEAD on 2021/10/05); Copyright Joyent, Inc. and other Node contributors. -- TODO Include license text here?
 
-local ENABLE_DEBUG_OUTPUT = false
-local function DEBUG(...)
-	if not ENABLE_DEBUG_OUTPUT then return end
-	print(...)
-end
-
-
 local win32 = {
 	sep = '\\',
 	delimiter = ';',
@@ -19,31 +12,18 @@ local posix = {
 	convention = "POSIX"
 }
 
--- -- TODO
--- -- local {
--- --   FunctionPrototypeBind,
--- --   StringPrototypeCharCodeAt,
--- --   StringPrototypeIndexOf,
--- --   StringPrototypeLastIndexOf,
--- --   StringPrototypeReplace,
--- --   StringPrototypeSlice,
--- --   StringPrototypeToLowerCase,
--- -- } = primordials;
 
 function string:charAt(index)
-	DEBUG("charAt", index)
 	return self:sub(index, index+1)
 end
 
 function string:charCodeAt(index)
-	DEBUG("charCodeAt", index)
 	return self:charAt(index):byte()
 end
 
 
 -- TBD: Test and create alias string.charCodeAt?
 local function StringPrototypeCharCodeAt(str, index)
-	DEBUG("StringPrototypeCharCodeAt", str, index)
 	index = index + 1 -- Offset by one because Lua indices start at 1, and not 0
 	return string.charCodeAt(str, index)
 end
@@ -572,7 +552,6 @@ end
 --    * @returns {boolean}
 --    ]]--
 function win32.isAbsolute(path)
-	DEBUG("isAbsolute", path)
     -- validateString(path, 'path');
 	if type(path) ~= "string" then return nil, "Usage: isAbsolute(path)" end
 
@@ -594,9 +573,7 @@ function win32.isAbsolute(path)
    * @returns {string}
    ]]--
   function win32.join(...)
-	DEBUG("join", ...)
 	local args = { ... }
---	p("join", args)
 
     if (#args == 0) then
       return '.';
@@ -824,7 +801,6 @@ local type = type
    * @returns {string}
 ]]--
 function win32.dirname(path) -- dirname
-	DEBUG("dirname", path)
 		-- validateString(path, 'path');
 		if type(path) ~= "string" then return nil, "Usage: dirname(path)" end
 		local len = #path;
@@ -925,7 +901,6 @@ function win32.dirname(path) -- dirname
 		* @returns {string}
 		]]--
 function win32.basename(path, ext)
-	DEBUG("basename", path, ext)
 	if (ext ~= nil) then
 		-- validateString(ext, 'ext');
 		if type(path) ~= "string" then return nil, "Usage: basename(path, ext)" end
