@@ -1,13 +1,13 @@
 
 
--- local fixtures = require('../common/fixtures');
+-- local fixtures = require('../common/fixtures')
 
--- local child = require('child_process');
+-- local child = require('child_process')
 local path = require("./Core/Environment/path")
 
-local failures = {};
-local slashPattern = "/";
-local backslashPattern = "\\";
+local failures = {}
+local slashPattern = "/"
+local backslashPattern = "\\"
 
 local ffi = require("ffi")
 local uv = require("uv")
@@ -15,13 +15,13 @@ local uv = require("uv")
 -- JavaScript is truly a thing of beauty...
 local posixyCwd = ffi.os == "Windows" and
  (function()
-    local _ = uv.cwd():gsub(path.separator, path.posix.separator);
-	local posixPath = _:sub(_:find(path.posix.separator), #_);
+    local _ = uv.cwd():gsub(path.separator, path.posix.separator)
+	local posixPath = _:sub(_:find(path.posix.separator), #_)
 	-- error(posixPath)
     return posixPath
  end)()
   or
-  process.cwd();
+  process.cwd()
 
 local uv = require("uv")
 
@@ -88,7 +88,7 @@ end
 -- Resolve, internally ignores all the zero-length strings and returns the
 -- current working directory
 local pwd = uv.cwd()
-assertStrictEqual(path.resolve(''), pwd);
-assertStrictEqual(path.resolve('', ''), pwd);
+assertStrictEqual(path.resolve(''), pwd)
+assertStrictEqual(path.resolve('', ''), pwd)
 
 print("OK\ttest-path-resolve")

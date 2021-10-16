@@ -1,7 +1,7 @@
 local path = require("./Core/Environment/path")
 
 
-local failures = {};
+local failures = {}
 local slashPattern = "/"
 
 _G.currentNamespace = "any"
@@ -68,24 +68,24 @@ end
 -- On Windows, backslash is a path separator.
 _G.currentNamespace = "win32"
 
-assertStrictEqual(path.win32.extname('.\\'), '');
-assertStrictEqual(path.win32.extname('..\\'), '');
-assertStrictEqual(path.win32.extname('file.ext\\'), '.ext');
-assertStrictEqual(path.win32.extname('file.ext\\\\'), '.ext');
-assertStrictEqual(path.win32.extname('file\\'), '');
-assertStrictEqual(path.win32.extname('file\\\\'), '');
-assertStrictEqual(path.win32.extname('file.\\'), '.');
-assertStrictEqual(path.win32.extname('file.\\\\'), '.');
+assertStrictEqual(path.win32.extname('.\\'), '')
+assertStrictEqual(path.win32.extname('..\\'), '')
+assertStrictEqual(path.win32.extname('file.ext\\'), '.ext')
+assertStrictEqual(path.win32.extname('file.ext\\\\'), '.ext')
+assertStrictEqual(path.win32.extname('file\\'), '')
+assertStrictEqual(path.win32.extname('file\\\\'), '')
+assertStrictEqual(path.win32.extname('file.\\'), '.')
+assertStrictEqual(path.win32.extname('file.\\\\'), '.')
 
 -- On *nix, backslash is a valid name component like any other character.
 _G.currentNamespace = "posix"
-assertStrictEqual(path.posix.extname('.\\'), '');
-assertStrictEqual(path.posix.extname('..\\'), '.\\');
-assertStrictEqual(path.posix.extname('file.ext\\'), '.ext\\');
-assertStrictEqual(path.posix.extname('file.ext\\\\'), '.ext\\\\');
-assertStrictEqual(path.posix.extname('file\\'), '');
-assertStrictEqual(path.posix.extname('file\\\\'), '');
-assertStrictEqual(path.posix.extname('file.\\'), '.\\');
-assertStrictEqual(path.posix.extname('file.\\\\'), '.\\\\');
+assertStrictEqual(path.posix.extname('.\\'), '')
+assertStrictEqual(path.posix.extname('..\\'), '.\\')
+assertStrictEqual(path.posix.extname('file.ext\\'), '.ext\\')
+assertStrictEqual(path.posix.extname('file.ext\\\\'), '.ext\\\\')
+assertStrictEqual(path.posix.extname('file\\'), '')
+assertStrictEqual(path.posix.extname('file\\\\'), '')
+assertStrictEqual(path.posix.extname('file.\\'), '.\\')
+assertStrictEqual(path.posix.extname('file.\\\\'), '.\\\\')
 
 print("OK\ttest-path-extname")

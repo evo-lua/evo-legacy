@@ -1,6 +1,6 @@
 local path = require("./Core/Environment/path")
 
-local backslashPattern = "\\";
+local backslashPattern = "\\"
 
 local posixTestCases = {
     -- Arguments                     result
@@ -73,9 +73,9 @@ local windowsTestCases ={
 -- Relative, internally calls resolve. So, '' is actually the current directory
 local uv = require("uv")
 local pwd = uv.cwd()
-assertStrictEqual(path.relative('', pwd), '');
-assertStrictEqual(path.relative(pwd, ''), '');
-assertStrictEqual(path.relative(pwd, pwd), '');
+assertStrictEqual(path.relative('', pwd), '')
+assertStrictEqual(path.relative(pwd, ''), '')
+assertStrictEqual(path.relative(pwd, pwd), '')
 
 
   print("OK\ttest-path-relative")
