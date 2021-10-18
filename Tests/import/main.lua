@@ -44,6 +44,11 @@ function import(modulePath)
 		return nil, "Usage: import(modulePath)"
 	end
 
+	if path.extname(modulePath) ~= ".lua" then
+		print("Attempted to import module path without extension; assuming .lua")
+		modulePath = modulePath .. ".lua"
+	end
+
 	local cwd = uv.cwd()
 	local scriptFile = args[1] or "main.lua" -- Will include the .. operator if it isn't the bundle's root file (on disk)
 	local scriptPath = path.resolve(path.join(cwd, scriptFile)) -- Remove the operators if they're present
@@ -133,4 +138,8 @@ assert(parentModule == path.join(_G.rootDirectory, "main.lua"), tostring(parentM
 local nilReturnValue, errorMessage = import()
 assert(returnValueShouldBeNil == nil, tostring(returnValueShouldBeNil) .. " IS NOT " .. type(nil))
 assert(type(errorMessage) == "string", type(errorMessage) .. " IS NOT " .. "string")
+
+-- Attempting to load a module without an extension should automatically append .lua (since native modules are loaded via FFI)
+local bundledModuleLoadedWithoutExtension = import("bundled-module")
+assert(bundledModule == bundledModuleLoadedWithoutExtension, ".lua extension was not appended automatically?")
 
