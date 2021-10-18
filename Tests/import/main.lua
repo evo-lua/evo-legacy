@@ -25,12 +25,6 @@ function VFS:LoadFile(filePath)
 	return compiledChunk
 end
 
-function VFS:IsCompiledBundle()
-	-- nyi
-	return true
-end
-
-
 -- assert path is string
 -- if absolutePath exists in cache, load from cache
 -- If relativePath exists in bundle, then load from bundle?
@@ -41,8 +35,6 @@ local moduleCache = {}
 local prefixStack = {}
 
 _G.rootDirectory = uv.cwd() -- tbd: find a better way to do this? OR just embrace it and introduce a global SCRIPT_ROOT or sth?
-
-print("Is running from a compiled bundle: " .. tostring(VFS:IsCompiledBundle()))
 
 function import(modulePath)
 	-- print("Dumping prefix stack...")
@@ -89,7 +81,7 @@ function import(modulePath)
 	-- dump(prefixStack)
 
 	local loadedModule = {}
-	if VFS:IsCompiledBundle() and VFS:HasFile(modulePath) then
+	if VFS:HasFile(modulePath) then
 		print("Loading from the bundle's virtual file system: " .. modulePath)
 		loadedModule = VFS:LoadFile(modulePath), path.resolve(path.join(cwd, modulePath)), parentModule
 	else
