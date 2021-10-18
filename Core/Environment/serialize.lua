@@ -1,4 +1,6 @@
-local serpent = require("../../Libs/serpent")
+
+
+local serpent = import("../Libs/serpent.lua")
 
 -- Upvalues
 local serpent_dump = serpent.dump
