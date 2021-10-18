@@ -15,22 +15,25 @@ local uv = require("uv")
 local moduleCache = {}
 local prefixStack = {}
 
+_G.rootDirectory = uv.cwd() -- tbd: find a better way to do this? OR just embrace it and introduce a global SCRIPT_ROOT or sth?
+
 function import(modulePath)
-	print("Dumping prefix stack...")
-	dump(prefixStack)
+	-- print("Dumping prefix stack...")
+	-- dump(prefixStack)
 
 	local cwd = uv.cwd()
-	local scriptPath = path.resolve(path.join(cwd, scriptFile)) -- Remove the operators if they're present
-	local scriptDirectory = path.dirname(scriptPath) -- Remove the file name to get the script's "cwd" even if cwd is elsewhere
 	local scriptFile = args[1] or "main.lua" -- Will include the .. operator if it isn't the bundle's root file (on disk)
+	local scriptPath = path.resolve(path.join(cwd, scriptFile)) -- Remove the operators if they're present
 
 	-- print("Source: " .. source)
 	print("Script file: " .. scriptFile)
 	print("Script path: " .. scriptPath)
-	print("Script directory: " .. scriptDirectory)
 
 	-- If no parent chain existed, use the main entry point instead
-	local parentModule = (#prefixStack == 0) and scriptFile or prefixStack[#prefixStack] -- It must be the entry point (top-level module)
+	local entryPoint = path.resolve(path.join(cwd, scriptFile))
+	print("Detected entry point: " .. entryPoint)
+	local parentModule = (#prefixStack == 0) and entryPoint or prefixStack[#prefixStack] -- It must be the entry point (top-level module)
+	_G.rootDirectory = path.dirname(entryPoint) -- Only needed for the assertion below, so this is somewhat awkward
 
 	local parentDirectory = path.dirname(parentModule)
 	local absolutePath = path.resolve(path.join(parentDirectory, modulePath))
@@ -50,8 +53,8 @@ function import(modulePath)
 	-- By always pushing the latest prefix before loading, the context can be reconstructed from inside the nested import call
 	prefixStack[#prefixStack+1] = absolutePath
 
-	print("Dumping prefix stack...")
-	dump(prefixStack)
+	-- print("Dumping prefix stack...")
+	-- dump(prefixStack)
 
 	print("Loading from disk...")
 	local loadedModule = dofile(absolutePath)
@@ -81,11 +84,11 @@ assert(reimportedModule == bundledModule, "The re-imported module isn't retrieve
 assert(reimportedModule.isLoaded == true, "reimportedModule is also loaded")
 
 -- The path should be resolved directly from the entry point
-local expectedAbsolutePath = path.join(uv.cwd(), "bundled-module.lua")
+local expectedAbsolutePath = path.join(_G.rootDirectory, "bundled-module.lua")
 assert(absolutePath == expectedAbsolutePath, absolutePath .. " IS NOT " .. expectedAbsolutePath)
 
 -- The parent should be the module that imported it, i.e. the main/entry point
-assert(parentModule == "main.lua", tostring(parentModule) .. " IS NOT " .. "main.lua")
+assert(parentModule == path.join(_G.rootDirectory, "main.lua"), tostring(parentModule) .. " IS NOT " .. "main.lua")
 
 
 -- The main module has no parent module (since it's not imported anywhere else, hopefully)
