@@ -40,6 +40,10 @@ function import(modulePath)
 	-- print("Dumping prefix stack...")
 	-- dump(prefixStack)
 
+	if type(modulePath) ~= "string" then
+		return nil, "Usage: import(modulePath)"
+	end
+
 	local cwd = uv.cwd()
 	local scriptFile = args[1] or "main.lua" -- Will include the .. operator if it isn't the bundle's root file (on disk)
 	local scriptPath = path.resolve(path.join(cwd, scriptFile)) -- Remove the operators if they're present
@@ -57,7 +61,7 @@ function import(modulePath)
 	local parentDirectory = path.dirname(parentModule)
 	local absolutePath = path.resolve(path.join(parentDirectory, modulePath))
 
-	print("Importing from path: " .. parentDirectory .. "/" .. modulePath)
+	print("Importing from path: " .. path.join(parentDirectory, modulePath))
 	print("Resolved to: " .. absolutePath)
 
 	print("Parent directory for this import: " .. parentDirectory)
@@ -124,3 +128,9 @@ assert(parentModule == path.join(_G.rootDirectory, "main.lua"), tostring(parentM
 -- The main module has no parent module (since it's not imported anywhere else, hopefully)
 
 -- When a module is loaded from another file, its parent is set to the module that imported it
+
+-- If no or invalid parameters are passed, we expect a nil return value and an error message (Lua style)
+local nilReturnValue, errorMessage = import()
+assert(returnValueShouldBeNil == nil, tostring(returnValueShouldBeNil) .. " IS NOT " .. type(nil))
+assert(type(errorMessage) == "string", type(errorMessage) .. " IS NOT " .. "string")
+
