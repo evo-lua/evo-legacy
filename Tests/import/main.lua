@@ -2,20 +2,47 @@
 
 print("This is the bundle's entry point")
 
+local uv = require("uv")
 -- TODO Move test to evo-luvi and use the existing assertion utilities
 -- TODO Add CI workflow for this test
+
+-- TBD: Move to evo-luvi?
+local luvi = require('luvi')
+local bundle = luvi.bundle
+
+-- High-level wrapper for Luvi's builtin bundling API (virtual file system)
+local VFS = {}
+
+function VFS:HasFile(filePath)
+	local fileStats = bundle.stat(filePath)
+	if fileStats and fileStats.type == "file" then return true end
+end
+
+function VFS:LoadFile(filePath)
+	print("Reading file from bundle VFS: " .. filePath)
+	local fileContents = bundle.readfile(filePath)
+	local compiledChunk = loadstring(fileContents)()
+	return compiledChunk
+end
+
+function VFS:IsCompiledBundle()
+	-- nyi
+	return true
+end
+
 
 -- assert path is string
 -- if absolutePath exists in cache, load from cache
 -- If relativePath exists in bundle, then load from bundle?
 -- assert file exists on disk
 -- if absolutePath exists on disk, load module from it
-local uv = require("uv")
 
 local moduleCache = {}
 local prefixStack = {}
 
 _G.rootDirectory = uv.cwd() -- tbd: find a better way to do this? OR just embrace it and introduce a global SCRIPT_ROOT or sth?
+
+print("Is running from a compiled bundle: " .. tostring(VFS:IsCompiledBundle()))
 
 function import(modulePath)
 	-- print("Dumping prefix stack...")
@@ -30,7 +57,7 @@ function import(modulePath)
 	print("Script path: " .. scriptPath)
 
 	-- If no parent chain existed, use the main entry point instead
-	local entryPoint = path.resolve(path.join(cwd, scriptFile))
+	local entryPoint = path.resolve(path.join(cwd, scriptFile)) -- TBD: Why is it the same as scriptPath?
 	print("Detected entry point: " .. entryPoint)
 	local parentModule = (#prefixStack == 0) and entryPoint or prefixStack[#prefixStack] -- It must be the entry point (top-level module)
 	_G.rootDirectory = path.dirname(entryPoint) -- Only needed for the assertion below, so this is somewhat awkward
@@ -42,6 +69,11 @@ function import(modulePath)
 	print("Resolved to: " .. absolutePath)
 
 	print("Parent directory for this import: " .. parentDirectory)
+
+	-- The bundle VFS always takes priority, so check it first
+	print("Parent module: " .. parentModule)
+	local relativeModulePath = path.relative(scriptPath, modulePath)
+	print("Relative path (used for bundle lookups): " .. relativeModulePath)
 
 	local cachedModule = moduleCache[absolutePath]
 	if cachedModule then
@@ -56,8 +88,14 @@ function import(modulePath)
 	-- print("Dumping prefix stack...")
 	-- dump(prefixStack)
 
-	print("Loading from disk...")
-	local loadedModule = dofile(absolutePath)
+	local loadedModule = {}
+	if VFS:IsCompiledBundle() and VFS:HasFile(modulePath) then
+		print("Loading from the bundle's virtual file system: " .. modulePath)
+		loadedModule = VFS:LoadFile(modulePath), path.resolve(path.join(cwd, modulePath)), parentModule
+	else
+		print("Loading from disk...")
+		loadedModule = dofile(absolutePath)
+	end
 
 	if (#prefixStack > 0) then
 		-- This must be a nested call, so we want to clear out the parent hierarchy before exiting
