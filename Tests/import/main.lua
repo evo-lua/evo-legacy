@@ -173,6 +173,8 @@ assert(import() == import("@"), "Empty epo package notation should be treated th
 -- Attempting to load a module without an extension should automatically append .lua (since native modules are loaded via FFI)
 local bundledModuleLoadedWithoutExtension = import("bundled-module")
 assert(bundledModule == bundledModuleLoadedWithoutExtension, ".lua extension was not appended automatically?")
+assert(import("./bundled-module") == bundledModuleLoadedWithoutExtension, "Importing from cwd with dot prefix failed (without extension")
+assert(import("./bundled-module.lua") == bundledModule, "Importing from cwd with dot prefix failed (with extension")
 
 -- Import modules from file in local epo cache
 -- No entry point given (modulePath is a folder): Use main.lua in that same folder
