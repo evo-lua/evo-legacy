@@ -13,9 +13,16 @@ local bundle = luvi.bundle
 -- High-level wrapper for Luvi's builtin bundling API (virtual file system)
 local VFS = {}
 
+
 function VFS:HasFile(filePath)
 	local fileStats = bundle.stat(filePath)
 	if fileStats and fileStats.type == "file" then return true end
+end
+
+function VFS:HasFolder(filePath)
+	local fileStats = bundle.stat(filePath)
+	-- dump(fileStats)
+	if fileStats and fileStats.type == "directory" then return true end
 end
 
 function VFS:LoadFile(filePath)
@@ -34,19 +41,37 @@ end
 local moduleCache = {}
 local prefixStack = {}
 
+local EPO_PACKAGE_DIRECTORY = ".epo"
+
 _G.rootDirectory = uv.cwd() -- tbd: find a better way to do this? OR just embrace it and introduce a global SCRIPT_ROOT or sth?
 
 function import(modulePath)
 	-- print("Dumping prefix stack...")
 	-- dump(prefixStack)
 
-	if type(modulePath) ~= "string" then
+	if type(modulePath) ~= "string" or modulePath == "" or modulePath == "@" then
 		return nil, "Usage: import(modulePath)"
+	end
+
+	local isEpoPackage = false
+	if string.sub(modulePath, 1, 1) == "@" then
+		print("Detected epo package notation identifier (@)")
+		local strippedModulePath = string.sub(modulePath, 2)
+		modulePath = path.join(EPO_PACKAGE_DIRECTORY, strippedModulePath)
+		print("Module path is now: " .. modulePath)
+		isEpoPackage = true
 	end
 
 	if path.extname(modulePath) ~= ".lua" then
 		print("Attempted to import module path without extension; assuming .lua")
-		modulePath = modulePath .. ".lua"
+		if isEpoPackage then
+			-- Assume entry point is main.lua, if none was given
+			print("No epo module entry point was given, assuming main.lua")
+			modulePath = path.join(modulePath, "main.lua")
+		else
+			modulePath = modulePath .. ".lua"
+		end
+		print("Module path is now: " .. modulePath)
 	end
 
 	local cwd = uv.cwd()
@@ -91,7 +116,11 @@ function import(modulePath)
 
 	local loadedModule = {}
 	if VFS:HasFile(modulePath) then
-		print("Loading from the bundle's virtual file system: " .. modulePath)
+		print("Loading from the bundle's virtual file system (file): " .. modulePath)
+		loadedModule = VFS:LoadFile(modulePath), path.resolve(path.join(cwd, modulePath)), parentModule
+	elseif VFS:HasFolder(path.join(EPO_PACKAGE_DIRECTORY, modulePath)) then
+		modulePath = path.join(EPO_PACKAGE_DIRECTORY, modulePath, "main.lua")
+		print("Loading from the bundle's virtual file system (folder): " .. modulePath)
 		loadedModule = VFS:LoadFile(modulePath), path.resolve(path.join(cwd, modulePath)), parentModule
 	else
 		print("Loading from disk...")
@@ -135,11 +164,31 @@ assert(parentModule == path.join(_G.rootDirectory, "main.lua"), tostring(parentM
 -- When a module is loaded from another file, its parent is set to the module that imported it
 
 -- If no or invalid parameters are passed, we expect a nil return value and an error message (Lua style)
-local nilReturnValue, errorMessage = import()
+local returnValueShouldBeNil, errorMessage = import()
 assert(returnValueShouldBeNil == nil, tostring(returnValueShouldBeNil) .. " IS NOT " .. type(nil))
 assert(type(errorMessage) == "string", type(errorMessage) .. " IS NOT " .. "string")
+assert(import() == import(""), "Empty strings should be treated the same as nil")
+assert(import() == import("@"), "Empty epo package notation should be treated the same as nil")
 
 -- Attempting to load a module without an extension should automatically append .lua (since native modules are loaded via FFI)
 local bundledModuleLoadedWithoutExtension = import("bundled-module")
 assert(bundledModule == bundledModuleLoadedWithoutExtension, ".lua extension was not appended automatically?")
 
+-- Import modules from file in local epo cache
+-- No entry point given (modulePath is a folder): Use main.lua in that same folder
+-- This requires special handling, because if .lua is blindly appended it can't work in this case
+local epoModule = import("@test/example-package")
+assert(type(epoModule) == "table", type(epoModule) .. " IS NOT table")
+assert(epoModule.identifier == 123456789, tostring(epoModule.identifier) .. " IS NOT " .. 123456789)
+
+assert(epoModule == import("@test/example-package/main.lua"), "Assumed entry point for epo package is not correct?")
+
+-- Entry point given (modulePath is a file): Load that one instead
+local epoModule2 = import("@foo/bar/nonstandard-entrypoint.lua")
+assert(type(epoModule2) == "table", type(epoModule2) .. " IS NOT table")
+assert(epoModule2.identifier == 987654321, tostring(epoModule2.identifier) .. " IS NOT " .. 987654321)
+
+-- No owner/packageName given: Return nil and error message
+local returnValueShouldBeNilAlso, anotherErrorMessage = import("@")
+assert(returnValueShouldBeNilAlso == nil, tostring(returnValueShouldBeNilAlso) .. " IS NOT " .. type(nil))
+assert(type(anotherErrorMessage) == "string", type(anotherErrorMessage) .. " IS NOT " .. "string")
