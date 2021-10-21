@@ -33,6 +33,7 @@ function Evo:DisplayHelpText()
 end
 
 function Evo:LoadBuiltins()
+	import("Core/Builtins/aliases")
 	import("Core/Builtins/log")
 end
 
