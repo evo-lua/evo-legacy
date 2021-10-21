@@ -1,0 +1,54 @@
+name: Build and Release (Mac & Linux)
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+  create:
+    # Any branch or tag
+
+jobs:
+  build:
+    name: Build for Linux and Mac
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+        include:
+          - os: macos-latest
+            os-suffix: darwin
+          - os: ubuntu-latest
+            os-suffix: linux
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Fetch latest evo-luvi version tag
+        # This seems like a hacky way of getting the tag, but I haven't found a better one that "just works"
+        run: curl --location --silent --head --output curl.log -w %{url_effective} https://github.com/evo-lua/evo-luvi/releases/latest | grep --only-matching tag/.* | cut -f2- -d/ | tee LATEST_EVO_LUVI_VERSION && cat curl.log # Print everything, for easier debugging
+
+      - name: Download evo-luvi release
+        run: curl --location --silent --fail --output evo-luvi https://github.com/evo-lua/evo-luvi/releases/download/$(cat LATEST_EVO_LUVI_VERSION)/evo-luvi-${{ matrix.os-suffix }}-amd64 && chmod +x evo-luvi && ./evo-luvi -v # Output version to allow troubleshooting issues more easily if it's wrong
+
+      - name: Clean up temporary files # We don't want to bloat the bundle with these
+        run: rm -v LATEST_EVO_LUVI_VERSION curl.log && mv evo-luvi .. # We still need the runtime, but not in cwd
+
+      - name: Make executable
+        run: ls && ../evo-luvi . -o evo && chmod +x evo && ls && cp evo evo-${{ matrix.os-suffix }}-amd64 && ls
+
+      # We don't want to deploy a faulty release
+      - name: Verify the build
+        run: ./evo Tests/run-all-tests.lua
+
+      - name: Publish new release
+        # Truly "continuous" releases may be overkill here, so better only release tagged versions
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: evo-${{ matrix.os-suffix }}-amd64
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
