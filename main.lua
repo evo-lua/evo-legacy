@@ -32,4 +32,9 @@ function Evo:DisplayHelpText()
 	print("evo myScript.lua [optional command line arguments go here]")
 end
 
+function Evo:LoadBuiltins()
+	import("Core/Builtins/log")
+end
+
+Evo:LoadBuiltins()
 Evo:ProcessUserInput()
