@@ -7,7 +7,7 @@ function Evo:ProcessUserInput()
 	-- There's always one argument, the runtime itself (but it's stored at index "0", so Lua doesn't count it)
 	local hasCommandLineArguments = (#args > 0)
 	if not hasCommandLineArguments then
-		Evo:DisplayHelpText()
+		self:DisplayHelpText()
 		return
 	end
 
