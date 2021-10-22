@@ -1,6 +1,6 @@
 local Evo = {}
 
-
+local uv = require("uv")
 local ffi = require("ffi")
 
 function Evo:ProcessUserInput()
@@ -37,14 +37,19 @@ end
 function Evo:LoadBuiltins()
 	import("Core/Builtins/aliases")
 	import("Core/Builtins/log")
+end
 
 function Evo:ExportSharedConstants()
 	import("Core/SharedConstants.lua")
 end
 
+function Evo:StartEventLoop()
+	uv.run()
 end
 
 Evo:LoadBuiltins()
 Evo:ExportSharedConstants()
 
 Evo:ProcessUserInput()
+
+Evo:StartEventLoop()
