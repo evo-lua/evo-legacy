@@ -37,6 +37,7 @@ end
 function Evo:LoadBuiltins()
 	import("Core/Builtins/aliases")
 	import("Core/Builtins/log")
+	import("Core/Builtins/serialize")
 end
 
 function Evo:ExportSharedConstants()
