@@ -6,8 +6,6 @@ Evo = {
 	version = EVO_VERSION_STRING
 }
 
--- Set up the global environment
-printf = require("Core/Environment/printf")
 
 -- LuaJIT API
 local ffi = require("ffi")
