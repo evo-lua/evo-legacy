@@ -1,13 +1,6 @@
--- TODO: Do not hardcode this
-EVO_VERSION_STRING = "0.0.1"
-
--- Expose the top-level module container so packages can access it from anywhere
-Evo = {
-	version = EVO_VERSION_STRING
-}
+local Evo = {}
 
 
--- LuaJIT API
 local ffi = require("ffi")
 
 function Evo:ProcessUserInput()
@@ -33,7 +26,14 @@ end
 function Evo:LoadBuiltins()
 	import("Core/Builtins/aliases")
 	import("Core/Builtins/log")
+
+function Evo:ExportSharedConstants()
+	import("Core/SharedConstants.lua")
+end
+
 end
 
 Evo:LoadBuiltins()
+Evo:ExportSharedConstants()
+
 Evo:ProcessUserInput()
