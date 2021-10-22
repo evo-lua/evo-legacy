@@ -35,6 +35,7 @@ function Evo:DisplayHelpText()
 end
 
 function Evo:LoadBuiltins()
+	import("Core/Builtins/async-await")
 	import("Core/Builtins/aliases")
 	import("Core/Builtins/log")
 	import("Core/Builtins/serialize")
