@@ -12,7 +12,18 @@ function Evo:ProcessUserInput()
 	end
 
 	local scriptFile = args[1]
-	dofile(scriptFile) -- args is global, so there's no need to pass it along
+	-- Run user scripts in a coroutine so it can yield() for sequential but non-blocking I/O
+	local runUserScript = function()
+		dofile(scriptFile) -- args is global, so there's no need to pass it along
+	end
+
+	local userScript = coroutine.create(runUserScript)
+	local ranWithoutErrors, errorMessage = coroutine.resume(userScript)
+	errorMessage = errorMessage or "<Mo message was provided by the script>"
+
+	-- We want to assert this here in order to ensure the runtime never exits without indicating EXIT_FAILURE
+	local formattedErrorMessage = format("Oh no! I've encountered an error while running %s :(\n%s", scriptFile, errorMessage)
+	assert(ranWithoutErrors, formattedErrorMessage)
 end
 
 function Evo:DisplayHelpText()
