@@ -16,8 +16,8 @@
 ]]
 
 local uv = require('uv')
-local wrapStream = require('coro-channel').wrapStream
-local wrapper = require('coro-wrapper')
+local wrapStream = import('@creationix/coro-channel/coro-channel.lua').wrapStream
+local wrapper = import('@creationix/coro-wrapper/coro-wrapper.lua')
 local merger = wrapper.merger
 local decoder = wrapper.decoder
 local encoder = wrapper.encoder
