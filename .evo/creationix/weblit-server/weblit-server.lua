@@ -13,8 +13,8 @@
 ]]
 
 local uv = require('uv')
-local createServer = require('coro-net').createServer
-local httpCodec = require('http-codec')
+local createServer = import('@creationix/coro-net/coro-net.lua').createServer
+local httpCodec = import('@luvit/http-codec/http-codec.lua')
 
 -- Provide a nice case insensitive interface to headers.
 local headerMeta = {}

@@ -14,9 +14,9 @@
 ]]
 
 local uv = require('uv')
-local httpCodec = require('http-codec')
-local websocketCodec = require('websocket-codec')
-local net = require('coro-net')
+local httpCodec = import("@luvit/http-codec/http-codec.lua")
+local websocketCodec = import("@creationix/websocket-codec/websocket-codec.lua")
+local net = import("@creationix/coro-net/coro-net.lua")
 
 local function parseUrl(url)
   local protocol, host, port, pathname = string.match(url, "^(wss?)://([^:/]+):?(%d*)(/?[^#?]*)")

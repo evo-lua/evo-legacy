@@ -11,7 +11,7 @@
   homepage = "https://github.com/creationix/weblit/blob/master/libs/weblit-app.lua"
 ]]
 
-local parseQuery = require('querystring').parse
+local parseQuery = import("@luvit/querystring/querystring.lua").parse
 
 local quotepattern = '(['..("%^$().[]*+-?"):gsub("(.)", "%%%1")..'])'
 local function escape(str)

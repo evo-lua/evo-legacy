@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 --]]
-local getContext = require('./context')
-local bioWrap = require('./biowrap')
+local getContext = import('./context.lua')
+local bioWrap = import('./biowrap.lua')
 
 local function assertResume(thread, ...)
   local success, err = coroutine.resume(thread, ...)

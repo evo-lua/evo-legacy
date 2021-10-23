@@ -23,7 +23,7 @@ if type(module) == "table" then
     return module:load(path)
   end
 else
-  loadResource = require('resource').load
+  loadResource = import('@luvit/resource/resource.lua').load
 end
 local bit = require('bit')
 

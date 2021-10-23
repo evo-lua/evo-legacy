@@ -21,8 +21,8 @@ if uv.constants.SIGPIPE then
   uv.new_signal():start("sigpipe")
 end
 
-local router = require('weblit-router').newRouter()
-local server = require('weblit-server').newServer(router.run)
+local router = import('@creationix/weblit-router/weblit-router.lua').newRouter()
+local server = import('@creationix/weblit-server/weblit-server.lua').newServer(router.run)
 
 -- Forward router methods from app instance
 local serverMeta = {}

@@ -12,8 +12,8 @@
   author = { name = "Tim Caswell" }
 ]]
 
-local base64 = require('base64').encode
-local sha1 = require('sha1')
+local base64 = import('@creationix/base64/base64.lua').encode
+local sha1 = import('@creationix/sha1/init.lua')
 local bit = require('bit')
 
 local band = bit.band

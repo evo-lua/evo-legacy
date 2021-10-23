@@ -28,7 +28,7 @@ limitations under the License.
   tags = {"luvit", "relative", "resource"}
 ]]
 
-local pathJoin = require('pathjoin').pathJoin
+local pathJoin = path.join
 local bundle = require('luvi').bundle
 local uv = require('uv')
 

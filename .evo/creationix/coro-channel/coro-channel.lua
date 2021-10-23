@@ -8,8 +8,6 @@
   author = { name = "Tim Caswell" }
 ]]
 
--- local p = require('pretty-print').prettyPrint
-
 local function assertResume(thread, ...)
   local success, err = coroutine.resume(thread, ...)
   if not success then

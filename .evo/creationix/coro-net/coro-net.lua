@@ -109,7 +109,7 @@ local function connect(options)
   if not success then return nil, err end
   local dsocket
   if options.tls then
-    if not secureSocket then secureSocket = require('secure-socket') end
+    if not secureSocket then secureSocket = import('@luvit/secure-socket/init.lua') end
     dsocket, err = secureSocket(socket, options.tls)
     if not dsocket then
       return nil, err
@@ -155,7 +155,7 @@ local function createServer(options, onConnect)
       local success, failure = xpcall(function ()
         local dsocket
         if options.tls then
-          if not secureSocket then secureSocket = require('secure-socket') end
+          if not secureSocket then secureSocket = import('@luvit/secure-socket/init.lua') end
           dsocket = assert(secureSocket(socket, options.tls))
           dsocket.socket = socket
         else

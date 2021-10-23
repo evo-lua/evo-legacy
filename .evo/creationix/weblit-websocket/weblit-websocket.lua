@@ -12,8 +12,8 @@
   homepage = "https://github.com/creationix/weblit/blob/master/libs/weblit-websocket.lua"
 ]]
 
-local websocketCodec = require('websocket-codec')
-local wrapIo = require('coro-websocket').wrapIo
+local websocketCodec = import('@creationix/websocket-codec/websocket-codec.lua')
+local wrapIo = import('@creationix/coro-websocket/coro-websocket.lua').wrapIo
 
 local function websocketHandler(options, handler)
   return function (req, res, go)
@@ -87,7 +87,7 @@ local function websocketHandler(options, handler)
   end
 end
 
-local server = require('weblit-app')
+local server = import('@creationix/weblit-app/weblit-app.lua')
 function server.websocket(options, handler)
   server.route({
     method = "GET",
