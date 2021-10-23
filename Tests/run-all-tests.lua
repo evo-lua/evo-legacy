@@ -1,3 +1,7 @@
+-- Since we don't run the tests from the package root (main.lua), import won't find evo packages normally
+-- This isn't something that would be needed when running regular user scripts, since the entry point is always main.lua
+EVO_PACKAGE_DIRECTORY = "../.evo"
+
 print("Running all tests...\n")
 
 import("Core/test-wrapped-user-script.lua")
