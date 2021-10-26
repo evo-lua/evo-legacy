@@ -14,7 +14,7 @@
 
 local uv = require('uv')
 local fs = {}
-local pathJoin = require('pathjoin').pathJoin
+local pathJoin = path.join
 
 local function assertResume(thread, ...)
   local success, err = coroutine.resume(thread, ...)
