@@ -2,6 +2,7 @@ std = "lua51"
 max_line_length = false
 exclude_files = {
 	".luacheckrc",
+	".evo"
 }
 ignore = {
 	"212", -- unused argument (I'd rather it's obvious what arguments are passed even if they aren't currently used)
