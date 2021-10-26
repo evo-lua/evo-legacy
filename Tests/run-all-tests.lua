@@ -11,4 +11,6 @@ import("Builtins/test-log.lua")
 import("Builtins/test-serialize.lua")
 import("Builtins/test-shared-constants.lua")
 
+import("API/test-networking.lua")
+
 print("\nAll tests completed!")
