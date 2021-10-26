@@ -1,4 +1,4 @@
-local serpent = import("../../Libs/serpent.lua")
+local serpent = import("@pkulchenko/serpent/serpent.lua")
 
 local dumpOptions = {
 	compact = true, -- Remove spaces
