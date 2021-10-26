@@ -7,7 +7,8 @@ local global_module_name = 'json'
 
 David Kolf's JSON module for Lua 5.1/5.2
 
-Version 2.5
+Version 2.5.1
+-- Based on the original version (2.5), adding minor changes. See test cases/commit history for details
 
 
 For the documentation see the corresponding readme.txt or visit
@@ -319,7 +320,7 @@ encode2 = function (value, indent, level, buffer, buflen, tables, globalorder, s
         for i = 1, n do
           local k = order[i]
           local v = value[k]
-          if v then
+          if v ~= nil then
             used[k] = true
             buflen, msg = addpair (k, v, prev, indent, level, buffer, buflen, tables, globalorder, state)
             prev = true -- add a seperator before the next element
