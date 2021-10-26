@@ -19,6 +19,7 @@ globals = {
 
 	-- evo
 	"format",
+	"json",
 	"log",
 	"printf",
 	"serialize",
