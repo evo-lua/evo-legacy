@@ -36,6 +36,7 @@ end
 
 function Evo:LoadBuiltins()
 	import("Core/Builtins/aliases")
+	import("Core/Builtins/json")
 	import("Core/Builtins/log")
 	import("Core/Builtins/serialize")
 end
