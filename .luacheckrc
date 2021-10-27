@@ -6,6 +6,7 @@ exclude_files = {
 }
 ignore = {
 	"212", -- unused argument (I'd rather it's obvious what arguments are passed even if they aren't currently used)
+	"213", -- unused loop argument (readability improvement; _ adds nothing and is less explicit)
 }
 globals = {
 
