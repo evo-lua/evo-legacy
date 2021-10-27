@@ -14,7 +14,11 @@ function Evo:ProcessUserInput()
 	local scriptFile = args[1]
 	-- Run user scripts in a coroutine so it can yield() for sequential but non-blocking I/O
 	local runUserScript = function()
-		dofile(scriptFile) -- args is global, so there's no need to pass it along
+		-- Since user scripts will yield whenever they call into asynchronous APIs, we can't use dofile here
+		-- dofile would run the chunk in C land and cause  an "attempt to yield across C-call boundary" error
+		local compiledChunk = loadfile(scriptFile)
+		assert(compiledChunk, "Failed to load user script " .. tostring(scriptFile))
+		compiledChunk()
 	end
 
 	local userScript = coroutine.create(runUserScript)
@@ -36,9 +40,18 @@ end
 
 function Evo:LoadBuiltins()
 	import("Core/Builtins/aliases")
+	import("Core/Builtins/fs")
 	import("Core/Builtins/json")
 	import("Core/Builtins/log")
 	import("Core/Builtins/serialize")
+end
+
+function Evo:LoadStandardLibraryExtensions()
+	import("Core/Extensions/table")
+end
+
+function Evo:ExportHighLevelAPI()
+	import("Core/API/C_FileSystem")
 end
 
 function Evo:ExportSharedConstants()
@@ -50,6 +63,8 @@ function Evo:StartEventLoop()
 end
 
 Evo:LoadBuiltins()
+Evo:LoadStandardLibraryExtensions()
+Evo:ExportHighLevelAPI()
 Evo:ExportSharedConstants()
 
 Evo:ProcessUserInput()
