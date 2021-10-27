@@ -9,4 +9,8 @@ import("Builtins/test-log.lua")
 import("Builtins/test-serialize.lua")
 import("Builtins/test-shared-constants.lua")
 
+import("Extensions/test-table.lua")
+
+import("API/test-c-filesystem.lua")
+
 print("\nAll tests completed!")

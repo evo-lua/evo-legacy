@@ -46,6 +46,14 @@ function Evo:LoadBuiltins()
 	import("Core/Builtins/serialize")
 end
 
+function Evo:LoadStandardLibraryExtensions()
+	import("Core/Extensions/table")
+end
+
+function Evo:ExportHighLevelAPI()
+	import("Core/API/C_FileSystem")
+end
+
 function Evo:ExportSharedConstants()
 	import("Core/SharedConstants.lua")
 end
@@ -55,6 +63,8 @@ function Evo:StartEventLoop()
 end
 
 Evo:LoadBuiltins()
+Evo:LoadStandardLibraryExtensions()
+Evo:ExportHighLevelAPI()
 Evo:ExportSharedConstants()
 
 Evo:ProcessUserInput()

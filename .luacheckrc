@@ -5,6 +5,8 @@ exclude_files = {
 	".evo"
 }
 ignore = {
+	"142", -- setting undefined field ... of global ... (working as intended)
+	"143", -- accessing undefined field ... of global ... (it's not undefined now, is it?)
 	"212", -- unused argument (I'd rather it's obvious what arguments are passed even if they aren't currently used)
 	"213", -- unused loop argument (readability improvement; _ adds nothing and is less explicit)
 }
