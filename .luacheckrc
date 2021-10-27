@@ -15,6 +15,7 @@ globals = {
 
 	-- evo-luvi
 	"dump",
+	"path",
 	"import",
 
 	-- evo
