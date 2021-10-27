@@ -19,7 +19,7 @@ function Evo:ProcessUserInput()
 
 	local userScript = coroutine.create(runUserScript)
 	local ranWithoutErrors, errorMessage = coroutine.resume(userScript)
-	errorMessage = errorMessage or "<Mo message was provided by the script>"
+	errorMessage = errorMessage or "<No message was provided by the script>"
 
 	-- We want to assert this here in order to ensure the runtime never exits without indicating EXIT_FAILURE
 	local formattedErrorMessage = format("Oh no! I've encountered an error while running %s :(\n%s", scriptFile, errorMessage)
