@@ -21,11 +21,14 @@ globals = {
 	"import",
 
 	-- evo
+	-- Builtins
 	"format",
 	"json",
 	"log",
 	"printf",
 	"serialize",
+	--- API
+	"C_FileSystem",
 
 	-- Shared constants
 	"EVO_VERSION_MAJOR",
