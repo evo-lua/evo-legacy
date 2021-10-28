@@ -18,68 +18,110 @@ local COLOR_CODE_WHITE_BACKGROUND = "0;47m"
 
 local type = type
 
+-- It's safe to cache it as the intended use is to pass it as a CLI parameter on startup
+local ENABLE_TEXT_TRANSFORMATIONS = _G.ENABLE_TEXT_TRANSFORMATIONS
+
 function transform.bold(text)
 	if type(text) ~= "string" then return nil, "Usage: bold(text)" end
+
+	if not ENABLE_TEXT_TRANSFORMATIONS then return text end
+
 	return COLOR_START_SEQUENCE .. COLOR_CODE_BOLD .. text .. RESET_SEQUENCE
 end
 
 function transform.underline(text)
 	if type(text) ~= "string" then return nil, "Usage: underline(text)" end
+
+	if not ENABLE_TEXT_TRANSFORMATIONS then return text end
+
 	return COLOR_START_SEQUENCE .. COLOR_CODE_UNDERLINE .. text .. RESET_SEQUENCE
 end
 
 function transform.black(text)
 	if type(text) ~= "string" then return nil, "Usage: black(text)" end
+
+	if not ENABLE_TEXT_TRANSFORMATIONS then return text end
+
 	return COLOR_START_SEQUENCE .. COLOR_CODE_BLACK .. text .. RESET_SEQUENCE
  end
 
 function transform.blackBackground(text)
 	if type(text) ~= "string" then return nil, "Usage: blackBackground(text)" end
+
+	if not ENABLE_TEXT_TRANSFORMATIONS then return text end
+
 	return COLOR_START_SEQUENCE .. COLOR_CODE_BLACK_BACKGROUND .. text .. RESET_SEQUENCE
 end
 
 function transform.green(text)
 	if type(text) ~= "string" then return nil, "Usage: green(text)" end
+
+	if not ENABLE_TEXT_TRANSFORMATIONS then return text end
+
 	return COLOR_START_SEQUENCE .. COLOR_CODE_GREEN .. text .. RESET_SEQUENCE
 end
 
 function transform.gray(text)
 	if type(text) ~= "string" then return nil, "Usage: gray(text)" end
+
+	if not ENABLE_TEXT_TRANSFORMATIONS then return text end
+
 	return COLOR_START_SEQUENCE .. COLOR_CODE_GRAY .. text .. RESET_SEQUENCE
 end
 
 function transform.white(text)
 	if type(text) ~= "string" then return nil, "Usage: white(text)" end
+
+	if not ENABLE_TEXT_TRANSFORMATIONS then return text end
+
 	return COLOR_START_SEQUENCE .. COLOR_CODE_WHITE .. text .. RESET_SEQUENCE
 end
 
 function transform.red(text)
 	if type(text) ~= "string" then return nil, "Usage: red(text)" end
+
+	if not ENABLE_TEXT_TRANSFORMATIONS then return text end
+
 	return COLOR_START_SEQUENCE .. COLOR_CODE_RED .. text .. RESET_SEQUENCE
 end
 
 function transform.cyan(text)
 	if type(text) ~= "string" then return nil, "Usage: cyan(text)" end
+
+	if not ENABLE_TEXT_TRANSFORMATIONS then return text end
+
 	return COLOR_START_SEQUENCE .. COLOR_CODE_CYAN .. text .. RESET_SEQUENCE
 end
 
 function transform.yellow(text)
 	if type(text) ~= "string" then return nil, "Usage: yellow(text)" end
+
+	if not ENABLE_TEXT_TRANSFORMATIONS then return text end
+
 	return COLOR_START_SEQUENCE .. COLOR_CODE_YELLOW .. text .. RESET_SEQUENCE
 end
 
 function transform.brightRedBackground(text)
 	if type(text) ~= "string" then return nil, "Usage: brightRedBackground(text)" end
+
+	if not ENABLE_TEXT_TRANSFORMATIONS then return text end
+
 	return COLOR_START_SEQUENCE .. COLOR_CODE_RED_BACKGROUND_BRIGHT .. text .. RESET_SEQUENCE
 end
 
 function transform.greenBackground(text)
 	if type(text) ~= "string" then return nil, "Usage: greenBackground(text)" end
+
+	if not ENABLE_TEXT_TRANSFORMATIONS then return text end
+
 	return COLOR_START_SEQUENCE .. COLOR_CODE_GREEN_BACKGROUND .. text .. RESET_SEQUENCE
 end
 
 function transform.whiteBackground(text)
 	if type(text) ~= "string" then return nil, "Usage: whiteBackground(text)" end
+
+	if not ENABLE_TEXT_TRANSFORMATIONS then return text end
+
 	return COLOR_START_SEQUENCE .. COLOR_CODE_WHITE_BACKGROUND .. text .. RESET_SEQUENCE
 end
 

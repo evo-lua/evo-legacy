@@ -38,6 +38,10 @@ function Evo:DisplayHelpText()
 	print("evo myScript.lua [optional command line arguments go here]")
 end
 
+function Evo:LoadDefaultSettings()
+	_G.ENABLE_TEXT_TRANSFORMATIONS = true
+end
+
 function Evo:LoadBuiltins()
 	import("Core/Builtins/aliases")
 	import("Core/Builtins/event")
@@ -64,6 +68,7 @@ function Evo:StartEventLoop()
 	uv.run()
 end
 
+Evo:LoadDefaultSettings()
 Evo:LoadBuiltins()
 Evo:LoadStandardLibraryExtensions()
 Evo:ExportHighLevelAPI()
