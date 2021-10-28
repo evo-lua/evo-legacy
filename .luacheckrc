@@ -23,6 +23,7 @@ globals = {
 
 	-- evo
 	-- Builtins
+	"event",
 	"format",
 	"json",
 	"log",

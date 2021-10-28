@@ -40,6 +40,7 @@ end
 
 function Evo:LoadBuiltins()
 	import("Core/Builtins/aliases")
+	import("Core/Builtins/event")
 	import("Core/Builtins/fs")
 	import("Core/Builtins/json")
 	import("Core/Builtins/log")
