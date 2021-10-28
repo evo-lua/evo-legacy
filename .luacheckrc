@@ -23,11 +23,23 @@ globals = {
 
 	-- evo
 	-- Builtins
+	"event",
 	"format",
 	"json",
 	"log",
 	"printf",
 	"serialize",
+	--- Logging aliases
+	"EVENT",
+	"TEST",
+	"DEBUG",
+	"INFO",
+	"NOTICE",
+	"WARNING",
+	"ERROR",
+	"CRITICAL",
+	"ALERT",
+	"EMERGENCY",
 	--- API
 	"C_FileSystem",
 
