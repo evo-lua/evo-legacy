@@ -8,6 +8,7 @@ import("Builtins/test-fs.lua")
 import("Builtins/test-json.lua")
 import("Builtins/test-log.lua")
 import("Builtins/test-serialize.lua")
+import("Builtins/test-socket.lua")
 import("Builtins/test-transform.lua")
 import("Builtins/test-shared-constants.lua")
 

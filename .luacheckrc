@@ -29,6 +29,7 @@ globals = {
 	"log",
 	"printf",
 	"serialize",
+	"socket",
 	"transform",
 	--- Logging aliases
 	"EVENT",
