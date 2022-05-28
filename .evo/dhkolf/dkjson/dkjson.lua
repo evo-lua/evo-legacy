@@ -194,7 +194,7 @@ end
 
 local function addnewline2 (level, buffer, buflen)
   buffer[buflen+1] = "\n"
-  buffer[buflen+2] = strrep ("  ", level)
+  buffer[buflen+2] = strrep ("\t", level)
   buflen = buflen + 2
   return buflen
 end
@@ -221,7 +221,7 @@ local function addpair (key, value, prev, indent, level, buffer, buflen, tables,
     buflen = addnewline2 (level, buffer, buflen)
   end
   buffer[buflen+1] = quotestring (key)
-  buffer[buflen+2] = ":"
+  buffer[buflen+2] = ": "
   return encode2 (value, indent, level, buffer, buflen + 2, tables, globalorder, state)
 end
 
