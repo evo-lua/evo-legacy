@@ -65,8 +65,8 @@ function Evo:ExportSharedConstants()
 end
 
 function Evo:ExportTestingFramework()
-	import("Core/Primitives/TestSuite.lua")
-	import("Core/Primitives/Scenario.lua")
+	import("Core/BDD/TestSuite.lua")
+	import("Core/BDD/Scenario.lua")
 end
 
 function Evo:StartEventLoop()
