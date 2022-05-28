@@ -1,6 +1,6 @@
-    local Demo = {}
+    local Example = {}
 
-	function Demo:Execute()
+	function Example:Execute()
 
 		local testSuite = TestSuite:Construct("Basic demonstration")
 		local scenario = Scenario:Construct("Testing the framework")
@@ -37,6 +37,4 @@
 
 	end
 
-	Demo:Execute()
-
-	return Demo
+	Example:Execute()
