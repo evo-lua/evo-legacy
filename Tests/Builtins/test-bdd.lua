@@ -1,6 +1,6 @@
 
 assert(type(TestSuite) == "table", "The TestSuite primitive should be exported")
-print("OK\tBuiltin\t\tTestSuite")
+print("OK\tBDD\t\tTestSuite")
 
 -- Construct
 -- AddScenario
@@ -10,7 +10,7 @@ print("OK\tBuiltin\t\tTestSuite")
 -- PrintSummary
 
 assert(type(Scenario) == "table", "The Scenario primitive should be exported")
-print("OK\tBuiltin\t\tScenario")
+print("OK\tBDD\t\tScenario")
 
 -- Construct
 -- GIVEN
