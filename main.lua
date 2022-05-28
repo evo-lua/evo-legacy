@@ -78,6 +78,7 @@ Evo:LoadBuiltins()
 Evo:LoadStandardLibraryExtensions()
 Evo:ExportHighLevelAPI()
 Evo:ExportSharedConstants()
+Evo:ExportTestingFramework()
 
 Evo:ProcessUserInput()
 
