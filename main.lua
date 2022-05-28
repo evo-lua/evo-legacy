@@ -64,6 +64,11 @@ function Evo:ExportSharedConstants()
 	import("Core/SharedConstants.lua")
 end
 
+function Evo:ExportTestingFramework()
+	import("Core/Primitives/TestSuite.lua")
+	import("Core/Primitives/Scenario.lua")
+end
+
 function Evo:StartEventLoop()
 	uv.run()
 end
