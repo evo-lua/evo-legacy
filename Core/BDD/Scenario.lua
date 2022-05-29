@@ -118,9 +118,13 @@ function Scenario:PrintResults(printResultsFunction)
 	printResultsFunction()
 	printResultsFunction("\t" .. transform.cyan("Scenario: ") .. transform.white(self.name))
 	printResultsFunction()
-	printResultsFunction("\t" .. transform.cyan("GIVEN") .. "\t" .. transform.white(self.descriptions.GIVEN))
-	printResultsFunction("\t" .. transform.cyan("WHEN") .. "\t" .. transform.white(self.descriptions.WHEN))
-	printResultsFunction("\t" .. transform.cyan("THEN") .. "\t" .. transform.white(self.descriptions.THEN))
+
+	local preconditionsText = (self.descriptions.GIVEN == "") and "(no description)" or self.descriptions.GIVEN
+	local scriptText = (self.descriptions.WHEN == "") and "(no description)" or self.descriptions.WHEN
+	local postconditionsText = (self.descriptions.THEN == "") and "(no description)" or self.descriptions.THEN
+	printResultsFunction("\t" .. transform.cyan("GIVEN") .. "\t" .. transform.white(preconditionsText))
+	printResultsFunction("\t" .. transform.cyan("WHEN") .. "\t" .. transform.white(scriptText))
+	printResultsFunction("\t" .. transform.cyan("THEN") .. "\t" .. transform.white(postconditionsText))
 	printResultsFunction()
 
 	local failedAssertionCount = 0
