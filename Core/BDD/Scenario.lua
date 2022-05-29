@@ -127,7 +127,7 @@ function Scenario:ToString()
 
 	return self:GetOverviewText() .. "\n"
 	-- Displaying the number of assertions is pointless if there are none, but if any are present the summary needs more space
-	 .. self:GetResultsText() .. (hasResults and "\n\n" or "")
+	 .. self:GetResultsText() .. (hasResults and "\n" or "")
 	 .. self:GetSummaryText()
 end
 

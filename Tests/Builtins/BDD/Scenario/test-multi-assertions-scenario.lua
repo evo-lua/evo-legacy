@@ -49,7 +49,7 @@ local expectedSummaryText = transform.brightRedBackground("2 FAILED assertions!"
 assertEquals(scenario:GetSummaryText(), expectedSummaryText)
 
 
-local expectedOutput = expectedOverviewText .. expectedResultsText .. "\n" .. expectedSummaryText .. "\n"
+local expectedOutput = expectedOverviewText .. "\n" .. expectedResultsText .. "\n" .. expectedSummaryText .. "\n"
 assertEquals(fauxConsole.read(), expectedOutput)
 fauxConsole.clear()
 
