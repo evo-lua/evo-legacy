@@ -27,27 +27,7 @@ end
 
 ----------------------------------------------------------------------------------------------------------------
 
-local globalPrint = _G.print -- Backup
-
--- This should likely be streamlined and made re-usable (later)?
-local stdoutBuffer= ""
-local function fauxPrint(...)
-	stdoutBuffer = stdoutBuffer .. tostring(... or "") .. "\n"
-end
-
-local function resetFauxPrintBuffer()
-	stdoutBuffer= ""
-end
-
-_G.print = fauxPrint
-
-----------------------------------------------------------------------------------------------------------------
-
 import("./Scenario/test-constructor.lua")
-
-----------------------------------------------------------------------------------------------------------------
-
-_G.print = globalPrint -- Restore
 
 ----------------------------------------------------------------------------------------------------------------
 
