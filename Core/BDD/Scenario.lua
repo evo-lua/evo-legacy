@@ -126,7 +126,7 @@ function Scenario:ToString()
 
 	return self:GetOverviewText() .. LINEBREAK
 	 .. self:GetResultsText() .. LINEBREAK .. LINEBREAK
-	 .. self:GetSummaryText() .. LINEBREAK
+	 .. self:GetSummaryText()
 end
 
 function Scenario:GetOverviewText()
@@ -181,14 +181,6 @@ function Scenario:GetResultsText()
 	end
 
 	return coloredResultsText
-
-	-- exit code 0 or 1
-
-
-	-- local coloredResultsText = self:GetSummaryText()
-
-	-- printResultsFunction()
-	-- printResultsFunction(coloredResultsText)
 end
 
 function Scenario:GetSummaryText()
