@@ -75,16 +75,17 @@ function Scenario:THEN(description, assertPostconditions)
 	self.assertPostconditions = assertPostconditions
 end
 
-function Scenario:Run()
-	print("[Scenario] Running scenario: " .. self.name)
+function Scenario:Run(printResultsFunction)
+	printResultsFunction = printResultsFunction or print
+	printResultsFunction("[Scenario] Running scenario: " .. self.name)
 
-	print("[Scenario] Establishing pre-conditions")
+	printResultsFunction("[Scenario] Establishing pre-conditions")
 	self:establishPreconditions()
 
-	print("[Scenario] Executing test function")
+	printResultsFunction("[Scenario] Executing test function")
 	self:runTestCode()
 
-	print("[Scenario] Asserting post-conditions")
+	printResultsFunction("[Scenario] Asserting post-conditions")
 	local globalAssert = assert
 
 	local silentAssert = function(condition, description)
@@ -93,7 +94,7 @@ function Scenario:Run()
 		description = description or "<No Description>"
 
 		if not isConditionTrue then
-			print("[Scenario] Assertion failed: " .. description)
+			printResultsFunction("[Scenario] Assertion failed: " .. description)
 		end
 		local assertionDetails = {
 			description = description,
@@ -117,14 +118,15 @@ function Scenario:Run()
 	self:PrintResults()
 end
 
-function Scenario:PrintResults()
-	print()
-	print("\t" .. transform.cyan("Scenario: ") .. transform.white(self.name))
-	print()
-	print("\t" .. transform.cyan("GIVEN") .. "\t" .. transform.white(self.descriptions.GIVEN))
-	print("\t" .. transform.cyan("WHEN") .. "\t" .. transform.white(self.descriptions.WHEN))
-	print("\t" .. transform.cyan("THEN") .. "\t" .. transform.white(self.descriptions.THEN))
-	print()
+function Scenario:PrintResults(printResultsFunction)
+	printResultsFunction = printResultsFunction or print
+	printResultsFunction()
+	printResultsFunction("\t" .. transform.cyan("Scenario: ") .. transform.white(self.name))
+	printResultsFunction()
+	printResultsFunction("\t" .. transform.cyan("GIVEN") .. "\t" .. transform.white(self.descriptions.GIVEN))
+	printResultsFunction("\t" .. transform.cyan("WHEN") .. "\t" .. transform.white(self.descriptions.WHEN))
+	printResultsFunction("\t" .. transform.cyan("THEN") .. "\t" .. transform.white(self.descriptions.THEN))
+	printResultsFunction()
 
 	local failedAssertionCount = 0
 
@@ -145,7 +147,7 @@ function Scenario:PrintResults()
 			failedAssertionCount = failedAssertionCount + 1
 		end
 
-		print(format("\t\t%s %s", successText, description))
+		printResultsFunction(format("\t\t%s %s", successText, description))
 	end
 
 	-- exit code 0 or 1
@@ -157,8 +159,8 @@ function Scenario:PrintResults()
 
 	local coloredResultsText = self:GetResultsText()
 
-	print()
-	print(coloredResultsText)
+	printResultsFunction()
+	printResultsFunction(coloredResultsText)
 end
 
 function Scenario:GetName()
