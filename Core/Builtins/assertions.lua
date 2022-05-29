@@ -18,11 +18,15 @@ function assertEquals(actual, expected)
 end
 
 function assertFalse(conditionToCheck)
-	return assertEquals(conditionToCheck, false)
+	if conditionToCheck then
+		error(transform.red("\n\nASSERTION FAILURE:\n\n" .. transform.bold(tostring(conditionToCheck)) .. "\n\n") .. transform.red("SHOULD BE\n\n" .. transform.bold("false") .. "\n"))
+	end
 end
 
 function assertTrue(conditionToCheck)
-	return assertEquals(conditionToCheck, true)
+	if not conditionToCheck then
+		error(transform.red("\n\nASSERTION FAILURE:\n\n" .. transform.bold(tostring(conditionToCheck)) .. "\n\n") .. transform.red("SHOULD BE\n\n" .. transform.bold("true") .. "\n"))
+	end
 end
 
 -- function assertTypeOf(value, expectedType)
@@ -41,4 +45,5 @@ end
 _G.assertEquals = assertEquals
 _G.assertFalse = assertFalse
 _G.assertTrue = assertTrue
+
 -- _G.assertTypeOf = assertTypeOf
