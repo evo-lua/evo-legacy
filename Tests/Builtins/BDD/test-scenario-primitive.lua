@@ -45,14 +45,15 @@ _G.print = fauxPrint
 local scenario = Scenario:Construct("test")
 assert(scenario:GetName() == "test", "Should initialize a new scenario with the given name")
 
--- Does nothing when run/empty initialization
-assert(stdoutBuffer == "", "stdoutBuffer should be empty before running the scenario")
+-- Does nothing when run/empty initialization -> "stdoutBuffer should be empty before running the scenario"
+assertEquals(stdoutBuffer, "")
 
 scenario:Run(fauxPrint)
 
 -- Since there's no scripts attached to the scenario, it should just print nothing as its summary?
 -- TBD should display 0 tests run/0 assertions maybe?
-assert(stdoutBuffer == "", "stdoutBuffer should be empty after running the scenario")
+-- "stdoutBuffer should be empty after running the scenario"
+assertEquals(stdoutBuffer, "")
 
 resetFauxPrintBuffer()
 
