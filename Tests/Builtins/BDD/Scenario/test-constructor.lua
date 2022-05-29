@@ -28,5 +28,5 @@ assertEquals(fauxConsole.read(), "")
 scenario:Run(fauxConsole)
 local expectedOutput = expectedOverviewText .. expectedResultsText .. "\n" .. expectedSummaryText .. "\n"
 assertEquals(fauxConsole.read(), expectedOutput)
--- resetFauxPrintBuffer()
+
 fauxConsole.clear()
