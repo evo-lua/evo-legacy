@@ -110,7 +110,7 @@ function Scenario:Run(printResultsFunction)
 	_G.assert = globalAssert
 	-- _G.assertEquals = assertEquals
 
-	self:PrintResults()
+	self:PrintResults(printResultsFunction)
 end
 
 function Scenario:PrintResults(printResultsFunction)
