@@ -30,6 +30,7 @@ end
 import("./Scenario/test-noop-scenario.lua")
 import("./Scenario/test-multi-assertions-scenario.lua")
 import("./Scenario/test-cleanup-with-finally.lua")
+import("./Scenario/test-scenario-runs-in-order.lua")
 
 ----------------------------------------------------------------------------------------------------------------
 
