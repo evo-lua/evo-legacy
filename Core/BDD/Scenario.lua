@@ -97,7 +97,7 @@ function Scenario:Run(console)
 	local silentAssert = function(condition, description)
 		local isConditionTrue = condition
 
-		description = description or "<No Description>"
+		description = description or "(no description)"
 
 		local assertionDetails = {
 			description = description,
