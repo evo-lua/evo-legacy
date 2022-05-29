@@ -92,7 +92,7 @@ function Scenario:Run(console)
 		description = description or "<No Description>"
 
 		if not isConditionTrue then
-			printFunction("[Scenario] Assertion failed: " .. description)
+			-- printFunction("[Scenario] Assertion failed: " .. description)
 		end
 		local assertionDetails = {
 			description = description,
@@ -168,7 +168,7 @@ function Scenario:GetResultsText()
 		local description = assertionDetails.description
 		local isSuccess = assertionDetails.isSuccess
 
-		local successText = "TBD"
+		local successText = transform.yellow("﹖")
 
 		-- Explicitly checking here to avoid nil being interpreted as false
 		if isSuccess == true then
@@ -179,7 +179,7 @@ function Scenario:GetResultsText()
 			failedAssertionCount = failedAssertionCount + 1
 		end
 
-		coloredResultsText = coloredResultsText .. (format("\t\t%s %s", successText, description))
+		coloredResultsText = coloredResultsText .. (format("\t\t%s %s", successText, description)) .. "\n"
 	end
 
 	return coloredResultsText

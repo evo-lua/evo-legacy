@@ -19,14 +19,37 @@ scenario:THEN(
 )
 
 assertFalse(scenario:HasFailed())
-assertEquals(scenario:GetNumFailedAssertions(), 42)
+assertEquals(scenario:GetNumFailedAssertions(), 0)
 
 local fauxConsole = C_Testing:CreateFauxConsole()
 assertEquals(fauxConsole.read(), "")
 
-scenario:Run()
+local expectedOverviewText = "\n" -- To offset from the previous content (sub-optimal...)
 
-local expectedOutput = "todo"
+expectedOverviewText = expectedOverviewText .. "\t" -- To highlight the keywords visually
+expectedOverviewText = expectedOverviewText .. transform.cyan("Scenario: ") .. transform.white("Multiple assertions (some failing)") .. "\n\n"
+expectedOverviewText = expectedOverviewText .. "\t" .. transform.cyan("GIVEN") .. "\t" ..  transform.white("(no preconditions)") .. "\n"
+expectedOverviewText = expectedOverviewText .. "\t" .. transform.cyan("WHEN") .. "\t" ..  transform.white("I run the test code") .. "\n"
+expectedOverviewText = expectedOverviewText .. "\t" .. transform.cyan("THEN") .. "\t" ..  transform.white("The post-conditions hold true") .. "\n"
+
+-- Does nothing when run/empty initialization -> "stdoutBuffer should be empty before running the scenario"
+assertEquals(fauxConsole.read(), "")
+
+scenario:Run(fauxConsole)
+
+assertEquals(scenario:GetOverviewText(), expectedOverviewText)
+
+local expectedResultsText = "\t\t" .. transform.green("✓") .. " Some value is set to 42\n"
+expectedResultsText = expectedResultsText .. "\t\t" .. transform.red("✗") .. " Some value is set to 43\n"
+expectedResultsText = expectedResultsText .. "\t\t" .. transform.red("✗") .. " Some value is set to 44\n"
+assertEquals(scenario:GetResultsText(), expectedResultsText)
+
+
+local expectedSummaryText = transform.brightRedBackground("2 FAILED assertions!")
+assertEquals(scenario:GetSummaryText(), expectedSummaryText)
+
+
+local expectedOutput = expectedOverviewText .. expectedResultsText .. "\n" .. expectedSummaryText .. "\n"
 assertEquals(fauxConsole.read(), expectedOutput)
 fauxConsole.clear()
 
