@@ -77,15 +77,10 @@ end
 
 function Scenario:Run(printResultsFunction)
 	printResultsFunction = printResultsFunction or print
-	printResultsFunction("[Scenario] Running scenario: " .. self.name)
 
-	printResultsFunction("[Scenario] Establishing pre-conditions")
 	self:establishPreconditions()
-
-	printResultsFunction("[Scenario] Executing test function")
 	self:runTestCode()
 
-	printResultsFunction("[Scenario] Asserting post-conditions")
 	local globalAssert = assert
 
 	local silentAssert = function(condition, description)
