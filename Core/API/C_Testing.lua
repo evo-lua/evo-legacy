@@ -1,4 +1,4 @@
--- TODO Testing, documentation, luacheckrc
+-- TODO Testing, documentation
 local C_Testing = {}
 
 function C_Testing:CreateFauxConsole()
@@ -20,6 +20,9 @@ function C_Testing:CreateFauxConsole()
 	function fauxConsole.read()
 		return fauxConsole.stdoutBuffer
 	end
+
+	-- line(lineNo) = return content of line x
+	-- lines = count number of lines
 
 	return fauxConsole
 end
