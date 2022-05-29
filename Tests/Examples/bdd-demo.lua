@@ -24,7 +24,7 @@
 			"The post-conditions hold true",
 			function()
 				-- This function should assert the expected post-conditions
-				assert(self.someValue == 42, "Some value is set correctly")
+				assertEquals(self.someValue, 42, "Some value is set correctly")
 			end
 		)
 

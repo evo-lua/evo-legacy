@@ -3,7 +3,7 @@
 local error = error
 local tostring = tostring
 
-function assertEquals(actual, expected)
+function assertEquals(actual, expected, description)
 
 	if actual == "" then actual = "<empty string>" end
 	if expected == "" then expected = "<empty string>" end
@@ -17,7 +17,9 @@ function assertEquals(actual, expected)
 		actual = transform.bold(actual)
 		expected = transform.bold(expected)
 
-		error(transform.red("\n\nASSERTION FAILURE:\n\n" .. actual .. "\n\n") .. transform.red("SHOULD BE\n\n" .. expected .. "\n"))
+		assert(actual == expected, description)
+
+		ERROR(transform.red("\n\nASSERTION FAILURE:\n\n" .. actual .. "\n\n") .. transform.red("SHOULD BE\n\n" .. expected .. "\n"))
 	end
 end
 
