@@ -30,7 +30,7 @@ local globalPrint = _G.print -- Backup
 local stdoutBuffer= ""
 local function fauxPrint(...)
 	-- error("faux print used")
-	stdoutBuffer = stdoutBuffer .. tostring(...) .. "\n"
+	stdoutBuffer = stdoutBuffer .. tostring(... or "") .. "\n"
 end
 
 local function resetFauxPrintBuffer()
