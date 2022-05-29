@@ -8,13 +8,17 @@ function assertEquals(actual, expected)
 	if actual == "" then actual = "<empty string>" end
 	if expected == "" then expected = "<empty string>" end
 
-	actual = transform.bold(actual)
-	expected = transform.bold(expected)
 
 	if actual ~= expected then
-		error(transform.red("\n\nASSERTION FAILURE:\n\n" .. tostring(actual) .. "\n\n") .. transform.red("SHOULD BE\n\n" .. tostring(expected) .. "\n"))
+
+		actual = tostring(actual)
+		expected = tostring(expected)
+
+		actual = transform.bold(actual)
+		expected = transform.bold(expected)
+
+		error(transform.red("\n\nASSERTION FAILURE:\n\n" .. actual .. "\n\n") .. transform.red("SHOULD BE\n\n" .. expected .. "\n"))
 	end
-	-- assert(actual == expected, "Expected " .. tostring(actual) .. " to be " .. tostring(expected))
 end
 
 function assertFalse(conditionToCheck)
