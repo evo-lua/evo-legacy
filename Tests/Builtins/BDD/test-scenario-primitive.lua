@@ -42,8 +42,8 @@ _G.print = fauxPrint
 ----------------------------------------------------------------------------------------------------------------
 
 -- Scenario: A new scenario is created without defining any script logic
-local scenario = Scenario:Construct("test")
-assert(scenario:GetName() == "test", "Should initialize a new scenario with the given name")
+local scenario = Scenario:Construct("Do nothing")
+assert(scenario:GetName() == "Do nothing", "Should initialize a new scenario with the given name")
 
 -- Does nothing when run/empty initialization -> "stdoutBuffer should be empty before running the scenario"
 assertEquals(stdoutBuffer, "")
