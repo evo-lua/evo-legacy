@@ -53,5 +53,5 @@ local expectedOutput = expectedOverviewText .. "\n" .. expectedResultsText .. "\
 assertEquals(fauxConsole.read(), expectedOutput)
 fauxConsole.clear()
 
-assertEquals(scenario:GetNumFailedAssertions(), 32)
+assertEquals(scenario:GetNumFailedAssertions(), 2)
 assertTrue(scenario:HasFailed())
