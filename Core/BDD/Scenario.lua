@@ -122,10 +122,11 @@ function Scenario:Run(printResultsFunction)
 end
 
 function Scenario:ToString()
-	local LINEBREAK = "\n"
+	local hasResults = self:GetResultsText() ~= ""
 
-	return self:GetOverviewText() .. LINEBREAK
-	 .. self:GetResultsText() .. LINEBREAK .. LINEBREAK
+	return self:GetOverviewText() .. "\n"
+	-- Displaying the number of assertions is pointless if there are none, but if any are present the summary needs more space
+	 .. self:GetResultsText() .. (hasResults and "\n\n" or "")
 	 .. self:GetSummaryText()
 end
 

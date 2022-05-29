@@ -48,11 +48,6 @@ _G.print = fauxPrint
 local scenario = Scenario:Construct("Do nothing")
 assert(scenario:GetName() == "Do nothing", "Should initialize a new scenario with the given name")
 
--- Does nothing when run/empty initialization -> "stdoutBuffer should be empty before running the scenario"
-assertEquals(stdoutBuffer, "")
-
-scenario:Run(fauxPrint)
-
 -- Human-readable overview should indicate no handlers were registered
 local expectedOverviewText = "\n" -- To offset from the previous content (sub-optimal...)
 
@@ -72,7 +67,12 @@ assertEquals(scenario:GetResultsText(), expectedResultsText)
 local expectedSummaryText = transform.yellow("Warning: Nothing to assert (technically passing...)")
 assertEquals(scenario:GetSummaryText(), expectedSummaryText)
 
+-- Does nothing when run/empty initialization -> "stdoutBuffer should be empty before running the scenario"
+assertEquals(stdoutBuffer, "")
 
+scenario:Run(fauxPrint)
+local expectedOutput = expectedOverviewText .. expectedResultsText .. "\n" .. expectedSummaryText .. "\n"
+assertEquals(stdoutBuffer, expectedOutput)
 resetFauxPrintBuffer()
 
 ----------------------------------------------------------------------------------------------------------------
