@@ -126,7 +126,7 @@ function Scenario:PrintResults(printResultsFunction)
 	if self.runTestCode == NOOP_FUNCTION then scriptText = "(no code to execute)" end
 
 	local postconditionsText = (self.descriptions.THEN == "") and "(no description)" or self.descriptions.THEN
-	if self.assertPostconditions == NOOP_FUNCTION then preconditionsText = "(no postconditions)" end
+	if self.assertPostconditions == NOOP_FUNCTION then postconditionsText = "(no postconditions)" end
 
 	printResultsFunction("\t" .. transform.cyan("GIVEN") .. "\t" .. transform.white(preconditionsText))
 	printResultsFunction("\t" .. transform.cyan("WHEN") .. "\t" .. transform.white(scriptText))
