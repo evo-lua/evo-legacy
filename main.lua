@@ -43,6 +43,7 @@ function Evo:LoadDefaultSettings()
 end
 
 function Evo:LoadBuiltins()
+	import("Core/Builtins/assertions")
 	import("Core/Builtins/aliases")
 	import("Core/Builtins/event")
 	import("Core/Builtins/fs")
