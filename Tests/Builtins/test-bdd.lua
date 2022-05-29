@@ -1,30 +1,5 @@
-
-assert(type(TestSuite) == "table", "The TestSuite primitive should be exported")
-print("OK\tBDD\t\tTestSuite")
-
--- Construct
--- AddScenario
--- RunAllScenarios
-
--- RunScenario
--- PrintSummary
-
-assert(type(Scenario) == "table", "The Scenario primitive should be exported")
-print("OK\tBDD\t\tScenario")
-
--- Construct
--- GIVEN
--- WHEN
--- THEN
--- FINALLY
-
--- Run
--- PrintResults
--- GetName
--- GetResultsText
--- GetNumFailedAssertions
--- HasFailed
-
+import("./BDD/test-testsuite-primitive")
+import("./BDD/test-scenario-primitive")
 
 -- Scenario: Creating a directory, querying some basic properties, then deleting it
 assert(C_FileSystem.Exists("someFolder") == false, "Exists: Should return false if the file or folder doesn't exist")
