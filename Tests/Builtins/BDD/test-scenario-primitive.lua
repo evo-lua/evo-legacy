@@ -7,7 +7,10 @@ local exportedApiSurface = {
 	"Run",
 	"PrintResults",
 	"GetName",
+	"ToString",
+	"GetOverviewText",
 	"GetResultsText",
+	"GetSummaryText",
 	"GetNumFailedAssertions",
 	"HasFailed",
 	"GIVEN",
@@ -50,10 +53,14 @@ assertEquals(stdoutBuffer, "")
 
 scenario:Run(fauxPrint)
 
--- Since there's no scripts attached to the scenario, it should just print nothing as its summary?
--- TBD should display 0 tests run/0 assertions maybe?
--- "stdoutBuffer should be empty after running the scenario"
-assertEquals(stdoutBuffer, "")
+-- No assertions should be added
+local expectedResultsText = ""
+assertEquals(scenario:GetResultsText(), expectedResultsText)
+
+-- Warning should be displayed instead of the actual summary (no assertions...)
+local expectedSummaryText = transform.yellow("Warning: Nothing to assert (technically passing...)")
+assertEquals(scenario:GetSummaryText(), expectedSummaryText)
+
 
 resetFauxPrintBuffer()
 

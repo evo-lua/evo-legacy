@@ -67,7 +67,7 @@ function TestSuite:PrintSummary()
 			numFailedScenarios = numFailedScenarios + 1
 		end
 
-		local resultsText = scenario:GetResultsText()
+		local resultsText = scenario:GetSummaryText()
 
 		local summaryText = format("\t%s %s: %s", successIcon, scenario:GetName(), resultsText)
 		print(summaryText)

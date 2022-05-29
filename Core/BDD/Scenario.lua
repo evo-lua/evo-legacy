@@ -78,6 +78,8 @@ end
 function Scenario:Run(printResultsFunction)
 	printResultsFunction = printResultsFunction or print
 
+	local startTime = time()
+
 	self:establishPreconditions()
 	self:runTestCode()
 
@@ -110,14 +112,32 @@ function Scenario:Run(printResultsFunction)
 	_G.assert = globalAssert
 	-- _G.assertEquals = assertEquals
 
+
+	local endTime = time()
+	local runTime = (endTime - startTime) -- high precision = nanoseconds
+	local runTimeInMilliseconds = runTime / 10E6
+	self.runTimeInMilliseconds = runTimeInMilliseconds
+
 	self:PrintResults(printResultsFunction)
 end
 
-function Scenario:PrintResults(printResultsFunction)
-	printResultsFunction = printResultsFunction or print
-	printResultsFunction()
-	printResultsFunction("\t" .. transform.cyan("Scenario: ") .. transform.white(self.name))
-	printResultsFunction()
+function Scenario:ToString()
+	local LINEBREAK = "\n"
+
+	return self:GetOverviewText() .. LINEBREAK
+	 .. self:GetResultsText() .. LINEBREAK .. LINEBREAK
+	 .. self:GetSummaryText() .. LINEBREAK
+end
+
+function Scenario:GetOverviewText()
+	local displayText = ""
+
+	local LINEBREAK = "\n"
+	local INDENT = "\t"
+
+	displayText = displayText .. LINEBREAK
+	displayText = displayText .. INDENT .. transform.cyan("Scenario: ") .. transform.white(self.name) .. LINEBREAK
+	displayText = displayText .. LINEBREAK
 
 	local preconditionsText = (self.descriptions.GIVEN == "") and "(no description)" or self.descriptions.GIVEN
 	if self.establishPreconditions == NOOP_FUNCTION then preconditionsText = "(no preconditions)" end
@@ -128,14 +148,19 @@ function Scenario:PrintResults(printResultsFunction)
 	local postconditionsText = (self.descriptions.THEN == "") and "(no description)" or self.descriptions.THEN
 	if self.assertPostconditions == NOOP_FUNCTION then postconditionsText = "(no postconditions)" end
 
-	printResultsFunction("\t" .. transform.cyan("GIVEN") .. "\t" .. transform.white(preconditionsText))
-	printResultsFunction("\t" .. transform.cyan("WHEN") .. "\t" .. transform.white(scriptText))
-	printResultsFunction("\t" .. transform.cyan("THEN") .. "\t" .. transform.white(postconditionsText))
-	printResultsFunction()
+	displayText = displayText .. INDENT .. transform.cyan("GIVEN") .. INDENT .. transform.white(preconditionsText) .. LINEBREAK
+	displayText = displayText .. INDENT .. transform.cyan("WHEN") .. INDENT .. transform.white(scriptText) .. LINEBREAK
+	displayText = displayText .. INDENT .. transform.cyan("THEN") .. INDENT .. transform.white(postconditionsText) .. LINEBREAK
 
+	return displayText
+
+end
+
+
+function Scenario:GetResultsText()
+
+	local coloredResultsText = ""
 	local failedAssertionCount = 0
-
-	local startTime = time()
 
 	for assertionID, assertionDetails in ipairs(self.assertions) do
 		local description = assertionDetails.description
@@ -152,50 +177,57 @@ function Scenario:PrintResults(printResultsFunction)
 			failedAssertionCount = failedAssertionCount + 1
 		end
 
-		printResultsFunction(format("\t\t%s %s", successText, description))
+		coloredResultsText = coloredResultsText .. (format("\t\t%s %s", successText, description))
 	end
 
+	return coloredResultsText
+
 	-- exit code 0 or 1
-	local endTime = time()
-	local runTime = (endTime - startTime) -- high precision = nanoseconds
-	local runTimeInMilliseconds = runTime / 10E6
 
-	self.runTimeInMilliseconds = runTimeInMilliseconds
 
-	local coloredResultsText = self:GetResultsText()
+	-- local coloredResultsText = self:GetSummaryText()
 
-	printResultsFunction()
-	printResultsFunction(coloredResultsText)
+	-- printResultsFunction()
+	-- printResultsFunction(coloredResultsText)
+end
+
+function Scenario:GetSummaryText()
+	local totalAssertionCount = #self.assertions
+	local failedAssertionCount = self:GetNumFailedAssertions()
+
+	local coloredSummaryText
+	if failedAssertionCount == 0 then
+		coloredSummaryText =
+			format("%s passing (%.2f ms)", totalAssertionCount - failedAssertionCount, self.runTimeInMilliseconds)
+	end
+
+	if failedAssertionCount > 0 then
+		coloredSummaryText = transform.brightRedBackground(format("%s FAILED assertions!", failedAssertionCount))
+	end
+
+	if failedAssertionCount == 1 then -- OCD
+		coloredSummaryText = transform.brightRedBackground(("1 FAILED assertion!"))
+	end
+
+	if totalAssertionCount == 0 then
+		coloredSummaryText = transform.yellow("Warning: Nothing to assert (technically passing...)")
+	end
+
+	return coloredSummaryText
+end
+
+
+function Scenario:PrintResults(printResultsFunction)
+	printResultsFunction = printResultsFunction or print
+
+	printResultsFunction(self:ToString())
 end
 
 function Scenario:GetName()
 	return self.name or ""
 end
 
-function Scenario:GetResultsText()
-	local totalAssertionCount = #self.assertions
-	local failedAssertionCount = self:GetNumFailedAssertions()
 
-	local coloredResultsText
-	if failedAssertionCount == 0 then
-		coloredResultsText =
-			format("%s passing (%.2f ms)", totalAssertionCount - failedAssertionCount, self.runTimeInMilliseconds)
-	end
-
-	if failedAssertionCount > 0 then
-		coloredResultsText = transform.brightRedBackground(format("%s FAILED assertions!", failedAssertionCount))
-	end
-
-	if failedAssertionCount == 1 then -- OCD
-		coloredResultsText = transform.brightRedBackground(("1 FAILED assertion!"))
-	end
-
-	if totalAssertionCount == 0 then
-		coloredResultsText = transform.yellow("Warning: Nothing to assert (technically passing...)")
-	end
-
-	return coloredResultsText
-end
 
 function Scenario:GetNumFailedAssertions()
 	local failedAssertionCount = 0
