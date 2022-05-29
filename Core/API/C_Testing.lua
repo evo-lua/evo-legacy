@@ -9,14 +9,17 @@ function C_Testing:CreateFauxConsole()
 		stdoutBuffer = ""
 	}
 
+	-- Append string to the stdout buffer
 	function fauxConsole.print(...)
 		fauxConsole.stdoutBuffer = fauxConsole.stdoutBuffer .. tostring(... or "") .. "\n"
 	end
 
+	-- Clear the stdout buffer
 	function fauxConsole.clear()
 		fauxConsole.stdoutBuffer = ""
 	end
 
+	-- Return the contents of the stdout buffer
 	function fauxConsole.read()
 		return fauxConsole.stdoutBuffer
 	end
