@@ -33,7 +33,8 @@ globals = {
 	"transform",
 
 	"assertEquals",
-	"assertTypeOf",
+	"assertTrue",
+	"assertFalse",
 
 	"TestSuite",
 	"Scenario",

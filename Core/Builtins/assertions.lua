@@ -17,6 +17,14 @@ function assertEquals(actual, expected)
 	-- assert(actual == expected, "Expected " .. tostring(actual) .. " to be " .. tostring(expected))
 end
 
+function assertFalse(conditionToCheck)
+	return assertEquals(conditionToCheck, false)
+end
+
+function assertTrue(conditionToCheck)
+	return assertEquals(conditionToCheck, true)
+end
+
 -- function assertTypeOf(value, expectedType)
 
 -- 	local actualType = type(value)
@@ -31,4 +39,6 @@ end
 -- end
 
 _G.assertEquals = assertEquals
+_G.assertFalse = assertFalse
+_G.assertTrue = assertTrue
 -- _G.assertTypeOf = assertTypeOf
