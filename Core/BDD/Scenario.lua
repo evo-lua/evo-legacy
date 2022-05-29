@@ -120,8 +120,14 @@ function Scenario:PrintResults(printResultsFunction)
 	printResultsFunction()
 
 	local preconditionsText = (self.descriptions.GIVEN == "") and "(no description)" or self.descriptions.GIVEN
+	if self.establishPreconditions == NOOP_FUNCTION then preconditionsText = "(no preconditions)" end
+
 	local scriptText = (self.descriptions.WHEN == "") and "(no description)" or self.descriptions.WHEN
+	if self.runTestCode == NOOP_FUNCTION then scriptText = "(no code to execute)" end
+
 	local postconditionsText = (self.descriptions.THEN == "") and "(no description)" or self.descriptions.THEN
+	if self.assertPostconditions == NOOP_FUNCTION then preconditionsText = "(no postconditions)" end
+
 	printResultsFunction("\t" .. transform.cyan("GIVEN") .. "\t" .. transform.white(preconditionsText))
 	printResultsFunction("\t" .. transform.cyan("WHEN") .. "\t" .. transform.white(scriptText))
 	printResultsFunction("\t" .. transform.cyan("THEN") .. "\t" .. transform.white(postconditionsText))
