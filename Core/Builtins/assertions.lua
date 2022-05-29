@@ -12,7 +12,7 @@ function assertEquals(actual, expected)
 	expected = transform.bold(expected)
 
 	if actual ~= expected then
-		error(transform.red("\n\nASSERTION FAILURE:\n\n\t" .. tostring(actual) .. "\n\n") .. transform.red("SHOULD BE\n\n" .. tostring(expected) .. "\n"))
+		error(transform.red("\n\nASSERTION FAILURE:\n\n" .. tostring(actual) .. "\n\n") .. transform.red("SHOULD BE\n\n" .. tostring(expected) .. "\n"))
 	end
 	-- assert(actual == expected, "Expected " .. tostring(actual) .. " to be " .. tostring(expected))
 end
