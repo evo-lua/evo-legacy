@@ -30,6 +30,9 @@ globals = {
 	"printf",
 	"serialize",
 	"transform",
+
+	"TestSuite",
+	"Scenario",
 	--- Logging aliases
 	"EVENT",
 	"TEST",
