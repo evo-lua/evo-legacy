@@ -1,7 +1,7 @@
 -- TODO tests for this entire module
 
 local error = error
-local type = type
+local tostring = tostring
 
 function assertEquals(actual, expected)
 
