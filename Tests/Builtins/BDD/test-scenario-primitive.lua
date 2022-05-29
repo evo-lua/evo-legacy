@@ -32,7 +32,6 @@ local globalPrint = _G.print -- Backup
 -- This should likely be streamlined and made re-usable (later)?
 local stdoutBuffer= ""
 local function fauxPrint(...)
-	-- error("faux print used")
 	stdoutBuffer = stdoutBuffer .. tostring(... or "") .. "\n"
 end
 
@@ -42,7 +41,35 @@ end
 
 _G.print = fauxPrint
 
+-- TODO Testing, documentation, luacheckrc
+C_Testing = {}
+
+function C_Testing:CreateFauxConsole()
+
+	local tostring = tostring
+
+	local fauxConsole = {
+		stdoutBuffer = ""
+	}
+
+	function fauxConsole.print(...)
+		fauxConsole.stdoutBuffer = fauxConsole.stdoutBuffer .. tostring(... or "") .. "\n"
+	end
+
+	function fauxConsole.clear()
+		fauxConsole.stdoutBuffer = ""
+	end
+
+	function fauxConsole.read()
+		return fauxConsole.stdoutBuffer
+	end
+
+	return fauxConsole
+end
+
 ----------------------------------------------------------------------------------------------------------------
+
+import("./Scenario/test-constructor.lua")
 
 -- Scenario: A new scenario is created without defining any script logic
 local scenario = Scenario:Construct("Do nothing")
@@ -68,12 +95,14 @@ local expectedSummaryText = transform.yellow("Warning: Nothing to assert (techni
 assertEquals(scenario:GetSummaryText(), expectedSummaryText)
 
 -- Does nothing when run/empty initialization -> "stdoutBuffer should be empty before running the scenario"
-assertEquals(stdoutBuffer, "")
+local fauxConsole = C_Testing:CreateFauxConsole()
+assertEquals(fauxConsole.read(), "")
 
-scenario:Run(fauxPrint)
+scenario:Run(fauxConsole)
 local expectedOutput = expectedOverviewText .. expectedResultsText .. "\n" .. expectedSummaryText .. "\n"
-assertEquals(stdoutBuffer, expectedOutput)
-resetFauxPrintBuffer()
+assertEquals(fauxConsole.read(), expectedOutput)
+-- resetFauxPrintBuffer()
+fauxConsole.clear()
 
 ----------------------------------------------------------------------------------------------------------------
 

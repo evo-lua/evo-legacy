@@ -75,8 +75,9 @@ function Scenario:THEN(description, assertPostconditions)
 	self.assertPostconditions = assertPostconditions
 end
 
-function Scenario:Run(printResultsFunction)
-	printResultsFunction = printResultsFunction or print
+function Scenario:Run(console)
+	local printFunction = console and console.print or print
+	printFunction = printFunction or print
 
 	local startTime = time()
 
@@ -91,7 +92,7 @@ function Scenario:Run(printResultsFunction)
 		description = description or "<No Description>"
 
 		if not isConditionTrue then
-			printResultsFunction("[Scenario] Assertion failed: " .. description)
+			printFunction("[Scenario] Assertion failed: " .. description)
 		end
 		local assertionDetails = {
 			description = description,
@@ -118,7 +119,7 @@ function Scenario:Run(printResultsFunction)
 	local runTimeInMilliseconds = runTime / 10E6
 	self.runTimeInMilliseconds = runTimeInMilliseconds
 
-	self:PrintResults(printResultsFunction)
+	self:PrintResults(console)
 end
 
 function Scenario:ToString()
@@ -210,10 +211,9 @@ function Scenario:GetSummaryText()
 end
 
 
-function Scenario:PrintResults(printResultsFunction)
-	printResultsFunction = printResultsFunction or print
-
-	printResultsFunction(self:ToString())
+function Scenario:PrintResults(console)
+	local printFunction = console and console.print or print
+	printFunction(self:ToString())
 end
 
 function Scenario:GetName()
