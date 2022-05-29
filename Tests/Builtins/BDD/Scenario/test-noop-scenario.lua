@@ -30,3 +30,5 @@ local expectedOutput = expectedOverviewText .. expectedResultsText .. "\n" .. ex
 assertEquals(fauxConsole.read(), expectedOutput)
 
 fauxConsole.clear()
+
+assertFalse(scenario:HasFailed())
