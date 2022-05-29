@@ -1,5 +1,5 @@
 -- TODO Testing, documentation, luacheckrc
-C_Testing = {}
+local C_Testing = {}
 
 function C_Testing:CreateFauxConsole()
 
@@ -23,3 +23,6 @@ function C_Testing:CreateFauxConsole()
 
 	return fauxConsole
 end
+
+-- EXPORT("C_Testing", C_Testing)
+_G.C_Testing = C_Testing
