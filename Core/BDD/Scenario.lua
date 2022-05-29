@@ -36,7 +36,8 @@ function Scenario:Construct(name)
 		assertions = {},
 		establishPreconditions = NOOP_FUNCTION,
 		runTestCode = NOOP_FUNCTION,
-		assertPostconditions = NOOP_FUNCTION
+		assertPostconditions = NOOP_FUNCTION,
+		cleanupFunction = NOOP_FUNCTION
 	}
 
 	setmetatable(instance, inheritanceLookupMetatable)
@@ -53,8 +54,16 @@ function Scenario:GIVEN(description, establishPreconditions)
 	self.establishPreconditions = establishPreconditions
 end
 
-function Scenario:FINALLY(cleanupCode)
-	-- TODO
+function Scenario:FINALLY(cleanupFunction)
+	if type(cleanupFunction) ~= "function" then
+		return
+	end
+
+	self.cleanupFunction = cleanupFunction
+end
+
+function Scenario:HasCleanupFunction()
+	return self.cleanupFunction ~= NOOP_FUNCTION
 end
 
 function Scenario:WHEN(description, runTestCode)
@@ -77,7 +86,6 @@ end
 
 function Scenario:Run(console)
 	local printFunction = console and console.print or print
-	printFunction = printFunction or print
 
 	local startTime = time()
 
@@ -91,9 +99,6 @@ function Scenario:Run(console)
 
 		description = description or "<No Description>"
 
-		if not isConditionTrue then
-			-- printFunction("[Scenario] Assertion failed: " .. description)
-		end
 		local assertionDetails = {
 			description = description,
 			isSuccess = isConditionTrue
@@ -101,23 +106,16 @@ function Scenario:Run(console)
 		self.assertions[#self.assertions + 1] = assertionDetails
 	end
 
-	local function assertEquals(firstValue, secondValue, description)
-		if firstValue ~= secondValue then
-			error("Failed asserting that " .. tostring(firstValue) .. " equals " .. tostring(secondValue))
-		end
-		silentAssert(firstValue == secondValue, description)
-	end
-
 	_G.assert = silentAssert
 	self:assertPostconditions()
 	_G.assert = globalAssert
-	-- _G.assertEquals = assertEquals
-
 
 	local endTime = time()
 	local runTime = (endTime - startTime) -- high precision = nanoseconds
 	local runTimeInMilliseconds = runTime / 10E6
 	self.runTimeInMilliseconds = runTimeInMilliseconds
+
+	self.cleanupFunction()
 
 	self:PrintResults(console)
 end
@@ -157,7 +155,6 @@ function Scenario:GetOverviewText()
 	return displayText
 
 end
-
 
 function Scenario:GetResultsText()
 
@@ -210,7 +207,6 @@ function Scenario:GetSummaryText()
 	return coloredSummaryText
 end
 
-
 function Scenario:PrintResults(console)
 	local printFunction = console and console.print or print
 	printFunction(self:ToString())
@@ -219,8 +215,6 @@ end
 function Scenario:GetName()
 	return self.name or ""
 end
-
-
 
 function Scenario:GetNumFailedAssertions()
 	local failedAssertionCount = 0

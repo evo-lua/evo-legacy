@@ -29,6 +29,7 @@ end
 
 import("./Scenario/test-noop-scenario.lua")
 import("./Scenario/test-multi-assertions-scenario.lua")
+import("./Scenario/test-cleanup-with-finally.lua")
 
 ----------------------------------------------------------------------------------------------------------------
 
