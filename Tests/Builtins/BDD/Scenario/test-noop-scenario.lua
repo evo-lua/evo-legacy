@@ -31,4 +31,5 @@ assertEquals(fauxConsole.read(), expectedOutput)
 
 fauxConsole.clear()
 
+assertEquals(scenario:GetNumFailedAssertions(), 0)
 assertFalse(scenario:HasFailed())
