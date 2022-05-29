@@ -23,6 +23,7 @@ globals = {
 
 	-- evo
 	-- Builtins
+
 	"event",
 	"format",
 	"json",
@@ -30,6 +31,8 @@ globals = {
 	"printf",
 	"serialize",
 	"transform",
+
+	"assertEquals",
 
 	"TestSuite",
 	"Scenario",
