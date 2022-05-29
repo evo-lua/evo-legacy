@@ -21,6 +21,47 @@ for _, fieldName in pairs(exportedApiSurface) do
 	assert(type(Scenario[fieldName]) == "function", "Should export function " .. fieldName)
 end
 
+
+----------------------------------------------------------------------------------------------------------------
+
+local globalPrint = _G.print -- Backup
+
+-- This should likely be streamlined and made re-usable (later)?
+local stdoutBuffer= ""
+local function fauxPrint(...)
+	-- error("faux print used")
+	stdoutBuffer = stdoutBuffer .. tostring(...)
+end
+
+local function resetFauxPrintBuffer()
+	stdoutBuffer= ""
+end
+
+_G.print = fauxPrint
+
+----------------------------------------------------------------------------------------------------------------
+
+-- Scenario: A new scenario is created without defining any script logic
+local scenario = Scenario:Construct("test")
+assert(scenario:GetName() == "test", "Should initialize a new scenario with the given name")
+
+-- Does nothing when run/empty initialization
+assert(stdoutBuffer == "", "stdoutBuffer should be empty before running the scenario")
+
+scenario:Run(fauxPrint)
+
+-- Since there's no scripts attached to the scenario, it should just print nothing as its summary?
+-- TBD should display 0 tests run/0 assertions maybe?
+assert(stdoutBuffer == "", "stdoutBuffer should be empty after running the scenario")
+
+resetFauxPrintBuffer()
+
+----------------------------------------------------------------------------------------------------------------
+
+_G.print = globalPrint -- Restore
+
+----------------------------------------------------------------------------------------------------------------
+
 print("OK\tBDD\t\tScenario")
 
 -- Construct
