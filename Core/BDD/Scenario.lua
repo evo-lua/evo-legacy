@@ -113,7 +113,7 @@ function Scenario:Run(printResultsFunction)
 	_G.assert = silentAssert
 	self:assertPostconditions()
 	_G.assert = globalAssert
-	_G.assertEquals = assertEquals
+	-- _G.assertEquals = assertEquals
 
 	self:PrintResults()
 end
