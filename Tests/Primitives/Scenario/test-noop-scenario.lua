@@ -11,25 +11,23 @@ expectedOverviewText = expectedOverviewText .. "\t" .. transform.cyan("GIVEN") .
 expectedOverviewText = expectedOverviewText .. "\t" .. transform.cyan("WHEN") .. "\t" ..  transform.white("(no code to execute)") .. "\n"
 expectedOverviewText = expectedOverviewText .. "\t" .. transform.cyan("THEN") .. "\t" ..  transform.white("(no postconditions)") .. "\n"
 
-assertEquals(scenario:GetOverviewText(), expectedOverviewText)
+assertEquals(scenario:GetOverviewText(), expectedOverviewText, "Should return a string representation of the scenario in a standardized format")
 
 -- No assertions should be added
 local expectedResultsText = ""
-assertEquals(scenario:GetResultsText(), expectedResultsText)
+assertEquals(scenario:GetResultsText(), expectedResultsText, "Should return an empty string if no assertions have been added")
 
--- Warning should be displayed instead of the actual summary (no assertions...)
 local expectedSummaryText = transform.yellow("Warning: Nothing to assert (technically passing...)")
-assertEquals(scenario:GetSummaryText(), expectedSummaryText)
+assertEquals(scenario:GetSummaryText(), expectedSummaryText, "Should return a warning instead of the summary if no assertions have been added")
 
--- Does nothing when run/empty initialization -> "stdoutBuffer should be empty before running the scenario"
 local fauxConsole = C_Testing:CreateFauxConsole()
-assertEquals(fauxConsole.read(), "")
+assertEquals(fauxConsole.read(), "", "Should not have printed anything before the scenario was fun")
 
 scenario:Run(fauxConsole)
 local expectedOutput = expectedOverviewText .. expectedResultsText .. "\n" .. expectedSummaryText .. "\n"
-assertEquals(fauxConsole.read(), expectedOutput)
+assertEquals(fauxConsole.read(), expectedOutput, "Should display the full report text when the scenario is run")
 
 fauxConsole.clear()
 
-assertEquals(scenario:GetNumFailedAssertions(), 0)
-assertFalse(scenario:HasFailed())
+assertEquals(scenario:GetNumFailedAssertions(), 0, "Should return zero if no assertions have been added")
+assertFalse(scenario:HasFailed(), "Should return false if no assertions have been added")

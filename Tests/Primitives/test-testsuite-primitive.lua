@@ -14,7 +14,7 @@ for _, fieldName in pairs(exportedApiSurface) do
 	assert(type(TestSuite[fieldName]) == "function", "Should export function " .. fieldName)
 end
 
-print("OK\tBDD\t\tTestSuite")
+print("OK\tPrimitives\tTestSuite")
 
 -- Construct
 -- AddScenario

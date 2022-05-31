@@ -20,7 +20,6 @@ local exportedApiSurface = {
 	"WHEN",
 	"WHEN",
 	"THEN",
-	"FINALLY",
 }
 
 for _, fieldName in pairs(exportedApiSurface) do
@@ -36,4 +35,4 @@ import("./Scenario/test-scenario-runs-in-order.lua")
 
 ----------------------------------------------------------------------------------------------------------------
 
-print("OK\tBDD\t\tScenario")
+print("OK\tPrimitives\tScenario")

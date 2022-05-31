@@ -17,9 +17,9 @@ function assertEquals(actual, expected, description)
 		actual = transform.bold(actual)
 		expected = transform.bold(expected)
 
+		ERROR(transform.red("\n\nASSERTION FAILURE:\n\n" .. actual .. "\n\n") .. transform.red("SHOULD BE\n\n" .. expected .. "\n"))
 		assert(actual == expected, description)
 
-		ERROR(transform.red("\n\nASSERTION FAILURE:\n\n" .. actual .. "\n\n") .. transform.red("SHOULD BE\n\n" .. expected .. "\n"))
 	end
 end
 
