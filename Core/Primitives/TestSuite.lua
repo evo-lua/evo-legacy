@@ -27,6 +27,17 @@ function TestSuite:Construct(name)
 	return instance
 end
 
+function TestSuite:AddScenarios(listOfScenarios)
+	for _, scenarioFilePath in pairs(listOfScenarios) do
+		local scenario = import(scenarioFilePath)
+		self:AddScenario(scenario)
+	end
+end
+
+function TestSuite:Run()
+	self:RunAllScenarios()
+end
+
 function TestSuite:AddScenario(scenario)
 	print("[TestSuite] Added scenario: " .. scenario:GetName())
 	self.scenarios[#self.scenarios + 1] = scenario
