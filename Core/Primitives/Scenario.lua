@@ -52,34 +52,22 @@ Scenario.OnEvaluate = NOOP_FUNCTION
 Scenario.OnCleanup = NOOP_FUNCTION
 
 function Scenario:GIVEN(description)
--- 	if not description or type(establishPreconditions) ~= "function" then
--- 		return
--- 	end
 
--- 	self.descriptions.GIVEN = description
--- 	self.establishPreconditions = establishPreconditions
+	if type(description) ~= "string" then return end
+
+	self.descriptions.GIVEN = description
 end
 
--- function Scenario:HasCleanupFunction()
--- 	return self.cleanupFunction ~= NOOP_FUNCTION
--- end
-
 function Scenario:WHEN(description)
--- 	if not description or type(runTestCode) ~= "function" then
--- 		return
--- 	end
+	if type(description) ~= "string" then return end
 
--- 	self.descriptions.WHEN = description
--- 	self.runTestCode = runTestCode
+	self.descriptions.WHEN = description
 end
 
 function Scenario:THEN(description)
--- 	if not description or type(assertPostconditions) ~= "function" then
--- 		return
--- 	end
+	if type(description) ~= "string" then return end
 
--- 	self.descriptions.THEN = description
--- 	self.assertPostconditions = assertPostconditions
+	self.descriptions.THEN = description
 end
 
 function Scenario:Run(console)

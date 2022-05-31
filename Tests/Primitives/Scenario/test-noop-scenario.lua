@@ -21,7 +21,7 @@ local expectedSummaryText = transform.yellow("Warning: Nothing to assert (techni
 assertEquals(scenario:GetSummaryText(), expectedSummaryText, "Should return a warning instead of the summary if no assertions have been added")
 
 local fauxConsole = C_Testing:CreateFauxConsole()
-assertEquals(fauxConsole.read(), "", "Should not have printed anything before the scenario was fun")
+assertEquals(fauxConsole.read(), "", "Should not have printed anything before the scenario was run")
 
 scenario:Run(fauxConsole)
 local expectedOutput = expectedOverviewText .. expectedResultsText .. "\n" .. expectedSummaryText .. "\n"
