@@ -4,8 +4,11 @@ assert(type(Scenario) == "table", "The Scenario primitive should be exported")
 
 local exportedApiSurface = {
 	"Construct",
-	"Run",
-	"PrintResults",
+	"OnSetup",
+	"OnRun",
+	"OnEvaluate",
+	"OnCleanup",
+	"OnReport",
 	"GetName",
 	"ToString",
 	"GetOverviewText",

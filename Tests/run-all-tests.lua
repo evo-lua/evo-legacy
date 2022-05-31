@@ -2,8 +2,10 @@ print("Running all tests...\n")
 
 import("Core/test-wrapped-user-script.lua")
 
+import("Primitives/test-testsuite-primitive.lua")
+import("Primitives/test-scenario-primitive.lua")
+
 import("Builtins/test-aliases.lua")
-import("Builtins/test-bdd.lua")
 import("Builtins/test-event.lua")
 import("Builtins/test-fs.lua")
 import("Builtins/test-json.lua")

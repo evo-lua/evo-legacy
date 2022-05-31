@@ -7,7 +7,7 @@ local exportedApiSurface = {
 	"AddScenario",
 	"RunScenario",
 	"RunAllScenarios",
-	"PrintSummary",
+	"ReportSummary",
 }
 
 for _, fieldName in pairs(exportedApiSurface) do
@@ -21,4 +21,4 @@ print("OK\tBDD\t\tTestSuite")
 -- RunAllScenarios
 
 -- RunScenario
--- PrintSummary
+-- ReportSummary

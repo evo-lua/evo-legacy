@@ -1,100 +1,101 @@
 local TestSuite = {}
 
-local setmetatable = setmetatable
-local rawget = rawget
-local format = string.format
+-- local setmetatable = setmetatable
+-- local rawget = rawget
+-- local format = string.format
 
-local inheritanceLookupMetatable = {
-	__index = function(t, v)
-		if TestSuite[v] then
-			return TestSuite[v]
-		else
-			return rawget(t, v)
-		end
-	end
-}
+-- local inheritanceLookupMetatable = {
+-- 	__index = function(t, v)
+-- 		if TestSuite[v] then
+-- 			return TestSuite[v]
+-- 		else
+-- 			return rawget(t, v)
+-- 		end
+-- 	end
+-- }
 
 function TestSuite:Construct(name)
-	local instance = {}
+-- 	local instance = {}
 
-	setmetatable(instance, inheritanceLookupMetatable)
+-- 	setmetatable(instance, inheritanceLookupMetatable)
 
-	instance.name = name or ""
-	instance.scenarios = {}
+-- 	instance.name = name or ""
+-- 	instance.scenarios = {}
 
-	print("[TestSuite] Created test suite: " .. instance.name)
+-- 	print("[TestSuite] Created test suite: " .. instance.name)
 
-	return instance
+-- 	return instance
 end
 
-function TestSuite:AddScenarios(listOfScenarios)
-	for _, scenarioFilePath in pairs(listOfScenarios) do
-		local scenario = import(scenarioFilePath)
-		self:AddScenario(scenario)
-	end
-end
+-- function TestSuite:AddScenarios(listOfScenarios)
+-- 	for _, scenarioFilePath in pairs(listOfScenarios) do
+-- 		local scenario = import(scenarioFilePath)
+-- 		self:AddScenario(scenario)
+-- 	end
+-- end
 
-function TestSuite:Run()
-	self:RunAllScenarios()
-end
+-- function TestSuite:Run()
+-- 	self:RunAllScenarios()
+-- end
 
 function TestSuite:AddScenario(scenario)
-	print("[TestSuite] Added scenario: " .. scenario:GetName())
-	self.scenarios[#self.scenarios + 1] = scenario
+-- 	print("[TestSuite] Added scenario: " .. scenario:GetName())
+-- 	self.scenarios[#self.scenarios + 1] = scenario
 end
 
 function TestSuite:RunAllScenarios()
-	print("[TestSuite] Running all scenarios")
-	for scenarioID, scenario in ipairs(self.scenarios) do
-		self:RunScenario(scenario)
-	end
+-- 	print("[TestSuite] Running all scenarios")
+-- 	for scenarioID, scenario in ipairs(self.scenarios) do
+-- 		self:RunScenario(scenario)
+	-- end
 
-	self:PrintSummary()
+-- 	self:ReportSummary()
 end
 
 function TestSuite:RunScenario(scenario)
-	if not scenario then
-		print("[TestSuite] Skipping invalid scenario")
-		return
-	end
+-- 	if not scenario then
+-- 		print("[TestSuite] Skipping invalid scenario")
+-- 		return
+-- 	end
 
-	print("[TestSuite] Running scenario " .. scenario:GetName())
-	scenario:Run()
-	print()
+-- 	print("[TestSuite] Running scenario " .. scenario:GetName())
+-- 	scenario:Run()
+-- 	print()
 end
 
-function TestSuite:PrintSummary()
-	print("--------------------------------------------------------------------------------") -- 80 chars to fit terminals
-	print()
-	print(transform.cyan("Test Suite: ") .. transform.white(self.name))
-	print()
+function TestSuite:ReportSummary()
+-- 	print("--------------------------------------------------------------------------------") -- 80 chars to fit terminals
+-- 	print()
+-- 	print(transform.cyan("Test Suite: ") .. transform.white(self.name))
+-- 	print()
 
-	local numFailedScenarios = 0
+-- 	local numFailedScenarios = 0
 
-	for scenarioID, scenario in ipairs(self.scenarios) do
-		local successIcon = transform.green("✓")
-		if scenario:HasFailed() then
-			successIcon = transform.red("✗")
-			numFailedScenarios = numFailedScenarios + 1
-		end
+-- 	for scenarioID, scenario in ipairs(self.scenarios) do
+-- 		local successIcon = transform.green("✓")
+-- 		if scenario:HasFailed() then
+-- 			successIcon = transform.red("✗")
+-- 			numFailedScenarios = numFailedScenarios + 1
+-- 		end
 
-		local resultsText = scenario:GetSummaryText()
+-- 		local resultsText = scenario:GetSummaryText()
 
-		local summaryText = format("\t%s %s: %s", successIcon, scenario:GetName(), resultsText)
-		print(summaryText)
-	end
+-- 		local summaryText = format("\t%s %s: %s", successIcon, scenario:GetName(), resultsText)
+-- 		print(summaryText)
+-- 	end
 
-	print()
+-- 	print()
 
-	if numFailedScenarios == 1 then -- OCD...
-		print(transform.brightRedBackground("1 scenario failed"))
-	elseif numFailedScenarios > 1 then
-		print(transform.brightRedBackground(format("%s scenarios failed!", numFailedScenarios)))
-	else
-		print("All scenarios completed successfully!")
-	end
+-- 	if numFailedScenarios == 1 then -- OCD...
+-- 		print(transform.brightRedBackground("1 scenario failed"))
+-- 	elseif numFailedScenarios > 1 then
+-- 		print(transform.brightRedBackground(format("%s scenarios failed!", numFailedScenarios)))
+-- 	else
+-- 		print("All scenarios completed successfully!")
+-- 	end
 end
 
+-- EXPORT("TestSuite", TestSuite)
 _G.TestSuite = TestSuite
 
 return TestSuite
