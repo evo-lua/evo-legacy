@@ -9,6 +9,7 @@ local exportedApiSurface = {
 	"OnEvaluate",
 	"OnCleanup",
 	"OnReport",
+	"Run",
 	"GetName",
 	"ToString",
 	"GetOverviewText",
@@ -30,9 +31,7 @@ end
 
 import("./Scenario/test-noop-scenario.lua")
 import("./Scenario/test-multi-assertions-scenario.lua")
--- TODO
--- import("./Scenario/test-cleanup-with-finally.lua")
--- import("./Scenario/test-scenario-runs-in-order.lua")
+import("./Scenario/test-event-handlers-are-run.lua")
 
 ----------------------------------------------------------------------------------------------------------------
 
