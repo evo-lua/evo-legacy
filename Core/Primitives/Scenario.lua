@@ -1,9 +1,9 @@
 local uv = require("uv")
 
--- local format = string.format
--- local setmetatable = setmetatable
--- local rawget = rawget
--- local print = print
+local format = string.format
+local setmetatable = setmetatable
+local rawget = rawget
+local print = print
 
 local time = uv.hrtime
 
@@ -103,7 +103,7 @@ function Scenario:Run(console)
 	end
 
 	_G.assert = silentAssert
-	self:assertPostconditions()
+	self:OnEvaluate()
 	_G.assert = globalAssert
 
 	local endTime = time()
