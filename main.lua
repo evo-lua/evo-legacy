@@ -66,9 +66,9 @@ function Evo:ExportSharedConstants()
 	import("Core/SharedConstants.lua")
 end
 
-function Evo:ExportTestingFramework()
-	import("Core/BDD/TestSuite.lua")
-	import("Core/BDD/Scenario.lua")
+function Evo:ExportPrimitives()
+	import("Core/Primitives/TestSuite.lua")
+	import("Core/Primitives/Scenario.lua")
 end
 
 function Evo:StartEventLoop()
@@ -78,9 +78,9 @@ end
 Evo:LoadDefaultSettings()
 Evo:LoadBuiltins()
 Evo:LoadStandardLibraryExtensions()
-Evo:ExportHighLevelAPI()
 Evo:ExportSharedConstants()
-Evo:ExportTestingFramework()
+Evo:ExportPrimitives()
+Evo:ExportHighLevelAPI()
 
 Evo:ProcessUserInput()
 
