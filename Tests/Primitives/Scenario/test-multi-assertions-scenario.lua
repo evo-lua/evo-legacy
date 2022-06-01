@@ -19,13 +19,10 @@ function scenario:OnEvaluate()
 	assert(someValue == 44, "Some value is set to 44")
 end
 
-
 assertFalse(scenario:HasFailed(), "Should return false before the scenario was run")
 assertEquals(scenario:GetNumFailedAssertions(), 0, "Should return zero before the scenario was run")
 
-
 local expectedOverviewText = "\n" -- To offset from the previous content (sub-optimal...)
-
 expectedOverviewText = expectedOverviewText .. "\t" -- To highlight the keywords visually
 expectedOverviewText = expectedOverviewText .. transform.cyan("Scenario: ") .. transform.white("Multiple assertions (some failing)") .. "\n\n"
 expectedOverviewText = expectedOverviewText .. "\t" .. transform.cyan("GIVEN") .. "\t" ..  transform.white("(no preconditions)") .. "\n"
@@ -50,10 +47,8 @@ expectedResultsText = expectedResultsText .. "\t\t" .. red("✗") .. " Some valu
 expectedResultsText = expectedResultsText .. "\t\t" .. red("✗") .. " Some value is set to 44\n"
 assertEquals(scenario:GetResultsText(), expectedResultsText, "Should return the evaluation results text")
 
-
 local expectedSummaryText = transform.brightRedBackground("3 FAILED assertions!")
 assertEquals(scenario:GetSummaryText(), expectedSummaryText, "Should return the summary text")
-
 
 local expectedOutput = expectedOverviewText .. "\n" .. expectedResultsText .. "\n" .. expectedSummaryText .. "\n"
 assertEquals(fauxConsole.read(), expectedOutput, "Should display the full report text when the scenario is run")
