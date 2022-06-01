@@ -1,13 +1,9 @@
--- TODO tests for this entire module
-
-local error = error
 local tostring = tostring
 
 function assertEquals(actual, expected, description)
 
 	if actual == "" then actual = "<empty string>" end
 	if expected == "" then expected = "<empty string>" end
-
 
 	if actual ~= expected then
 
@@ -19,7 +15,9 @@ function assertEquals(actual, expected, description)
 
 		description = description or actual .. " is not " ..  expected
 
-		ERROR(transform.red("\n\nASSERTION FAILURE:\n\n" .. actual .. "\n\n") .. transform.red("SHOULD BE\n\n" .. expected .. "\n"))
+		local errorMessage = transform.red("ASSERTION FAILURE: ") .. "Expected inputs to be equal" .. " "
+			.. "(" .. actual .. " should be " .. expected .. ")" .. "\n"
+		ERROR(errorMessage)
 		assert(actual == expected, description)
 
 	end
