@@ -30,6 +30,11 @@ globals = {
 	"printf",
 	"serialize",
 	"transform",
+
+	"assertEquals",
+	"assertTrue",
+	"assertFalse",
+
 	--- Logging aliases
 	"EVENT",
 	"TEST",
