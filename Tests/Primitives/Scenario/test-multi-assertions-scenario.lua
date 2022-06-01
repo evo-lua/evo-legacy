@@ -43,11 +43,11 @@ local green = transform.green
 local red = transform.red
 local bold = transform.bold
 
-local expectedResultsText = "\t\t" .. transform.green("✓") .. " (no description)\n"
-expectedResultsText = expectedResultsText .. "\t\t" .. transform.green("✓") .. " Some value is set to 42\n"
-expectedResultsText = expectedResultsText .. "\t\t" .. transform.red("✗") .. " " .. transform.bold("42") .. " is not " .. transform.bold("43") .. "\n"
-expectedResultsText = expectedResultsText .. "\t\t" .. transform.red("✗") .. " Some value is set to 43\n"
-expectedResultsText = expectedResultsText .. "\t\t" .. transform.red("✗") .. " Some value is set to 44\n"
+local expectedResultsText = "\t\t" .. green("✓") .. " (no description)\n"
+expectedResultsText = expectedResultsText .. "\t\t" .. green("✓") .. " Some value is set to 42\n"
+expectedResultsText = expectedResultsText .. "\t\t" .. red("✗") .. " " .. bold("42") .. " is not " .. bold("43") .. "\n"
+expectedResultsText = expectedResultsText .. "\t\t" .. red("✗") .. " Some value is set to 43\n"
+expectedResultsText = expectedResultsText .. "\t\t" .. red("✗") .. " Some value is set to 44\n"
 assertEquals(scenario:GetResultsText(), expectedResultsText, "Should return the evaluation results text")
 
 
