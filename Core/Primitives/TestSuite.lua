@@ -45,10 +45,10 @@ function TestSuite:AddScenario(scenario)
 end
 
 function TestSuite:AddScenarios(listOfScenarios)
-	-- 	for _, scenarioFilePath in pairs(listOfScenarios) do
-	-- 		local scenario = import(scenarioFilePath)
-	-- 		self:AddScenario(scenario)
-	-- 	end
+	for _, scenarioFilePath in pairs(listOfScenarios) do
+		local scenario = import(scenarioFilePath)
+		self:AddScenario(scenario)
+	end
 end
 
 function TestSuite:RunAllScenarios(console)
