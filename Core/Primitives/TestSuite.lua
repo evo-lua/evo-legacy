@@ -1,30 +1,38 @@
-local TestSuite = {}
+local TestSuite = {
+	-- 80 chars to fit greybeard terminals
+	REPORT_HORIZONTAL_LINE = "--------------------------------------------------------------------------------"
+}
 
--- local setmetatable = setmetatable
--- local rawget = rawget
--- local format = string.format
+local setmetatable = setmetatable
+local rawget = rawget
+local format = string.format
 
--- local inheritanceLookupMetatable = {
--- 	__index = function(t, v)
--- 		if TestSuite[v] then
--- 			return TestSuite[v]
--- 		else
--- 			return rawget(t, v)
--- 		end
--- 	end
--- }
+local inheritanceLookupMetatable = {
+	__index = function(t, v)
+		if TestSuite[v] then
+			return TestSuite[v]
+		else
+			return rawget(t, v)
+		end
+	end
+}
 
 function TestSuite:Construct(name)
--- 	local instance = {}
+	local instance = {
+		name = name or "",
+		scenarios = {}
+	}
 
--- 	setmetatable(instance, inheritanceLookupMetatable)
+	setmetatable(instance, inheritanceLookupMetatable)
 
--- 	instance.name = name or ""
--- 	instance.scenarios = {}
 
 -- 	print("[TestSuite] Created test suite: " .. instance.name)
 
--- 	return instance
+	return instance
+end
+
+function TestSuite:GetNumScenarios()
+	return #self.scenarios
 end
 
 -- function TestSuite:AddScenarios(listOfScenarios)
@@ -63,36 +71,40 @@ function TestSuite:RunScenario(scenario)
 -- 	print()
 end
 
-function TestSuite:ReportSummary()
--- 	print("--------------------------------------------------------------------------------") -- 80 chars to fit terminals
--- 	print()
--- 	print(transform.cyan("Test Suite: ") .. transform.white(self.name))
--- 	print()
+function TestSuite:ReportSummary(console)
+	local printMethod = console and console.print or print
+	printMethod(self.REPORT_HORIZONTAL_LINE)
+	printMethod()
+	printMethod(transform.cyan("Test Suite: ") .. transform.white(self.name))
+	printMethod()
 
--- 	local numFailedScenarios = 0
+	local numFailedScenarios = 0
 
--- 	for scenarioID, scenario in ipairs(self.scenarios) do
--- 		local successIcon = transform.green("✓")
--- 		if scenario:HasFailed() then
--- 			successIcon = transform.red("✗")
--- 			numFailedScenarios = numFailedScenarios + 1
--- 		end
+	-- If no scenarios have been added, this is a NOOP and can be ignored
+	for scenarioID, scenario in ipairs(self.scenarios) do
+		local successIcon = transform.green("✓")
+		if scenario:HasFailed() then
+			successIcon = transform.red("✗")
+			numFailedScenarios = numFailedScenarios + 1
+		end
 
--- 		local resultsText = scenario:GetSummaryText()
+		local resultsText = scenario:GetSummaryText()
 
--- 		local summaryText = format("\t%s %s: %s", successIcon, scenario:GetName(), resultsText)
--- 		print(summaryText)
--- 	end
+		local summaryText = format("\t%s %s: %s", successIcon, scenario:GetName(), resultsText)
+		printMethod(summaryText)
+	end
 
--- 	print()
+	if #self.scenarios > 0 then printMethod() end -- Extra newline increases readability
 
--- 	if numFailedScenarios == 1 then -- OCD...
--- 		print(transform.brightRedBackground("1 scenario failed"))
--- 	elseif numFailedScenarios > 1 then
--- 		print(transform.brightRedBackground(format("%s scenarios failed!", numFailedScenarios)))
--- 	else
--- 		print("All scenarios completed successfully!")
--- 	end
+	if numFailedScenarios == 1 then -- OCD...
+		printMethod(transform.brightRedBackground("1 scenario failed"))
+	elseif numFailedScenarios > 1 then
+		printMethod(transform.brightRedBackground(format("%s scenarios failed!", numFailedScenarios)))
+	elseif #self.scenarios == 0 then
+		printMethod(transform.yellow("Warning: No scenarios to run (technically passing...)"))
+	else
+		printMethod("All scenarios completed successfully!")
+	end
 end
 
 -- EXPORT("TestSuite", TestSuite)

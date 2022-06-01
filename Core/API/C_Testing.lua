@@ -1,7 +1,7 @@
 -- TODO Testing, documentation
 local C_Testing = {}
 
-function C_Testing:CreateFauxConsole()
+function C_Testing.CreateFauxConsole()
 
 	local tostring = tostring
 

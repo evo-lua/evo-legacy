@@ -29,7 +29,7 @@ expectedOverviewText = expectedOverviewText .. "\t" .. transform.cyan("GIVEN") .
 expectedOverviewText = expectedOverviewText .. "\t" .. transform.cyan("WHEN") .. "\t" ..  transform.white("I run the test code") .. "\n"
 expectedOverviewText = expectedOverviewText .. "\t" .. transform.cyan("THEN") .. "\t" ..  transform.white("The post-conditions hold true") .. "\n"
 
-local fauxConsole = C_Testing:CreateFauxConsole()
+local fauxConsole = C_Testing.CreateFauxConsole()
 assertEquals(fauxConsole.read(), "",  "Should not have printed anything before the scenario was run")
 
 scenario:Run(fauxConsole)
