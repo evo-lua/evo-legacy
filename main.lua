@@ -66,6 +66,10 @@ function Evo:ExportSharedConstants()
 	import("Core/SharedConstants.lua")
 end
 
+function Evo:ExportPrimitives()
+	import("Core/Primitives/Scenario.lua")
+end
+
 function Evo:StartEventLoop()
 	uv.run()
 end
@@ -73,8 +77,9 @@ end
 Evo:LoadDefaultSettings()
 Evo:LoadBuiltins()
 Evo:LoadStandardLibraryExtensions()
-Evo:ExportHighLevelAPI()
 Evo:ExportSharedConstants()
+Evo:ExportPrimitives()
+Evo:ExportHighLevelAPI()
 
 Evo:ProcessUserInput()
 

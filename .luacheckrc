@@ -35,6 +35,7 @@ globals = {
 	"assertTrue",
 	"assertFalse",
 
+	"Scenario",
 	--- Logging aliases
 	"EVENT",
 	"TEST",
