@@ -5,8 +5,8 @@ assert(type(TestSuite) == "table", "The TestSuite primitive should be exported")
 local exportedApiSurface = {
 	"Construct",
 	"AddScenario",
-	"RunScenario",
-	"RunAllScenarios",
+	"AddScenarios",
+	"Run",
 	"ReportSummary",
 }
 

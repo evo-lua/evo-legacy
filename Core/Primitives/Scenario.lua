@@ -149,18 +149,18 @@ function Scenario:GetResultsText()
 		local description = assertionDetails.description
 		local isSuccess = assertionDetails.isSuccess
 
-		local successText = transform.yellow("﹖")
+		local successIcon = transform.yellow("﹖")
 
 		-- Explicitly checking here to avoid nil being interpreted as false
 		if isSuccess == true then
-			successText = transform.green("✓")
+			successIcon = transform.green("✓")
 		end
 		if isSuccess == false then
-			successText = transform.red("✗")
+			successIcon = transform.red("✗")
 			failedAssertionCount = failedAssertionCount + 1
 		end
 
-		coloredResultsText = coloredResultsText .. (format("\t\t%s %s", successText, description)) .. "\n"
+		coloredResultsText = coloredResultsText .. (format("\t\t%s %s", successIcon, description)) .. "\n"
 	end
 
 	return coloredResultsText

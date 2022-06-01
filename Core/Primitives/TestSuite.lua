@@ -1,6 +1,6 @@
 local TestSuite = {
 	-- 80 chars to fit greybeard terminals
-	REPORT_HORIZONTAL_LINE = "--------------------------------------------------------------------------------"
+	HORIZONTAL_LINE_SEPARATOR = "--------------------------------------------------------------------------------"
 }
 
 local setmetatable = setmetatable
@@ -35,45 +35,45 @@ function TestSuite:GetNumScenarios()
 	return #self.scenarios
 end
 
--- function TestSuite:AddScenarios(listOfScenarios)
--- 	for _, scenarioFilePath in pairs(listOfScenarios) do
--- 		local scenario = import(scenarioFilePath)
--- 		self:AddScenario(scenario)
--- 	end
--- end
-
--- function TestSuite:Run()
--- 	self:RunAllScenarios()
--- end
+function TestSuite:Run(console)
+	self:RunAllScenarios(console)
+end
 
 function TestSuite:AddScenario(scenario)
 -- 	print("[TestSuite] Added scenario: " .. scenario:GetName())
--- 	self.scenarios[#self.scenarios + 1] = scenario
+	self.scenarios[#self.scenarios + 1] = scenario
 end
 
-function TestSuite:RunAllScenarios()
--- 	print("[TestSuite] Running all scenarios")
--- 	for scenarioID, scenario in ipairs(self.scenarios) do
--- 		self:RunScenario(scenario)
-	-- end
+function TestSuite:AddScenarios(listOfScenarios)
+	-- 	for _, scenarioFilePath in pairs(listOfScenarios) do
+	-- 		local scenario = import(scenarioFilePath)
+	-- 		self:AddScenario(scenario)
+	-- 	end
+end
 
--- 	self:ReportSummary()
+function TestSuite:RunAllScenarios(console)
+-- 	print("[TestSuite] Running all scenarios")
+	for scenarioID, scenario in ipairs(self.scenarios) do
+		self:RunScenario(scenario)
+	end
+
+	self:ReportSummary(console)
 end
 
 function TestSuite:RunScenario(scenario)
--- 	if not scenario then
+	if not scenario then
 -- 		print("[TestSuite] Skipping invalid scenario")
--- 		return
--- 	end
+		return
+	end
 
 -- 	print("[TestSuite] Running scenario " .. scenario:GetName())
--- 	scenario:Run()
+	scenario:Run()
 -- 	print()
 end
 
 function TestSuite:ReportSummary(console)
 	local printMethod = console and console.print or print
-	printMethod(self.REPORT_HORIZONTAL_LINE)
+	printMethod(self.HORIZONTAL_LINE_SEPARATOR)
 	printMethod()
 	printMethod(transform.cyan("Test Suite: ") .. transform.white(self.name))
 	printMethod()
@@ -103,7 +103,7 @@ function TestSuite:ReportSummary(console)
 	elseif #self.scenarios == 0 then
 		printMethod(transform.yellow("Warning: No scenarios to run (technically passing...)"))
 	else
-		printMethod("All scenarios completed successfully!")
+		printMethod(transform.green("All scenarios completed successfully!"))
 	end
 end
 

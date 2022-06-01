@@ -7,7 +7,7 @@ local fauxConsole = C_Testing.CreateFauxConsole()
 assertEquals(fauxConsole.read(), "", "Should not display anything before the test suite was run")
 testSuite:ReportSummary(fauxConsole)
 
-local expectedConsoleOutput = TestSuite.REPORT_HORIZONTAL_LINE .. "\n\n"
+local expectedConsoleOutput = TestSuite.HORIZONTAL_LINE_SEPARATOR .. "\n\n"
 expectedConsoleOutput = expectedConsoleOutput ..transform.cyan("Test Suite: ") .. transform.white("TestSuite with no scenarios") .. "\n\n"
 expectedConsoleOutput = expectedConsoleOutput .. transform.yellow("Warning: No scenarios to run (technically passing...)") .. "\n"
 assertEquals(fauxConsole.read(), expectedConsoleOutput, "Should display a summary text indicating no scenarios have been added")
