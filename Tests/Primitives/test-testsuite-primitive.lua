@@ -19,7 +19,7 @@ end
 import("./TestSuite/test-noop-suite.lua")
 import("./TestSuite/test-multi-scenario-suite-success.lua")
 import("./TestSuite/test-multi-scenario-suite-failure.lua")
-import("./TestSuite/test-returns-exit-failure.lua")
+-- import("./TestSuite/test-returns-exit-failure.lua")
 
 ----------------------------------------------------------------------------------------------------------------
 

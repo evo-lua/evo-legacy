@@ -47,7 +47,7 @@ expectedResultsText = expectedResultsText .. "\t\t" .. red("✗") .. " Some valu
 expectedResultsText = expectedResultsText .. "\t\t" .. red("✗") .. " Some value is set to 44\n"
 assertEquals(scenario:GetResultsText(), expectedResultsText, "Should return the evaluation results text")
 
-local expectedSummaryText = transform.brightRedBackground("3 FAILED assertions!")
+local expectedSummaryText = transform.brightRedBackground("3 FAILED assertions")
 assertEquals(scenario:GetSummaryText(), expectedSummaryText, "Should return the summary text")
 
 local expectedOutput = expectedOverviewText .. "\n" .. expectedResultsText .. "\n" .. expectedSummaryText .. "\n"
