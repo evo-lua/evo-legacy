@@ -59,6 +59,7 @@ end
 
 function Evo:ExportHighLevelAPI()
 	import("Core/API/C_FileSystem")
+	import("Core/API/C_Testing")
 end
 
 function Evo:ExportSharedConstants()
