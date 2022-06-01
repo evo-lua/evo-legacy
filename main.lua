@@ -68,6 +68,7 @@ end
 
 function Evo:ExportPrimitives()
 	import("Core/Primitives/Scenario.lua")
+	import("Core/Primitives/TestSuite.lua")
 end
 
 function Evo:StartEventLoop()
