@@ -10,9 +10,7 @@ local time = uv.hrtime
 local NOOP_FUNCTION = function()
 end
 
-local Scenario = {
-	-- name = ""
-}
+local Scenario = {}
 
 local inheritanceLookupMetatable = {
 	__index = function(t, v)
@@ -34,10 +32,6 @@ function Scenario:Construct(name)
 			THEN = ""
 		},
 		assertions = {},
--- 		establishPreconditions = NOOP_FUNCTION,
--- 		runTestCode = NOOP_FUNCTION,
--- 		assertPostconditions = NOOP_FUNCTION,
--- 		cleanupFunction = NOOP_FUNCTION
 	}
 
 	setmetatable(instance, inheritanceLookupMetatable)

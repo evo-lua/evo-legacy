@@ -18,3 +18,5 @@ expectedConsoleOutput = expectedConsoleOutput .. "\t" .. transform.green("✓") 
 expectedConsoleOutput = expectedConsoleOutput .. transform.green("All scenarios completed successfully!") .. "\n"
 
 assertEquals(fauxConsole.read(), expectedConsoleOutput, "Should display the expected result after loading and running all scenario files")
+
+assertFalse(testSuite:HasFailedScenarios(), "Should return false if no scenarios have failed")

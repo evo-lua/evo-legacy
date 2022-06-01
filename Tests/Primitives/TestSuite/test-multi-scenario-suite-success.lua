@@ -25,3 +25,5 @@ expectedConsoleOutput = expectedConsoleOutput .. transform.cyan("Test Suite: ") 
 expectedConsoleOutput = expectedConsoleOutput .. "\t" .. transform.green("✓") .. " " .. "NOOP scenario: 3 passing (0.00 ms)" .. "\n\n"
 expectedConsoleOutput = expectedConsoleOutput .. transform.green("All scenarios completed successfully!") .. "\n"
 assertEquals(fauxConsole.read(), expectedConsoleOutput, "Should display a summary text indicating no scenarios have been added")
+
+assertFalse(testSuite:HasFailedScenarios(), "Should return false if no scenarios have failed")

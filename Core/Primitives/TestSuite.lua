@@ -25,9 +25,6 @@ function TestSuite:Construct(name)
 
 	setmetatable(instance, inheritanceLookupMetatable)
 
-
--- 	print("[TestSuite] Created test suite: " .. instance.name)
-
 	return instance
 end
 
@@ -37,10 +34,20 @@ end
 
 function TestSuite:Run(console)
 	self:RunAllScenarios(console)
+
+	-- This allows using assert(testSuite:Run(), "Error messag here") to set EXIT_FAILURE for CI pipelines and scripts
+	return not self:HasFailedScenarios()
+end
+
+function TestSuite:HasFailedScenarios()
+	local hasFailedScenarios = false
+	for scenarioID, scenario in ipairs(self.scenarios) do
+		if scenario:HasFailed() then hasFailedScenarios = true end
+	end
+	return hasFailedScenarios
 end
 
 function TestSuite:AddScenario(scenario)
--- 	print("[TestSuite] Added scenario: " .. scenario:GetName())
 	self.scenarios[#self.scenarios + 1] = scenario
 end
 
@@ -52,7 +59,6 @@ function TestSuite:AddScenarios(listOfScenarios)
 end
 
 function TestSuite:RunAllScenarios(console)
--- 	print("[TestSuite] Running all scenarios")
 	for scenarioID, scenario in ipairs(self.scenarios) do
 		self:RunScenario(scenario)
 	end
@@ -62,13 +68,10 @@ end
 
 function TestSuite:RunScenario(scenario)
 	if not scenario then
--- 		print("[TestSuite] Skipping invalid scenario")
 		return
 	end
 
--- 	print("[TestSuite] Running scenario " .. scenario:GetName())
 	scenario:Run()
--- 	print()
 end
 
 function TestSuite:ReportSummary(console)
