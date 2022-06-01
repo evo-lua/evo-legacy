@@ -24,10 +24,6 @@ function C_Testing.CreateFauxConsole()
 		return fauxConsole.stdoutBuffer
 	end
 
-	-- line(lineNo) = return content of line x
-	-- lines = count number of lines
-	-- dump = print to the actual console, for debugging purposes - or maybe to a file?
-
 	return fauxConsole
 end
 

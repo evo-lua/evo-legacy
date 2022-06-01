@@ -20,6 +20,8 @@ import("Extensions/test-table.lua")
 import("API/test-c-filesystem.lua")
 
 -- These aren't proper tests, though they need to pass without errors at least (sub-par criteria, but still...)
-import("Examples/bdd-usage-example/run-my-tests.lua")
+import("Examples/automated-testing/run-my-tests.lua")
+import("Examples/automated-testing/faux-console-usage-example.lua")
+import("Examples/automated-testing/faux-console-injection-example.lua")
 
 print("\nAll tests completed!")
