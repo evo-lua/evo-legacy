@@ -177,11 +177,11 @@ function Scenario:GetSummaryText()
 	end
 
 	if failedAssertionCount > 0 then
-		coloredSummaryText = transform.brightRedBackground(format("%s FAILED assertions!", failedAssertionCount))
+		coloredSummaryText = transform.brightRedBackground(format("%s FAILED assertions", failedAssertionCount))
 	end
 
 	if failedAssertionCount == 1 then -- OCD
-		coloredSummaryText = transform.brightRedBackground(("1 FAILED assertion!"))
+		coloredSummaryText = transform.brightRedBackground(("1 FAILED assertion"))
 	end
 
 	if totalAssertionCount == 0 then

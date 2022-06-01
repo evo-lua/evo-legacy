@@ -97,7 +97,7 @@ function TestSuite:ReportSummary(console)
 	if #self.scenarios > 0 then printMethod() end -- Extra newline increases readability
 
 	if numFailedScenarios == 1 then -- OCD...
-		printMethod(transform.brightRedBackground("1 scenario failed"))
+		printMethod(transform.brightRedBackground("1 scenario failed!"))
 	elseif numFailedScenarios > 1 then
 		printMethod(transform.brightRedBackground(format("%s scenarios failed!", numFailedScenarios)))
 	elseif #self.scenarios == 0 then
