@@ -19,4 +19,7 @@ import("Extensions/test-table.lua")
 
 import("API/test-c-filesystem.lua")
 
+import("Examples/automated-testing/faux-console-usage-example.lua")
+import("Examples/automated-testing/faux-console-injection-example.lua")
+
 print("\nAll tests completed!")
