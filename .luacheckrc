@@ -35,6 +35,8 @@ globals = {
 	"assertTrue",
 	"assertFalse",
 
+	"Scenario",
+	"TestSuite",
 	--- Logging aliases
 	"EVENT",
 	"TEST",
@@ -48,6 +50,7 @@ globals = {
 	"EMERGENCY",
 	--- API
 	"C_FileSystem",
+	"C_Testing",
 
 	-- Shared constants
 	"EVO_VERSION_MAJOR",

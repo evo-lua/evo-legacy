@@ -59,10 +59,16 @@ end
 
 function Evo:ExportHighLevelAPI()
 	import("Core/API/C_FileSystem")
+	import("Core/API/C_Testing")
 end
 
 function Evo:ExportSharedConstants()
 	import("Core/SharedConstants.lua")
+end
+
+function Evo:ExportPrimitives()
+	import("Core/Primitives/Scenario.lua")
+	import("Core/Primitives/TestSuite.lua")
 end
 
 function Evo:StartEventLoop()
@@ -72,8 +78,9 @@ end
 Evo:LoadDefaultSettings()
 Evo:LoadBuiltins()
 Evo:LoadStandardLibraryExtensions()
-Evo:ExportHighLevelAPI()
 Evo:ExportSharedConstants()
+Evo:ExportPrimitives()
+Evo:ExportHighLevelAPI()
 
 Evo:ProcessUserInput()
 
