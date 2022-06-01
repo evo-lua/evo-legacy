@@ -24,17 +24,13 @@ function assertEquals(actual, expected, description)
 end
 
 function assertFalse(conditionToCheck, description)
-	if conditionToCheck then
-		ERROR(transform.red("\n\nASSERTION FAILURE:\n\n" .. transform.bold(tostring(conditionToCheck)) .. "\n\n") .. transform.red("SHOULD BE\n\n" .. transform.bold("false") .. "\n"))
-		assert(not conditionToCheck, description)
-	end
+	-- Taking the lazy way out here until requirements demand more sophistication
+	assertEquals(conditionToCheck, false, description)
 end
 
 function assertTrue(conditionToCheck, description)
-	if not conditionToCheck then
-		ERROR(transform.red("\n\nASSERTION FAILURE:\n\n" .. transform.bold(tostring(conditionToCheck)) .. "\n\n") .. transform.red("SHOULD BE\n\n" .. transform.bold("true") .. "\n"))
-		assert(conditionToCheck, description)
-	end
+	-- Taking the lazy way out here until requirements demand more sophistication
+	assertEquals(conditionToCheck, true, description)
 end
 
 _G.assertEquals = assertEquals

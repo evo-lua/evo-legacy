@@ -1,10 +1,7 @@
-
-
-
 -- Assertions that don't fail should do nothing
-	assertEquals(1, 1, "1 should be 1")
-	-- Failed assertion handlers should call the default ERROR builtin
+assertEquals(1, 1, "1 should be 1")
 
+-- Failed assertion handlers should call the default ERROR builtin
 local originalErrorHandler = _G.ERROR
 
 local wasErrorHandlerCalled = false
