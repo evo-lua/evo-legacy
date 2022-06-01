@@ -1,4 +1,3 @@
--- TODO Testing, documentation
 local C_Testing = {}
 
 function C_Testing.CreateFauxConsole()
