@@ -18,9 +18,8 @@ function assertEquals(actual, expected, description)
 		local errorMessage = transform.red("ASSERTION FAILURE: ") .. "Expected inputs to be equal" .. " "
 			.. "(" .. actual .. " should be " .. expected .. ")" .. "\n"
 		ERROR(errorMessage)
-		assert(actual == expected, description)
-
 	end
+	assert(actual == expected, description)
 end
 
 function assertFalse(conditionToCheck, description)
