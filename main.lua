@@ -58,6 +58,7 @@ function Evo:LoadStandardLibraryExtensions()
 end
 
 function Evo:ExportHighLevelAPI()
+	import("Core/API/C_EventLoop")
 	import("Core/API/C_FileSystem")
 	import("Core/API/C_Testing")
 end
@@ -71,7 +72,32 @@ function Evo:ExportPrimitives()
 	import("Core/Primitives/TestSuite.lua")
 end
 
+local math_max = math.max
+
 function Evo:StartEventLoop()
+	local timeSinceLastUpdate = uv.hrtime()
+	-- This allows applications to queue non-libuv tasks via event.register("EVENT_LOOP_UPDATE")
+	if C_EventLoop.HasAsyncTasks() then
+		local externalTaskTicker = uv.new_idle()
+		externalTaskTicker:start(function()
+			C_EventLoop.RunAsyncTasks()
+			event.trigger("EVENT_LOOP_UPDATE")
+
+			if not C_EventLoop.HasAsyncTasks() then
+				-- The last task just finished, kill the handle to exit the program
+				DEBUG("No more async tasks are scheduled, exiting...")
+				externalTaskTicker:stop()
+			else -- Must update external poll timers etc. while some are registered
+				timeSinceLastUpdate = (uv.hrtime() - timeSinceLastUpdate) / 10E6 -- hr time in ns, sleep time in ms
+				local sleepTime = math_max(POLL_TIME_IN_MILLISECONDS - timeSinceLastUpdate, 0) -- todo C_EventLoop.SetTickTime(20)
+				-- DEBUG("Sleeping for " .. sleepTime .. " ms (last update: " .. timeSinceLastUpdate .. " ms)")
+				uv.sleep(sleepTime)
+				timeSinceLastUpdate = uv.hrtime()
+			end
+			end)
+	end
+
+	-- Exits immediately if there are no handles
 	uv.run()
 end
 

@@ -34,7 +34,9 @@ function event.trigger(eventID, ...)
 		return nil, "Usage: trigger(eventID, ...)"
 	end
 
-	EVENT(eventID, ...)
+	if eventID ~= "EVENT_LOOP_UPDATE" then -- Anti-spam guard
+		EVENT(eventID, ...)
+	end
 
 	local registeredListeners = event.listeners[eventID]
 	if not registeredListeners then
