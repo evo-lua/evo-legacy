@@ -9,7 +9,8 @@ scenario:THEN("The server should send the same data back to the client")
 
 -- Event handlers can be overridden to implement a simulation of the scenario you're testing
 function scenario:OnSetup()
-        -- This function should run all setup code and establish the preconditions you expect
+	self.server = C_Networking.CreateTcpServer()
+	self.client = C_Networking.CreateSocket()
 end
 
 function scenario:OnRun()
