@@ -11,7 +11,7 @@ function TcpServer:Construct()
 end
 
 function TcpServer:StartListening(hostName, port)
-
+	DEBUG("Listening on tcp://" .. hostName .. ":" .. port)
 end
 
 _G.TcpServer = TcpServer

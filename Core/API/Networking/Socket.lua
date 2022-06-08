@@ -10,6 +10,10 @@ function Socket:Construct()
 	return instance
 end
 
+function Socket:StartConnecting(hostName, port)
+	DEBUG("Connecting to tcp://" .. hostName .. ":" .. port)
+end
+
 _G.Socket = Socket
 
 return Socket

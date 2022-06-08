@@ -13,6 +13,7 @@ function scenario:OnSetup()
 	self.client = C_Networking.CreateSocket()
 
 	self.server:StartListening("127.0.0.1", 1234)
+	self.client:StartConnecting("127.0.0.1", 1234)
 end
 
 function scenario:OnRun()
