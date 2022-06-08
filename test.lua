@@ -18,7 +18,16 @@ import("Tests/Builtins/test-shared-constants.lua")
 import("Tests/Extensions/test-table.lua")
 
 import("Tests/API/test-c-filesystem.lua")
-import("Tests/API/test-c-networking.lua")
+
+local testSuites = {
+	"Tests/API/test-c-networking.lua"
+}
+
+for _, filePath in pairs(testSuites) do
+	local testSuite = import(filePath)
+	-- For CI pipelines and scripts, ensure the return code indicates EXIT_FAILURE if at least one assertion has failed
+	assert(testSuite:Run(), "Assertion failure in test suite " .. filePath)
+end
 
 import("Tests/Examples/automated-testing/run-my-tests.lua")
 import("Tests/Examples/automated-testing/faux-console-usage-example.lua")

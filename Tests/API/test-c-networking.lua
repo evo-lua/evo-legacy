@@ -1,4 +1,9 @@
-assert(type(C_Networking) == "table", "The C_Networking API should be exported")
-assert(type(Socket) == "table", "The Socket primitive should be exported")
+local testSuite = TestSuite:Construct("Networking API")
 
-print("OK\tAPI\t\tC_FileSystem")
+local listOfScenarioFilesToLoad = {
+    "./Networking/tcp-echo.lua"
+}
+
+testSuite:AddScenarios(listOfScenarioFilesToLoad)
+
+return testSuite
