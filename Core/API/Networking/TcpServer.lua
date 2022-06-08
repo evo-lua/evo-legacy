@@ -10,6 +10,10 @@ function TcpServer:Construct()
 	return instance
 end
 
+function TcpServer:StartListening(hostName, port)
+
+end
+
 _G.TcpServer = TcpServer
 
 return TcpServer

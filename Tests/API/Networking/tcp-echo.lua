@@ -11,6 +11,8 @@ scenario:THEN("The server should send the same data back to the client")
 function scenario:OnSetup()
 	self.server = C_Networking.CreateTcpServer()
 	self.client = C_Networking.CreateSocket()
+
+	self.server:StartListening("127.0.0.1", 1234)
 end
 
 function scenario:OnRun()
