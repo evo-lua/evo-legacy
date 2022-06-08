@@ -1,5 +1,5 @@
 @echo OFF
 
-evo Tests/run-all-tests.lua
+evo test.lua
 
 IF %ERRORLEVEL% NEQ 0 EXIT /B 1
