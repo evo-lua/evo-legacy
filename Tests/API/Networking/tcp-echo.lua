@@ -1,12 +1,11 @@
--- Whatever name or description you set here will be displayed in the final report
-local scenario = Scenario:Construct("Testing the framework")
+local scenario = Scenario:Construct("TCP echo server")
 
 -- Whatever name or description you set here will be displayed in the final report
 -- Labelling the individual phases is optional, but highly recommended
 -- You can think of this notation as a shortcut for something like scenario:SetLabel("GIVEN", "Your text")
-scenario:GIVEN("I have established the pre-conditions")
-scenario:WHEN("I run the test code")
-scenario:THEN("The post-conditions hold true")
+scenario:GIVEN("I start a TCP echo server on localhost")
+scenario:WHEN("A TCP client sends some data to the server")
+scenario:THEN("The server should send the same data back to the client")
 
 -- Event handlers can be overridden to implement a simulation of the scenario you're testing
 function scenario:OnSetup()
