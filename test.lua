@@ -20,7 +20,8 @@ import("Tests/Extensions/test-table.lua")
 import("Tests/API/test-c-filesystem.lua")
 
 local testSuites = {
-	"Tests/API/test-c-networking.lua"
+	"Tests/Builtins/test-llhttp.lua",
+	"Tests/API/test-c-networking.lua",
 }
 
 for _, filePath in pairs(testSuites) do
