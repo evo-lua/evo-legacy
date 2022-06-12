@@ -93,7 +93,7 @@ function Scenario:Run(console)
 	local runTimeInMilliseconds = runTime / 10E6
 	self.runTimeInMilliseconds = runTimeInMilliseconds
 
-	self.OnCleanup()
+	self:OnCleanup()
 
 	self:OnReport(console)
 end
