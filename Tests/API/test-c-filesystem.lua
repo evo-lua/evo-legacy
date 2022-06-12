@@ -30,25 +30,25 @@ assert(C_FileSystem.Delete("someFolder") == true, "Delete: Should return true if
 
 
 -- git can't track empty directories, so the tests/CI will fail unless it is created manually
-C_FileSystem.CreateDirectory(path.resolve(path.join(_G.USER_SCRIPT_ROOT, "Fixtures", "someEmptyDirectory")))
+C_FileSystem.CreateDirectory(path.resolve(path.join(_G.USER_SCRIPT_ROOT, "Tests", "Fixtures", "someEmptyDirectory")))
 -- Scenario: Listing the contents of an existing directory
-local emptyDirectoryContents = C_FileSystem.ScanDirectory(path.resolve(path.join(_G.USER_SCRIPT_ROOT, "Fixtures", "someEmptyDirectory")))
+local emptyDirectoryContents = C_FileSystem.ScanDirectory(path.resolve(path.join(_G.USER_SCRIPT_ROOT, "Tests", "Fixtures", "someEmptyDirectory")))
 assert(type(emptyDirectoryContents) == "table", "ScanDirectory: Should return a table when listing the contents of an empty directory")
 assert(table.count(emptyDirectoryContents) == 0, "ScanDirectory: Should return an empty table when listing the contents of an empty directory")
 
-local almostEmptyDirectoryContents = C_FileSystem.ScanDirectory(path.resolve(path.join(_G.USER_SCRIPT_ROOT, "Fixtures", "almostEmptyDirectory")))
+local almostEmptyDirectoryContents = C_FileSystem.ScanDirectory(path.resolve(path.join(_G.USER_SCRIPT_ROOT, "Tests", "Fixtures", "almostEmptyDirectory")))
 assert(type(almostEmptyDirectoryContents) == "table", "ScanDirectory: Should return a table when listing the contents of an almost-empty directory")
 assert(table.count(almostEmptyDirectoryContents) == 2, "ScanDirectory: Should return a table with the right number of elements when listing the contents of non-empty directory")
 
 assert(C_FileSystem.ScanDirectory("nonexistentPath") == nil, "Should return nil when attempting to scan a directory that doesn't exit")
 
 -- Scenario: Reading an existing file from disk, in text/read-only mode
-local fileContents = C_FileSystem.ReadFile(path.resolve(path.join(_G.USER_SCRIPT_ROOT, "Fixtures", "almostEmptyDirectory", "42.txt")))
+local fileContents = C_FileSystem.ReadFile(path.resolve(path.join(_G.USER_SCRIPT_ROOT, "Tests", "Fixtures", "almostEmptyDirectory", "42.txt")))
 assert(fileContents == "Hello world!", "Should be able to read file contents as text")
 
 -- Use fully resolved, absolute paths here to be sure it will work anywhere (performance doesn't matter here)
 local text = "some text"
-local parentFolderPath = path.resolve(path.join(_G.USER_SCRIPT_ROOT, "Fixtures", "newFolderThatHasToBeCreatedRecursively"))
+local parentFolderPath = path.resolve(path.join(_G.USER_SCRIPT_ROOT, "Tests", "Fixtures", "newFolderThatHasToBeCreatedRecursively"))
 local filePath = path.join(parentFolderPath, "newFile.txt")
 assert(C_FileSystem.Exists(filePath) == false, "Should not have a file " .. filePath .. " before the test is run")
 assert(C_FileSystem.WriteFile(filePath, text), "Should be able to write to a new file")
