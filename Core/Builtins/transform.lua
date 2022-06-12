@@ -11,6 +11,7 @@ local COLOR_CODE_BLACK = "1;30m"
 local COLOR_CODE_RED = "0;31m"
 local COLOR_CODE_CYAN = "0;96m"
 local COLOR_CODE_YELLOW = "0;33m"
+local COLOR_CODE_BRIGHT_RED = "0;91m"
 local COLOR_CODE_RED_BACKGROUND_BRIGHT = "0;101m"
 local COLOR_CODE_BLACK_BACKGROUND = "0;40m"
 local COLOR_CODE_GREEN_BACKGROUND = "0;42m"
@@ -83,6 +84,14 @@ function transform.red(text)
 	if not ENABLE_TEXT_TRANSFORMATIONS then return text end
 
 	return COLOR_START_SEQUENCE .. COLOR_CODE_RED .. text .. RESET_SEQUENCE
+end
+
+function transform.brightRed(text)
+	if type(text) ~= "string" then return nil, "Usage: red(text)" end
+
+	if not ENABLE_TEXT_TRANSFORMATIONS then return text end
+
+	return COLOR_START_SEQUENCE .. COLOR_CODE_BRIGHT_RED .. text .. RESET_SEQUENCE
 end
 
 function transform.cyan(text)
