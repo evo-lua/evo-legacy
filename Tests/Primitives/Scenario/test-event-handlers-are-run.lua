@@ -5,20 +5,26 @@ local numTestExecutions = 0
 local numEvaluationExecutions = 0
 local numCleanupExecutions = 0
 
+scenario.someValue = 42
+
 function scenario:OnSetup()
 	numSetupExecutions = numSetupExecutions + 1
+	assertEquals(self.someValue, 42, "Parameter self should be passed to OnSetup")
 end
 
 function scenario:OnRun()
 	numTestExecutions = numTestExecutions + 1
+	assertEquals(self.someValue, 42, "Parameter self should be passed to OnRun")
 end
 
 function scenario:OnEvaluate()
 	numEvaluationExecutions = numEvaluationExecutions + 1
+	assertEquals(self.someValue, 42, "Parameter self should be passed to OnEvaluate")
 end
 
 function scenario:OnCleanup()
 	numCleanupExecutions = numCleanupExecutions + 1
+	assertEquals(self.someValue, 42, "Parameter self should be passed to OnCleanup")
 end
 
 assertEquals(numSetupExecutions, 0, "Should not call the OnSetup handler before the scenario was run")
