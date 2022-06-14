@@ -2,7 +2,8 @@
 local testSuite = TestSuite:Construct("Basic demonstration")
 
 local listOfScenarioFilesToLoad = {
-	"./example-scenario.lua"
+	"./example-scenario.lua",
+	"./async-test-with-coroutines.lua"
 }
 
 testSuite:AddScenarios(listOfScenarioFilesToLoad)
