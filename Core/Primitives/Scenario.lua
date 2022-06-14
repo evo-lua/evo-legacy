@@ -117,13 +117,13 @@ function Scenario:GetOverviewText()
 	displayText = displayText .. INDENT .. transform.cyan("Scenario: ") .. transform.white(self.name) .. LINEBREAK
 	displayText = displayText .. LINEBREAK
 
-	local preconditionsText = (self.descriptions.GIVEN == "") and "(no description)" or self.descriptions.GIVEN
+	local preconditionsText = (self.descriptions.GIVEN == "") and "(no preconditions)" or self.descriptions.GIVEN
 	if self.OnSetup == NOOP_FUNCTION then preconditionsText = "(no preconditions)" end
 
-	local scriptText = (self.descriptions.WHEN == "") and "(no description)" or self.descriptions.WHEN
+	local scriptText = (self.descriptions.WHEN == "") and "(no code to execute)" or self.descriptions.WHEN
 	if self.OnRun == NOOP_FUNCTION then scriptText = "(no code to execute)" end
 
-	local postconditionsText = (self.descriptions.THEN == "") and "(no description)" or self.descriptions.THEN
+	local postconditionsText = (self.descriptions.THEN == "") and "(no postconditions)" or self.descriptions.THEN
 	if self.OnEvaluate == NOOP_FUNCTION then postconditionsText = "(no postconditions)" end
 
 	displayText = displayText .. INDENT .. transform.cyan("GIVEN") .. INDENT .. transform.white(preconditionsText) .. LINEBREAK
