@@ -20,8 +20,10 @@ jobs:
         include:
           - os: macos-latest
             os-suffix: darwin
+            os-install-command: brew install
           - os: ubuntu-latest
             os-suffix: linux
+            os-install-command: sudo apt-get install
 
     steps:
       - name: Check out Git repository
@@ -40,9 +42,15 @@ jobs:
       - name: Make executable
         run: ls && ../evo-luvi . -o evo && chmod +x evo && ls && cp evo evo-${{ matrix.os-suffix }}-amd64 && ls
 
+      - name: Install LuaRocks
+        run: ${{ matrix.os-install-command }} luarocks
+
+      - name: Install busted
+        run: sudo luarocks install busted
+
       # We don't want to deploy a faulty release
       - name: Verify the build
-        run: ./evo test.lua
+        run: ./evo test.lua && ./evo unit-tests.lua
 
       - name: Publish new release
         # Truly "continuous" releases may be overkill here, so better only release tagged versions
