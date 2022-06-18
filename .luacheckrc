@@ -54,6 +54,7 @@ globals = {
 	--- API
 	"C_FileSystem",
 	"C_Testing",
+	"C_Timer",
 
 	-- Shared constants
 	"EVO_VERSION_MAJOR",
