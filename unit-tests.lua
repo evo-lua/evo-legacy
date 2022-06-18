@@ -1,5 +1,6 @@
 local testCases = {
 	"./Tests/Extensions/table.spec.lua",
+	"./Tests/Extensions/uv.spec.lua",
 }
 
 -- Crappy makeshift test runner... for now it will do
