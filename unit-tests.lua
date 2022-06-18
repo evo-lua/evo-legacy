@@ -1,3 +1,7 @@
+local testCases = {
+	"./Tests/Extensions/table.spec.lua",
+}
+
 -- Crappy makeshift test runner... for now it will do
 local numTestsComplete = 0
 local numFailedTests = 0
@@ -49,7 +53,9 @@ local uv = require("uv")
 
 local timeStart = uv.hrtime()
 
-import("./Tests/Extensions/table.spec.lua")
+for _, testFile in ipairs(testCases) do
+	import(testFile)
+end
 
 local timeEnd = uv.hrtime()
 local durationInMilliseconds = (timeEnd - timeStart) / 10E6 -- ns (hrtime) to ms
