@@ -33,13 +33,14 @@ local iconSuccess = transform.green("✓")
 local function it(label, codeUnderTest)
 	indent = indent + 1
 
-	local success = pcall(codeUnderTest)
+	local success, errorMessage = pcall(codeUnderTest)
 	local icon = success and iconSuccess or iconFail
 	indentText(icon .. " " .. label)
 
 	if success then
 		numTestsComplete = numTestsComplete + 1
 	else
+		ERROR(errorMessage)
 		numFailedTests = numFailedTests + 1
 	end
 
