@@ -10,7 +10,6 @@ local string_rep = string.rep
 local print = print
 
 local bold = transform.bold
-local gray = transform.gray
 
 local indent = 0
 local function indentText(text, ...)
@@ -35,7 +34,7 @@ local function it(label, codeUnderTest)
 
 	local success = pcall(codeUnderTest)
 	local icon = success and iconSuccess or iconFail
-	indentText(icon .. " " .. gray(label))
+	indentText(icon .. " " .. label)
 
 	if success then
 		numTestsComplete = numTestsComplete + 1
