@@ -11,6 +11,9 @@ ignore = {
 	"213", -- unused loop argument (readability improvement; _ adds nothing and is less explicit)
 }
 globals = {
+	-- busted (Test runner)
+	"describe",
+	"it",
 
 	-- Builtins
 	--- Luvi
