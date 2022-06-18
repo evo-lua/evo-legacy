@@ -55,6 +55,7 @@ end
 
 function Evo:LoadStandardLibraryExtensions()
 	import("Core/Extensions/table")
+	import("Core/Extensions/uv")
 end
 
 function Evo:ExportHighLevelAPI()
