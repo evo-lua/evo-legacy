@@ -12,7 +12,6 @@ describe("assertEquals", function()
 		local function fauxErrorHandler(message)
 			wasErrorHandlerCalled = true
 			lastErrorMessage = message
-			originalErrorHandler(message) -- Forward transparently for easier debugging of assertion failures in this test
 		end
 
 		_G.ERROR = fauxErrorHandler
