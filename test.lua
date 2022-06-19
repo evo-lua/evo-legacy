@@ -6,7 +6,6 @@ import("Tests/Primitives/test-scenario-primitive.lua")
 import("Tests/Primitives/test-testsuite-primitive.lua")
 
 import("Tests/Builtins/test-aliases.lua")
-import("Tests/Builtins/test-assertions.lua")
 import("Tests/Builtins/test-event.lua")
 import("Tests/Builtins/test-fs.lua")
 import("Tests/Builtins/test-json.lua")
