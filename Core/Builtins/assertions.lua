@@ -32,6 +32,28 @@ function assertTrue(conditionToCheck, description)
 	assertEquals(conditionToCheck, true, description)
 end
 
+function assertFunctionCalls(codeUnderTest, hostTable, targetFunctionName, numExpectedInvocations, description)
+	numExpectedInvocations = numExpectedInvocations or 1
+
+	local backupFunctionToCall = hostTable[targetFunctionName]
+	local numActualInvocations = 0
+
+	local function spy(...)
+		numActualInvocations = numActualInvocations + 1
+		DEBUG("Spy called for function " .. targetFunctionName)
+		backupFunctionToCall(...)
+	end
+
+	-- Must restore before asserting anything or unrelated tests may break
+	hostTable[targetFunctionName] = spy
+	codeUnderTest() -- Should call target function x times
+	hostTable[targetFunctionName] = backupFunctionToCall
+
+	assert(numActualInvocations == numExpectedInvocations, description)
+
+end
+
 _G.assertEquals = assertEquals
 _G.assertFalse = assertFalse
 _G.assertTrue = assertTrue
+_G.assertFunctionCalls = assertFunctionCalls

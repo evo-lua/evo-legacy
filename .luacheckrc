@@ -37,6 +37,7 @@ globals = {
 	"assertEquals",
 	"assertTrue",
 	"assertFalse",
+	"assertFunctionCalls",
 
 	"Scenario",
 	"TestSuite",
