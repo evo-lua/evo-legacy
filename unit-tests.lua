@@ -29,7 +29,7 @@ local function describe(description, codeUnderTest)
 	indent = indent - 1
 end
 
-local iconFail = transform.red("✗")
+local iconFail = transform.brightRed("✗")
 local iconSuccess = transform.green("✓")
 
 local function it(label, codeUnderTest)
@@ -37,6 +37,10 @@ local function it(label, codeUnderTest)
 
 	local success, errorMessage = pcall(codeUnderTest)
 	local icon = success and iconSuccess or iconFail
+
+	if not success then
+		label = transform.brightRed(label)
+	end
 	indentText(icon .. " " .. label)
 
 	if success then
