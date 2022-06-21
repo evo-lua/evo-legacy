@@ -3,6 +3,8 @@ local testCases = {
 	"./Tests/Builtins/assertions/assertFunctionCalls.spec.lua",
 	"./Tests/Extensions/table.spec.lua",
 	"./Tests/Extensions/uv.spec.lua",
+	"./Tests/Extensions/vfs.spec.lua",
+	"./Tests/API/Networking/unit-tests.lua",
 }
 
 -- Crappy makeshift test runner... for now it will do
