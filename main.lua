@@ -51,6 +51,7 @@ function Evo:LoadBuiltins()
 	import("Core/Builtins/log")
 	import("Core/Builtins/serialize")
 	import("Core/Builtins/transform")
+	import("Core/Builtins/typeof")
 end
 
 function Evo:LoadStandardLibraryExtensions()
