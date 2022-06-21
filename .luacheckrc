@@ -33,6 +33,7 @@ globals = {
 	"printf",
 	"serialize",
 	"transform",
+	"typeof",
 
 	"assertEquals",
 	"assertTrue",
