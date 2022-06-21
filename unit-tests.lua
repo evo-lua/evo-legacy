@@ -1,6 +1,7 @@
 local testCases = {
 	"./Tests/Builtins/assertions/assertEquals.spec.lua",
 	"./Tests/Builtins/assertions/assertFunctionCalls.spec.lua",
+	"./Tests/Builtins/typeof.spec.lua",
 	"./Tests/Extensions/table.spec.lua",
 	"./Tests/Extensions/uv.spec.lua",
 }
