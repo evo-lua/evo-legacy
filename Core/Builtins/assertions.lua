@@ -53,7 +53,37 @@ function assertFunctionCalls(codeUnderTest, hostTable, targetFunctionName, numEx
 
 end
 
+function assertThrows(codeUnderTest, expectedErrorMessage, description)
+
+	local numErrors = 0
+	local lastErrorMessage = nil
+	local function errorHandler(errorMessage)
+		numErrors = numErrors + 1
+		lastErrorMessage = errorMessage
+		print("error handler in assertThrows", errorMessage)
+	end
+
+	local success, errorMessage = pcall(codeUnderTest, errorHandler)
+print("assertThrows->success", success)
+print("assertThrows->errorMessage", errorMessage)
+	-- assert(numErrors == 1)
+	-- local globalErrorHandler = _G.ERROR
+	-- local numErrors = 0
+	-- local lastErrorMessage = nil
+	-- _G.ERROR = function(errorMessage)
+	-- 	numErrors = numErrors + 1
+	-- 	lastErrorMessage = errorMessage
+	-- end
+
+	-- _G.ERROR = globalErrorHandler
+		assert(not success, description)
+		assert(errorMessage == expectedErrorMessage, description)
+	-- assertEquals(numErrors, 1, "Should raise an error")
+	-- assert(numErrors == 1 and lastErrorMessage == expectedErrorMessage, description)
+end
+
 _G.assertEquals = assertEquals
 _G.assertFalse = assertFalse
 _G.assertTrue = assertTrue
 _G.assertFunctionCalls = assertFunctionCalls
+_G.assertThrows = assertThrows

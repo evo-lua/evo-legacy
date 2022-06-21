@@ -7,7 +7,14 @@ function log.debug(message, ...) print("[DEBUG]", message, ...) end
 function log.info(message, ...) print("[INFO]", message, ...) end
 function log.notice(message, ...) print("[NOTICE]", message, ...) end
 function log.warning(message, ...) print("[WARNING]", message, ...) end
-function log.error(message, ...) print("[ERROR]", message, ...) end
+function log.error(message, ...)
+	print("[ERROR]", message, ...)
+	print()
+
+	error(transform.brightRed(message), 2)
+	print(debug.traceback())
+	return nil, message
+end
 function log.critical(message, ...) print("[CRITICAL]", message, ...) end
 function log.alert(message, ...) print("[ALERT]", message, ...) end
 function log.emergency(message, ...) print("[EMERGENCY]", message, ...) end
