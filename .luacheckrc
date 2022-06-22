@@ -56,6 +56,7 @@ globals = {
 	"EMERGENCY",
 	--- API
 	"C_FileSystem",
+	"C_Networking",
 	"C_Testing",
 
 	-- Shared constants
