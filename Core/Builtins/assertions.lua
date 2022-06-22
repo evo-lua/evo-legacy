@@ -33,6 +33,9 @@ function assertTrue(conditionToCheck, description)
 end
 
 function assertFunctionCalls(codeUnderTest, hostTable, targetFunctionName, numExpectedInvocations, description)
+
+	description = description or "Should call function " .. targetFunctionName
+
 	numExpectedInvocations = numExpectedInvocations or 1
 
 	local backupFunctionToCall = hostTable[targetFunctionName]
