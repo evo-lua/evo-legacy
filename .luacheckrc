@@ -30,6 +30,7 @@ globals = {
 	"format",
 	"json",
 	"log",
+	"mixin",
 	"printf",
 	"serialize",
 	"transform",
