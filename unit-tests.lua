@@ -68,6 +68,7 @@ end
 
 local timeEnd = uv.hrtime()
 local durationInMilliseconds = (timeEnd - timeStart) / 10E6 -- ns (hrtime) to ms
+durationInMilliseconds = math.floor(durationInMilliseconds + 0.5)
 
 print()
 
