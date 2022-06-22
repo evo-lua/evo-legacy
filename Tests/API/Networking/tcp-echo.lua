@@ -25,12 +25,12 @@ function scenario:OnRun()
 	local currentThread = coroutine.running()
 	local client = self.client
 
-	function client:TCP_CONNECTION_ESTABLISHED()
-		self:Send("Hello server!")
+	function client.TCP_CONNECTION_ESTABLISHED()
+		client:Send("Hello server!")
 		hasClientSentMessageToServer = true
 	end
 
-	function client:TCP_CHUNK_RECEIVED(chunk)
+	function client.TCP_CHUNK_RECEIVED(_, chunk)
 		assertEquals(chunk, "Hello server!", "Should receive the same message that was originally sent")
 		hasClientReceivedEchoMessage = true
 		-- The echo test is over, so we can continue with the report
@@ -38,13 +38,13 @@ function scenario:OnRun()
 	end
 
 	local server = self.server
-	function server:TCP_CHUNK_RECEIVED(client, chunk)
+	function server.TCP_CHUNK_RECEIVED(serverSocket, clientSocket, chunk)
 		assertEquals(chunk, "Hello server!")
 		hasServerReceivedMessage = true
-		self:Send(client, chunk)
+		serverSocket:Send(clientSocket, chunk)
 	end
 
-	function server:TCP_WRITE_SUCCEEDED(client, chunk)
+	function server.TCP_WRITE_SUCCEEDED()
 		hasServerSentResponse = true
 	end
 
