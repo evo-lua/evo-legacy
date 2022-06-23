@@ -62,6 +62,7 @@ end
 
 function Evo:ExportHighLevelAPI()
 	import("Core/API/C_FileSystem")
+	import("Core/API/Networking/C_Networking")
 	import("Core/API/C_Testing")
 end
 
