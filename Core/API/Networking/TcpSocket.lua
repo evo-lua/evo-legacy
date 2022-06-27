@@ -3,9 +3,9 @@ local uv = require("uv")
 local setmetatable = setmetatable
 local type = type
 
-local AsyncHandleMixin = import("../../Primitives/AsyncHandleMixin.lua")
-local AsyncStreamMixin = import("../../Primitives/AsyncStreamMixin.lua")
-local AsyncSocketMixin = import("../../Primitives/AsyncSocketMixin.lua")
+local AsyncHandleMixin = _G.AsyncHandleMixin -- import("../../Primitives/AsyncHandleMixin.lua")
+local AsyncStreamMixin = _G.AsyncStreamMixin -- import("../../Primitives/AsyncStreamMixin.lua")
+local AsyncSocketMixin = _G.AsyncSocketMixin -- import("../../Primitives/AsyncSocketMixin.lua")
 
 local TcpSocket = {
 	__className = "TcpSocket",
@@ -68,5 +68,7 @@ function TcpSocket:OnEvent(eventID, ...)
 
 	eventListener(self, eventID, ...)
 end
+
+_G.TcpSocket = TcpSocket
 
 return TcpSocket

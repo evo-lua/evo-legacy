@@ -2,7 +2,7 @@ local rawget = rawget
 local setmetatable = setmetatable
 local type = type
 
-local TcpSocket = import("./TcpSocket.lua")
+local TcpSocket = _G.TcpSocket -- import("./TcpSocket.lua")
 
 local TcpClient = {}
 
@@ -100,5 +100,7 @@ function TcpClient:TCP_WRITE_FAILED(errorMessage, chunk) DEBUG("[TcpClient] TCP_
 function TcpClient:TCP_CHUNK_RECEIVED(chunk) DEBUG("[TcpClient] TCP_CHUNK_RECEIVED triggered", chunk) end
 function TcpClient:TCP_SESSION_ENDED() DEBUG("[TcpClient] TCP_SESSION_ENDED triggered") end
 function TcpClient:TCP_SOCKET_CLOSED() DEBUG("[TcpClient] TCP_SOCKET_CLOSED triggered") end
+
+_G.TcpClient = TcpClient
 
 return TcpClient

@@ -33,4 +33,6 @@ function AsyncHandleMixin:GetReadOnlyFileDescriptor() return self.handle:fileno(
 
 function AsyncHandleMixin:GetTypeInfo() return self.handle:handle_get_type() end
 
+_G.AsyncHandleMixin = AsyncHandleMixin
+
 return AsyncHandleMixin

@@ -21,4 +21,6 @@ function AsyncSocketMixin:SetWriteQueueSize() return self.handle:write_queue_siz
 
 function AsyncSocketMixin:Reset() return self.handle:close_reset() end
 
+_G.AsyncSocketMixin = AsyncSocketMixin
+
 return AsyncSocketMixin
