@@ -62,6 +62,9 @@ end
 
 function Evo:ExportHighLevelAPI()
 	import("Core/API/C_FileSystem")
+	import("Core/API/Networking/TcpSocket")
+	import("Core/API/Networking/TcpClient")
+	import("Core/API/Networking/TcpServer")
 	import("Core/API/Networking/C_Networking")
 	import("Core/API/C_Testing")
 end
@@ -73,6 +76,9 @@ end
 function Evo:ExportPrimitives()
 	import("Core/Primitives/Scenario.lua")
 	import("Core/Primitives/TestSuite.lua")
+	import("Core/Primitives/AsyncHandleMixin.lua")
+	import("Core/Primitives/AsyncStreamMixin.lua")
+	import("Core/Primitives/AsyncSocketMixin.lua")
 end
 
 function Evo:StartEventLoop()

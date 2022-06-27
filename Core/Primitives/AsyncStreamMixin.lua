@@ -21,4 +21,6 @@ function AsyncStreamMixin:SetBlockingMode(...) return self.handle:stream_set_blo
 
 function AsyncStreamMixin:GetWriteQueueSize() return self.handle:stream_get_write_queue_size() end
 
+_G.AsyncStreamMixin = AsyncStreamMixin
+
 return AsyncStreamMixin

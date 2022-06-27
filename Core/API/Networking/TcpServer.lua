@@ -5,7 +5,7 @@ local setmetatable = setmetatable
 local table_count = table.count
 local type = type
 
-local TcpSocket = import("./TcpSocket.lua")
+local TcpSocket = _G.TcpSocket -- import("./TcpSocket.lua")
 
 local DEFAULT_SERVER_CREATION_OPTIONS = {
 	port = 12345,
@@ -213,5 +213,7 @@ end
 function TcpServer:TCP_CLIENT_READ_ERROR(client, errorMessage)
 	DEBUG("[TcpServer] TCP_CLIENT_READ_ERROR triggered", client, errorMessage)
 end
+
+_G.TcpServer = TcpServer
 
 return TcpServer
