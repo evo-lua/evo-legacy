@@ -41,20 +41,47 @@ function C_Testing.CreateUnitTestRunner(testCases)
 		print(string_rep("  ", indent) .. text, ...)
 	end
 
+	local queuedSetupCode = nil
+	local queuedTeardownCode = nil
+
+	local function before(oneTimeSetupCode)
+		queuedSetupCode = oneTimeSetupCode
+	end
+
+	local function after(oneTimeTeardownCode)
+		queuedTeardownCode = oneTimeTeardownCode
+	end
+
 	local function describe(description, codeUnderTest)
 		indentText(bold(description))
 		indent = indent + 1
 
 		codeUnderTest()
-		numTestsComplete = numTestsComplete + 1
 
+		numTestsComplete = numTestsComplete + 1
 		indent = indent - 1
+
+		if type(queuedTeardownCode) == "function" then
+			-- Tests must have registered some teardown code that we should run
+			TEST("Running one-time teardown code")
+			queuedTeardownCode()
+			queuedTeardownCode = nil
+		end
+
 	end
 
 	local iconFail = transform.brightRed("✗")
 	local iconSuccess = transform.green("✓")
 
 	local function it(label, codeUnderTest)
+
+		if type(queuedSetupCode) == "function" then
+			-- Tests must have registered some setup code that we should run
+			TEST("Running one-time setup code")
+			queuedSetupCode()
+			queuedSetupCode = nil
+		end
+
 		indent = indent + 1
 
 		local success, errorMessage = pcall(codeUnderTest)
@@ -77,6 +104,8 @@ function C_Testing.CreateUnitTestRunner(testCases)
 
 	_G.describe = describe
 	_G.it = it
+	_G.before = before
+	_G.after = after
 
 	local uv = require("uv")
 
