@@ -80,7 +80,14 @@ function assertFunctionCalls(codeUnderTest, hostTable, targetFunctionName, numEx
 
 end
 
+function assertThrows(codeUnderTest, expectedErrorMessage)
+	local success, errorMessage = pcall(codeUnderTest)
+	assertFalse(success)
+	assertEquals(errorMessage, expectedErrorMessage)
+end
+
 _G.assertEquals = assertEquals
 _G.assertFalse = assertFalse
 _G.assertTrue = assertTrue
 _G.assertFunctionCalls = assertFunctionCalls
+_G.assertThrows = assertThrows
