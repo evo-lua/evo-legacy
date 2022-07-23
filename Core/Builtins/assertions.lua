@@ -1,9 +1,33 @@
 local tostring = tostring
 
+local function assertDeepStrictEquals(actual, expected, description)
+	if not (type(actual) == "table" and type(expected) == "table") then
+		return assertEquals(actual, expected, description)
+	end
+
+	for k, v in pairs(actual) do
+		if type(v) == "table" then
+			assertDeepStrictEquals(v, expected[k])
+		else assertEquals(v, expected[k])
+		end
+	end
+
+	for k, v in pairs(expected) do
+		if type(v) == "table" then
+			assertDeepStrictEquals(v, actual[k])
+		else assertEquals(v, actual[k])
+		end
+	end
+end
+
 function assertEquals(actual, expected, description)
 
 	if actual == "" then actual = "<empty string>" end
 	if expected == "" then expected = "<empty string>" end
+
+	if type(actual) == "table" and type(expected) == "table" then
+		return assertDeepStrictEquals(actual, expected, description)
+	end
 
 	if actual ~= expected then
 
